@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="FGC Open Scorebars — Clash Bars Monochrome">
+  <!-- Left Wing (P1) -->
+  <polygon points="34,104 222,194 159,248 222,302 243,420 137,298 159,302 106,256 135,265 75,196 82,190" fill="#ffffff"/>
+  <polygon points="34,104 222,194 180,230 79,181" fill="#ffffff" fill-opacity="0.9"/>
+  <!-- Right Wing (P2) -->
+  <polygon points="478,104 290,194 353,248 290,302 269,420 375,298 353,302 406,256 377,265 437,196 430,190" fill="#ffffff" fill-opacity="0.82"/>
+  <!-- Central Open-Source < ♦ > Clash Core -->
+  <polygon points="236,204 236,225 212,248 236,271 236,292 189,248" fill="#ffffff"/>
+  <polygon points="276,204 276,225 300,248 276,271 276,292 323,248" fill="#ffffff"/>
+  <path d="M 256 144 C 258 197 265 229 276 248 C 265 267 258 299 256 352 C 254 299 247 267 236 248 C 247 229 254 197 256 144 Z" fill="#ffffff"/>
+</svg>

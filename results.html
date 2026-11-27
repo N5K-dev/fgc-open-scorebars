@@ -4,9 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Tournament Results — FGC Open Scorebars (1920x1080)</title>
+<link rel="icon" type="image/svg+xml" href="assets/brand/fgc-open-scorebars-icon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Bebas+Neue&family=Black+Ops+One&family=Chakra+Petch:ital,wght@0,700;1,700&family=Exo+2:ital,wght@0,700;0,800;1,800&family=Montserrat:ital,wght@0,700;0,800;1,800&family=Orbitron:wght@700;900&family=Oswald:wght@600;700&family=Russo+One&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="top8-unified.css" />
 <style>
   :root {
     --res-bg: radial-gradient(circle at 22% 35%, #1d356b 0%, #0b1224 55%, #060912 100%);
@@ -553,7 +555,7 @@
   #res-stage[data-layout="podium-3"] .res-card[data-idx="7"] { display: none !important; }
 
   /* =========================================================================
-     4. PLACEMENT CARDS, CHARACTER RENDERS, AVATARS, FLAGS & 7 CARD STYLES
+     4. PLACEMENT CARDS, CHARACTER RENDERS, AVATARS, FLAGS & VECTOR CARD ENGINE
      ========================================================================= */
   .res-card, .res-champ-spotlight {
     position: relative;
@@ -562,49 +564,62 @@
     justify-content: flex-end;
     overflow: hidden;
     background: var(--res-card-bg);
-    border: 2px solid var(--res-card-border);
+    border: none !important;
     border-radius: 12px;
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
     isolation: isolate;
   }
-  .res-champ-spotlight { display: none; border-width: 3px; border-color: var(--res-gold); }
+  .res-champ-spotlight { display: none; }
 
-  /* Rank Accent Highlights */
-  .res-card[data-rank="1"] { border-color: var(--res-gold); border-width: 3px; }
-  .res-card[data-rank="2"] { border-color: var(--res-silver); }
-  .res-card[data-rank="3"] { border-color: var(--res-bronze); }
-
-  /* 7 Card Geometry Styles */
-  #res-stage[data-card="sharp"] .res-card,
-  #res-stage[data-card="sharp"] .res-champ-spotlight { border-radius: 4px; border-top-width: 4px; }
-  #res-stage[data-card="angled"] .res-card,
-  #res-stage[data-card="angled"] .res-champ-spotlight {
-    border-radius: 4px;
-    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
-  }
-  #res-stage[data-card="chamfer"] .res-card,
-  #res-stage[data-card="chamfer"] .res-champ-spotlight {
-    border-radius: 0;
-    clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px), 0 16px);
-  }
-  #res-stage[data-card="glass"] .res-card,
-  #res-stage[data-card="glass"] .res-champ-spotlight {
-    border-radius: 18px;
+  /* Per-Card Surface Finishes (Shape silhouette & exact continuous borders drawn by res-card-engine.js SVG!) */
+  .res-card[data-card-shape="glass"],
+  .res-champ-spotlight[data-card-shape="glass"] {
     backdrop-filter: blur(18px) saturate(140%);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 18px 36px rgba(0,0,0,0.45);
   }
-  #res-stage[data-card="comic"] .res-card,
-  #res-stage[data-card="comic"] .res-champ-spotlight {
-    border-radius: 6px;
-    border: 4px solid #090a0e !important;
+  .res-card[data-card-shape="comic"],
+  .res-champ-spotlight[data-card-shape="comic"] {
     box-shadow: 8px 8px 0 #090a0e;
   }
-  #res-stage[data-card="minimal"] .res-card,
-  #res-stage[data-card="minimal"] .res-champ-spotlight {
-    border-radius: 6px;
-    border-width: 1.5px;
+  .res-card[data-card-shape="minimal"],
+  .res-champ-spotlight[data-card-shape="minimal"] {
     box-shadow: none;
+  }
+
+  /* Precision Continuous Vector Border & FX Layer (100% immune to clip-path corner chopping!) */
+  .rc-frame-host {
+    position: absolute;
+    inset: 0;
+    z-index: 12;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .rc-frame-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+  }
+  .rc-fx-pulse {
+    animation: rcNeonPulse 2.4s ease-in-out infinite;
+  }
+  .rc-fx-trace {
+    animation: rcTraceOrbit 3.4s linear infinite;
+  }
+  .rc-fx-trace-glow {
+    filter: blur(2.6px);
+  }
+  .rc-fx-shimmer {
+    animation: rcTraceOrbit 4.8s ease-in-out infinite;
+  }
+  @keyframes rcNeonPulse {
+    0%, 100% { opacity: 0.72; }
+    50%      { opacity: 1; }
+  }
+  @keyframes rcTraceOrbit {
+    from { stroke-dashoffset: 100; }
+    to   { stroke-dashoffset: 0; }
   }
 
   /* Card Internal Soft Rank Glow */
@@ -635,13 +650,13 @@
     width: 100%;
     height: 108%;
     object-fit: contain;
-    object-position: center 22%;
+    object-position: center 16%;
     display: none;
     transform:
       translate(calc(var(--char-x, 0px) + var(--p-x, 0px)), calc(var(--char-y, 0px) + var(--p-y, 0px)))
       scale(calc(var(--char-zoom, 1) * var(--p-zoom, 1)))
       scaleX(calc(var(--char-flip, 1) * var(--p-flip, 1)));
-    transform-origin: center center;
+    transform-origin: center 16%;
     filter: drop-shadow(0 12px 24px rgba(0,0,0,0.6));
     will-change: transform;
   }
@@ -695,11 +710,11 @@
     -webkit-backdrop-filter: blur(10px);
     border-top: 2px solid rgba(15, 23, 42, 0.12);
     box-shadow: 0 -8px 22px rgba(15, 23, 42, 0.10);
-    padding: 10px 14px 12px;
+    padding: 10px var(--rc-info-r, 14px) var(--rc-info-b, 12px) var(--rc-info-l, 14px);
   }
   #res-stage[data-light-card="1"] .res-card[data-idx="0"] .res-info,
   #res-stage[data-light-card="1"] .res-champ-spotlight .res-info {
-    padding: 15px 22px 17px;
+    padding: 15px var(--rc-info-r, 22px) var(--rc-info-b, 17px) var(--rc-info-l, 22px);
     border-top: 3px solid var(--res-gold);
   }
   #res-stage[data-light-card="1"] .res-name { text-shadow: none; }
@@ -710,11 +725,11 @@
     box-shadow: none;
   }
 
-  /* Placement Badge (1ST, 2ND, 3RD...) */
+  /* Placement Badge (1ST, 2ND, 3RD...) — Shape-Aware Safe Insets! */
   .res-rank-badge {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: var(--rc-badge-t, 12px);
+    left: var(--rc-badge-l, 12px);
     z-index: 8;
     display: inline-flex;
     align-items: center;
@@ -743,8 +758,8 @@
 
   .res-crown {
     position: absolute;
-    top: 10px;
-    right: 16px;
+    top: var(--rc-crown-t, 10px);
+    right: var(--rc-crown-r, 16px);
     z-index: 9;
     font-size: 46px;
     filter: drop-shadow(0 6px 14px rgba(0,0,0,0.65));
@@ -753,18 +768,18 @@
   #res-stage[data-crown="1"] .res-card[data-rank="1"] .res-crown,
   #res-stage[data-crown="1"] .res-champ-spotlight .res-crown { display: block; }
 
-  /* Card Info Stack */
+  /* Card Info Stack — Automatically padded safely inside every bevel, octagon, slant or notch! */
   .res-info {
     position: relative;
     z-index: 6;
     display: flex;
     align-items: flex-end;
     gap: 12px;
-    padding: 14px 16px 14px;
+    padding: 14px var(--rc-info-r, 16px) var(--rc-info-b, 14px) var(--rc-info-l, 16px);
     min-width: 0;
   }
   .res-card[data-idx="0"] .res-info,
-  .res-champ-spotlight .res-info { padding: 20px 24px 22px; gap: 16px; }
+  .res-champ-spotlight .res-info { padding: 18px var(--rc-info-r, 24px) var(--rc-info-b, 20px) var(--rc-info-l, 24px); gap: 16px; }
 
   .res-av-badge {
     display: none;
@@ -790,6 +805,9 @@
   .res-flag svg { width: 100%; height: 100%; display: block; }
   .res-sponsor { font-size: 20px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--res-accent); white-space: nowrap; }
   .res-sponsor:empty { display: none; }
+  .res-seed-pill { padding: 1px 7px; border-radius: 4px; font-size: 13px; font-weight: 900; letter-spacing: 0.06em; background: rgba(250, 204, 21, 0.18); color: #fde047; border: 1px solid rgba(250, 204, 21, 0.55); white-space: nowrap; flex-shrink: 0; }
+  #res-stage[data-light-card="1"] .res-seed-pill { background: rgba(15, 23, 42, 0.9); color: #fde047; border-color: rgba(15, 23, 42, 0.95); }
+  .res-seed-pill:empty { display: none; }
 
   .res-name {
     font-family: var(--res-font-display);
@@ -842,7 +860,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 20px 0 0;
+    padding: 0 calc(20px + var(--rc-row-pad-l, 0px)) 0 0;
   }
   #res-stage[data-layout="tower-ladder"] .res-card .res-char-layer {
     position: relative;
@@ -861,14 +879,14 @@
   #res-stage[data-layout="tower-ladder"] .res-card .res-rank-badge {
     position: relative;
     top: auto; left: auto;
-    width: 90px;
+    width: calc(90px + var(--rc-row-pad-l, 0px));
     height: 100%;
     border-radius: 0;
     border: none;
     border-right: 2px solid var(--res-card-border);
     justify-content: center;
     font-size: 28px;
-    padding: 0;
+    padding: 0 0 0 var(--rc-row-pad-l, 0px);
     flex-shrink: 0;
     box-shadow: none;
   }
@@ -973,7 +991,7 @@
     <!-- TOP EVENT HEADER -->
     <header class="res-header">
       <div class="res-header-left">
-        <div class="res-logo-wrap" id="res-logo-wrap"><img id="res-logo-img" alt="" /></div>
+        <div class="res-logo-wrap" id="res-logo-wrap"><img id="res-logo-img" alt="" crossorigin="anonymous" /></div>
         <div class="res-titles">
           <div class="res-subtitle" id="res-subtitle">TOURNAMENT FINALS</div>
           <div class="res-title" id="res-title">TOP 8 RESULTS</div>
@@ -987,14 +1005,26 @@
     <!-- DYNAMIC 8-PLACEMENT STAGE + OPTIONAL CHAMPION SPOTLIGHT -->
     <main class="res-body" id="res-body"></main>
 
+    <!-- OPTIONAL TOP 12 EXTRA STRIP (FOUR 9TH-PLACE FINISHERS) -->
+    <section class="res-top12-strip" id="res-top12-strip"></section>
+
     <!-- FOOTER BAR -->
     <footer class="res-footer" id="res-footer"></footer>
+
+    <!-- UNIFIED TOP 8 DOUBLE-ELIMINATION BRACKET VIEW -->
+    <section class="top8-bracket-view" id="top8-bracket-view"></section>
+
+    <!-- UNIFIED TOP 8 MATCHUP VIEW (1v1 SPOTLIGHT + 2x2 BOARD) -->
+    <section class="top8-matchup-view" id="top8-matchup-view"></section>
   </div>
 </div>
 
 <script src="flags.js"></script>
 <script src="results-designs.js"></script>
+<script src="res-card-engine.js"></script>
+<script src="top8-engine.js"></script>
 <script src="custom-fonts.js"></script>
+<script src="audio-engine.js"></script>
 <script>
 (() => {
   const FLAGS_MAP = window.FGC_FLAGS || {};
@@ -1026,10 +1056,9 @@
 
   const qs = new URLSearchParams(location.search);
   const isPreview = qs.has('preview');
+  const isExport = qs.has('export');
+  const forcedUrlMode = (qs.get('mode') || '').toLowerCase();
   const isHttp = location.protocol === 'http:' || location.protocol === 'https:';
-  if (!isHttp) {
-    document.querySelectorAll('img[crossorigin]').forEach(im => im.removeAttribute('crossorigin'));
-  }
   const $ = (id) => document.getElementById(id);
 
   let currentState = null;
@@ -1037,26 +1066,46 @@
   let lastRenderedCardsSig = '';
   let currentScale = 1;
   let selectedIdx = -1;
+  let selectedBracketSlot = '';
 
   if (isPreview) document.body.classList.add('preview-mode');
 
-  // Always keep internal 1920x1080 broadcast resolution; scale cleanly to fit any browser tab (Open Results)
-  // while staying 1:1 native pixel-exact (scale=1, ox=0, oy=0, transparent) inside a 1920x1080 OBS Browser Source!
+  function resolveEffectiveViewMode(st) {
+    const stateMode = st?.results?.viewMode || 'normal';
+    if (forcedUrlMode === 'bracket') return 'bracket';
+    if (forcedUrlMode === 'normal') return 'normal';
+    if (forcedUrlMode === 'matchup-1v1') return 'matchup-1v1';
+    if (forcedUrlMode === 'matchup-2x2') return 'matchup-2x2';
+    if (forcedUrlMode === 'matchup') return stateMode.startsWith('matchup') ? stateMode : 'matchup-2x2';
+    return stateMode;
+  }
+
+  function getCanvasDims(st) {
+    const mode = resolveEffectiveViewMode(st);
+    const aspect = (mode === 'normal' && st?.results?.aspect === '4:5') ? '4:5' : '16:9';
+    return aspect === '4:5' ? { cw: 1080, ch: 1350, aspect: '4:5' } : { cw: 1920, ch: 1080, aspect: '16:9' };
+  }
+
+  // Scale internal 1920x1080 (or 1080x1350 4:5 vertical) cleanly to any browser window / preview iframe
+  // while staying 1:1 native pixel-exact inside matching OBS Browser Source dimensions!
   const rescalePreview = () => {
     const w = window.innerWidth;
     const h = window.innerHeight;
     if (!w || !h) return;
-    const isExact1080 = w === 1920 && h === 1080;
-    if (!isPreview && isExact1080) {
+    const { cw, ch, aspect } = getCanvasDims(currentState);
+    const scaler = $('res-scaler');
+    if (scaler) scaler.dataset.aspect = aspect;
+    const isExact = w === cw && h === ch;
+    if (!isPreview && isExact) {
       currentScale = 1;
-      $('res-scaler').style.transform = 'none';
+      scaler.style.transform = 'none';
       document.body.classList.remove('fitted-letterbox');
       return;
     }
-    currentScale = Math.min(w / 1920, h / 1080);
-    const ox = Math.max(0, (w - 1920 * currentScale) / 2);
-    const oy = Math.max(0, (h - 1080 * currentScale) / 2);
-    $('res-scaler').style.transform = `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px) scale(${currentScale})`;
+    currentScale = Math.min(w / cw, h / ch);
+    const ox = Math.max(0, (w - cw * currentScale) / 2);
+    const oy = Math.max(0, (h - ch * currentScale) / 2);
+    scaler.style.transform = `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px) scale(${currentScale})`;
     const isTransparent = currentState?.results?.bgMode === 'transparent';
     document.body.classList.toggle('fitted-letterbox', !window.obsstudio && !isTransparent);
   };
@@ -1077,24 +1126,9 @@
     if (/^https?:\/\//i.test(u) && isHttp) return `/api/avatar-proxy?url=${encodeURIComponent(u)}`;
     return u;
   }
-  const LOCAL_T8_CODES = {
-    'asuka kazama': 'asu', 'asuka': 'asu', 'robert "bob" richards': 'bob', 'bob': 'bob',
-    'bryan fury': 'bry', 'bryan': 'bry', 'sergei dragunov': 'dra', 'dragunov': 'dra',
-    'devil jin': 'dvj', 'eddy gordo': 'edd', 'eddy': 'edd', 'fahkumram': 'fak',
-    'heihachi mishima': 'hei', 'heihachi': 'hei', 'hwoarang': 'hwo', 'jack-8': 'jac',
-    'jin kazama': 'jin', 'jin': 'jin', 'jun kazama': 'jun', 'jun': 'jun',
-    'kazuya mishima': 'kaz', 'kazuya': 'kaz', 'king ii': 'kin', 'king': 'kin',
-    'marshall law': 'law', 'law': 'law', 'reina': 'rei', 'shaheen': 'sha',
-    'victor chevalier': 'vic', 'victor': 'vic', 'ling xiaoyu': 'xia', 'xiaoyu': 'xia'
-  };
   function buildCharRenderUrl(game, pack, charName) {
-    if (!charName || !String(charName).trim()) return '';
-    const clean = charName.trim();
-    if (!isHttp) {
-      const code = LOCAL_T8_CODES[clean.toLowerCase()];
-      return code ? `data/assets/tekken8/vs_renders/${code}_0.png` : '';
-    }
-    return `/api/assets/render?game=${encodeURIComponent(game || 'tekken8')}&pack=${encodeURIComponent(pack || 'full')}&char=${encodeURIComponent(clean)}`;
+    if (!charName || !String(charName).trim() || !isHttp) return '';
+    return `/api/assets/render?game=${encodeURIComponent(game || 'tekken8')}&pack=${encodeURIComponent(pack || 'full')}&char=${encodeURIComponent(charName.trim())}`;
   }
   function speedToDuration(speed0to100, slowSec, fastSec) {
     const s = Math.max(0, Math.min(100, Number(speed0to100 ?? 38)));
@@ -1134,6 +1168,9 @@
     const flags = resolveFlags(pl, res);
     const flagsHtml = flags.map(f => `<span class="res-flag">${f.svg}</span>`).join('');
     const sponsor = res.showSponsor !== false && pl.sponsor ? escHtml(pl.sponsor) : '';
+    const rawSeed = String(pl.seed ?? '').trim().replace(/^seed\s*/i, '').replace(/^#/, '');
+    const seedNum = Number(rawSeed);
+    const seedLabel = (res.showSeed !== false && Number.isInteger(seedNum) && seedNum >= 1) ? `SEED #${seedNum}` : '';
     const charName = res.showCharName !== false && pl.character ? escHtml(pl.character) : '';
     const handle = res.showHandles !== false && pl.handle ? escHtml(pl.handle) : '';
     const avUrl = resolveMediaSrc(pl.avatar);
@@ -1149,14 +1186,13 @@
       ? `data-idx="0" data-spotlight="1" data-rank="1" style="--stagger-idx:0;--p-zoom:${pz};--p-x:${px};--p-y:${py};--p-flip:${pf}"`
       : `data-idx="${idx}" data-rank="${rank}" style="--stagger-idx:${idx};--p-zoom:${pz};--p-x:${px};--p-y:${py};--p-flip:${pf}"`;
 
-    const corsAttr = isHttp ? ' crossorigin="anonymous"' : '';
     return `
       <article class="${cls}${selCls}" ${dataAttrs}>
         <div class="res-char-layer">
-          ${charUrl ? `<img class="res-char-img" data-char-src="${escHtml(charUrl)}" alt=""${corsAttr} />` : ''}
+          ${charUrl ? `<img class="res-char-img" data-char-src="${escHtml(charUrl)}" alt="" crossorigin="anonymous" />` : ''}
         </div>
         <div class="res-hero-avatar" data-hero-av="${escHtml(avUrl)}">
-          ${avUrl ? `<img src="${escHtml(avUrl)}" alt=""${corsAttr} />` : ''}
+          ${avUrl ? `<img src="${escHtml(avUrl)}" alt="" crossorigin="anonymous" />` : ''}
         </div>
         <div class="res-scrim"></div>
         <div class="res-sheen"></div>
@@ -1165,18 +1201,20 @@
         <div class="res-crown">👑</div>
         <div class="res-info">
           <div class="res-av-badge" data-badge-av="${escHtml(avUrl)}">
-            ${avUrl ? `<img src="${escHtml(avUrl)}" alt=""${corsAttr} />` : ''}
+            ${avUrl ? `<img src="${escHtml(avUrl)}" alt="" crossorigin="anonymous" />` : ''}
           </div>
           <div class="res-info-text">
             <div>
               <div class="res-meta-row">
                 <span class="res-flags">${flagsHtml}</span>
                 <span class="res-sponsor">${sponsor}</span>
+                ${seedLabel ? `<span class="res-seed-pill">${seedLabel}</span>` : ''}
               </div>
               <div class="res-name">${escHtml(pl.name || `PLAYER ${idx + 1}`)}</div>
             </div>
+            ${(idx === 0 && (res.qualifyBadge || '').trim()) ? `<div class="res-qualify-pill active">★ ${escHtml(res.qualifyBadge.trim())}</div>` : ''}
             <div class="res-sub-row">
-              <span class="res-char-name">${charName}</span>
+              <span class="res-char-name">${charName}${Array.isArray(pl.secondaryChars) && pl.secondaryChars.filter(Boolean).length ? `<span class="res-sec-chars">${pl.secondaryChars.filter(Boolean).slice(0, 2).map(sc => `<span class="res-sec-chip">+ ${escHtml(sc)}</span>`).join('')}</span>` : ''}</span>
               <span class="res-handle">${handle}</span>
             </div>
           </div>
@@ -1199,21 +1237,9 @@
         badgeAv?.classList.toggle('active', showBadge);
       };
       if (charImg && charImg.dataset.charSrc) {
-        let triedLocal = false;
-        const markOk = () => { charImg.classList.add('loaded'); syncAv(); };
-        charImg.onload = markOk;
-        charImg.onerror = () => {
-          const chName = (card.querySelector('.res-char-name')?.textContent || '').trim().toLowerCase();
-          const code = LOCAL_T8_CODES[chName];
-          if (!triedLocal && code && !charImg.src.includes(`/${code}_0.png`)) {
-            triedLocal = true;
-            charImg.src = `data/assets/tekken8/vs_renders/${code}_0.png`;
-            return;
-          }
-          charImg.classList.remove('loaded'); syncAv();
-        };
+        charImg.onload = () => { charImg.classList.add('loaded'); syncAv(); };
+        charImg.onerror = () => { charImg.classList.remove('loaded'); syncAv(); };
         charImg.src = charImg.dataset.charSrc;
-        if (charImg.complete && charImg.naturalWidth > 0) markOk();
       }
       syncAv();
     });
@@ -1222,6 +1248,7 @@
   function render(st) {
     if (!st) return;
     currentState = st;
+    window.FGC_AUDIO?.syncState(st);
     const res = st.results || {};
     const stage = $('res-stage');
     const root = document.documentElement;
@@ -1235,7 +1262,13 @@
     const effEntry = (res.entryAnim && res.entryAnim !== 'theme') ? res.entryAnim : (d.entry || 'cascade-slam');
     const effFont = (res.fontDisplay && res.fontDisplay !== 'theme') ? res.fontDisplay : (d.font || 'Russo One');
 
+    const viewMode = resolveEffectiveViewMode(st);
+    const { aspect } = getCanvasDims(st);
+    const showTop12 = Boolean(res.showTop12) && viewMode === 'normal';
     stage.classList.toggle('is-hidden', res.visible === false);
+    stage.dataset.viewMode = viewMode;
+    stage.dataset.aspect = aspect;
+    stage.dataset.top12 = showTop12 ? '1' : '0';
     stage.dataset.layout = effLayout;
     stage.dataset.card = effCard;
     stage.dataset.bgMode = res.bgMode || 'theme';
@@ -1279,6 +1312,56 @@
     root.style.setProperty('--char-y', `${Number(res.charOffsetY ?? 0)}px`);
     root.style.setProperty('--char-flip', res.charFlip ? '-1' : '1');
 
+    // Granular Top 8 Element Layout & Framing Studio variables
+    stage.dataset.infoAlign = res.infoAlign || 'theme';
+    stage.dataset.infoVpos = res.infoVPos || 'theme';
+    stage.dataset.infoScrim = res.infoScrim || 'theme';
+    const infoX = Number(res.infoOffsetX ?? 0);
+    const infoY = Number(res.infoOffsetY ?? 0);
+    stage.dataset.infoMoved = (infoX !== 0 || infoY !== 0) ? '1' : '0';
+    root.style.setProperty('--info-x', `${infoX}px`);
+    root.style.setProperty('--info-y', `${infoY}px`);
+    const nameSc = Number(res.nameScale ?? 100);
+    const metaSc = Number(res.metaScale ?? 100);
+    stage.dataset.nameScaled = nameSc !== 100 ? '1' : '0';
+    stage.dataset.metaScaled = metaSc !== 100 ? '1' : '0';
+    root.style.setProperty('--name-scale', (nameSc / 100).toFixed(2));
+    root.style.setProperty('--meta-scale', (metaSc / 100).toFixed(2));
+
+    const rankPos = res.rankPos || 'theme';
+    const rankX = Number(res.rankOffsetX ?? 0);
+    const rankY = Number(res.rankOffsetY ?? 0);
+    const rankSc = Number(res.rankScale ?? 100);
+    stage.dataset.rankPos = rankPos;
+    stage.dataset.rankCustom = (rankX !== 0 || rankY !== 0 || rankSc !== 100) ? '1' : '0';
+    root.style.setProperty('--rank-x', `${rankX}px`);
+    root.style.setProperty('--rank-y', `${rankY}px`);
+    root.style.setProperty('--rank-scale', (rankSc / 100).toFixed(2));
+
+    stage.dataset.artFit = res.artFit || 'theme';
+    const focusY = Number(res.artFocusY ?? -1);
+    stage.dataset.artFocus = focusY >= 0 ? '1' : '0';
+    if (focusY >= 0) {
+      root.style.setProperty('--art-focus-y', `${focusY}%`);
+      root.style.setProperty('--art-focus-shift', `${-focusY}%`);
+    } else {
+      root.style.removeProperty('--art-focus-y');
+      root.style.removeProperty('--art-focus-shift');
+    }
+    const stripW = Number(res.artStripWidth ?? 0);
+    stage.dataset.artStrip = stripW >= 30 ? '1' : '0';
+    if (stripW >= 30) root.style.setProperty('--art-strip-w', `${stripW}%`);
+    else root.style.removeProperty('--art-strip-w');
+    stage.dataset.artFade = res.artEdgeFade || 'theme';
+
+    const hdrSc = Number(res.headerScale ?? 100);
+    stage.dataset.hdrScaled = hdrSc !== 100 ? '1' : '0';
+    root.style.setProperty('--hdr-scale', (hdrSc / 100).toFixed(2));
+    const cGap = Number(res.cardGap ?? -1);
+    stage.dataset.hasGap = cGap >= 0 ? '1' : '0';
+    if (cGap >= 0) root.style.setProperty('--card-gap', `${cGap}px`);
+    else root.style.removeProperty('--card-gap');
+
     // Header & Logo (inherits VS event logo automatically if results.logoUrl is blank!)
     $('res-title').textContent = res.title || st.tournament || 'TOP 8 RESULTS';
     $('res-subtitle').textContent = res.subtitle || 'TOURNAMENT FINALS';
@@ -1310,10 +1393,13 @@
     const placements = Array.isArray(res.placements) && res.placements.length ? res.placements : [];
     const cardsSig = JSON.stringify({
       g: res.game, p: res.pack, fm: res.flagMode, sf: res.showFlags,
-      am: res.avatarMode, sp: res.showSponsor, sc: res.showCharName, sh: res.showHandles,
-      pl: placements.slice(0, 8).map(x => ({
+      am: res.avatarMode, sp: res.showSponsor, ss: res.showSeed !== false, sc: res.showCharName, sh: res.showHandles,
+      t12: Boolean(res.showTop12), qb: res.qualifyBadge || '',
+      pl: placements.slice(0, 12).map(x => ({
         place: x.place, name: x.name, sponsor: x.sponsor, flag: x.flag,
-        region: x.region, character: x.character, avatar: x.avatar, handle: x.handle
+        region: x.region, seed: x.seed || '', character: x.character,
+        sec: Array.isArray(x.secondaryChars) ? x.secondaryChars : [],
+        avatar: x.avatar, handle: x.handle
       }))
     });
     if (cardsSig !== lastRenderedCardsSig) {
@@ -1323,6 +1409,43 @@
       const spotHtml = placements[0] ? buildCardHtml(placements[0], 0, res, true) : '';
       bodyEl.innerHTML = cardsHtml + spotHtml;
       hydrateCardImages(res);
+
+      // Render optional Top 12 strip (4x 9th-place cards)
+      const t12Host = $('res-top12-strip');
+      if (t12Host) {
+        const extra = placements.slice(8, 12);
+        t12Host.innerHTML = extra.map((pl, j) => {
+          const flags = resolveFlags(pl, res).map(f => `<span class="res-flag" style="width:20px;height:13px;">${f.svg}</span>`).join('');
+          const charUrl = buildCharRenderUrl(res.game || 'tekken8', res.pack || 'full', pl.character);
+          const avUrl = resolveMediaSrc(pl.avatar);
+          const imgSrc = (res.avatarMode === 'avatar-only' ? avUrl : (charUrl || avUrl)) || '';
+          const sd = (res.showSeed !== false && Number(pl.seed) >= 1) ? `<span class="res-seed-pill" style="font-size:10px;padding:0 5px;">#${Number(pl.seed)}</span>` : '';
+          return `
+            <article class="res-t12-card">
+              ${imgSrc ? `<img class="res-t12-img" src="${escHtml(imgSrc)}" alt="" crossorigin="anonymous" />` : ''}
+              <span class="res-t12-rank">9TH</span>
+              <div class="res-t12-info">
+                <div class="res-t12-top">${flags}${pl.sponsor ? `<span>${escHtml(pl.sponsor)}</span>` : ''}${sd}</div>
+                <div class="res-t12-name">${escHtml(pl.name || `PLAYER ${9 + j}`)}</div>
+                <div class="res-t12-char">${escHtml([pl.character, pl.handle].filter(Boolean).join(' · '))}</div>
+              </div>
+            </article>`;
+        }).join('');
+      }
+    }
+
+    // Render Top 8 Bracket OR Top 8 Matchup views via shared top8-engine.js
+    const T8E = window.FGC_TOP8_ENGINE;
+    if (T8E) {
+      if (viewMode === 'bracket') {
+        T8E.renderBracketView($('top8-bracket-view'), st, {
+          FLAGS_MAP, resolveMediaSrc, isPreview, selectedSlot: selectedBracketSlot
+        });
+      } else if (viewMode === 'matchup-1v1' || viewMode === 'matchup-2x2') {
+        T8E.renderMatchupView($('top8-matchup-view'), st, viewMode, {
+          FLAGS_MAP, resolveMediaSrc, buildCharRenderUrl, isHttp
+        });
+      }
     }
 
     // Update per-player image framing CSS variables in-place at 60fps (no image reload!)
@@ -1336,6 +1459,22 @@
       card.classList.toggle('res-selected', isPreview && selectedIdx === i);
     });
     rescalePreview();
+
+    // Render exact continuous SVG vector borders & shape-aware safe insets on every player card!
+    const applyCardFrames = () => {
+      if (!currentState) return;
+      const curRes = currentState.results || {};
+      const curD = DESIGN_MAP[curRes.design] || FALLBACK_DESIGN;
+      const curLay = (curRes.layoutOverride && curRes.layoutOverride !== 'theme') ? curRes.layoutOverride : (curD.layout || 'champ-left');
+      window.FGC_RES_CARDS?.decorateCards(stage, curRes, curD, curLay);
+    };
+    applyCardFrames();
+    requestAnimationFrame(applyCardFrames);
+    if (!stage.dataset.rcObserved && typeof ResizeObserver === 'function') {
+      stage.dataset.rcObserved = '1';
+      const ro = new ResizeObserver(() => applyCardFrames());
+      ro.observe($('res-body'));
+    }
 
     const wasBooting = stage.classList.contains('is-booting');
     if (wasBooting) {
@@ -1363,6 +1502,8 @@
   }
   async function loadSvgAsImg(svg) {
     if (!svg) return null;
+    const imgMatch = String(svg).match(/<img[^>]+src="([^"]+)"/i);
+    if (imgMatch && imgMatch[1]) return loadImg(imgMatch[1]);
     const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const im = await loadImg(url);
@@ -1378,16 +1519,22 @@
     const effLayout = (res.layoutOverride && res.layoutOverride !== 'theme') ? res.layoutOverride : (d.layout || 'champ-left');
     const pickHex = (str, fb) => (String(str || '').match(/#[0-9a-fA-F]{6}/) || [fb])[0];
 
+    const isVertical = (res.aspect === '4:5' && (res.viewMode || 'normal') === 'normal');
+    const W = isVertical ? 1080 : 1920;
+    const H = isVertical ? 1350 : 1080;
+    const padX = isVertical ? 40 : 56;
+    const innerW = W - padX * 2;
+
     const canvas = document.createElement('canvas');
-    canvas.width = 1920; canvas.height = 1080;
+    canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
 
     if (res.bgMode !== 'transparent') {
       const c1 = res.bgMode === 'custom' ? (res.bgColor1 || '#1d356b') : pickHex(d.bg, '#1d356b');
       const c2 = res.bgMode === 'custom' ? (res.bgColor2 || '#060912') : (d.lightBg ? '#e2e8f0' : '#060912');
-      const gr = ctx.createRadialGradient(480, 320, 80, 960, 540, 1280);
+      const gr = ctx.createRadialGradient(W * 0.25, H * 0.28, 80, W * 0.5, H * 0.5, Math.max(W, H) * 0.72);
       gr.addColorStop(0, c1); gr.addColorStop(1, c2);
-      ctx.fillStyle = gr; ctx.fillRect(0, 0, 1920, 1080);
+      ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
     }
 
     const accent = (res.accentColor && res.accentColor.trim()) ? res.accentColor : d.accent;
@@ -1396,63 +1543,80 @@
     const isLightCard = Boolean(d.lightCard);
     // Header
     ctx.fillStyle = isLightCard ? 'rgba(255,255,255,0.96)' : 'rgba(10,14,26,0.92)';
-    ctx.beginPath(); ctx.roundRect(56, 36, 1808, 108, 10); ctx.fill();
-    ctx.fillStyle = accent; ctx.fillRect(56, 36, 8, 108);
+    ctx.beginPath(); ctx.roundRect(padX, 34, innerW, 108, 10); ctx.fill();
+    ctx.fillStyle = accent; ctx.fillRect(padX, 34, 8, 108);
 
     const rawLogo = res.logoUrl || st.vs?.logoUrl || '';
     const logoIm = res.showLogo !== false && rawLogo ? await loadImg(resolveMediaSrc(rawLogo)) : null;
-    let titleX = 88;
+    let titleX = padX + 30;
     if (logoIm) {
-      const sc = Math.min(160 / logoIm.naturalWidth, 76 / logoIm.naturalHeight, 1);
+      const sc = Math.min(140 / logoIm.naturalWidth, 74 / logoIm.naturalHeight, 1);
       const lw = logoIm.naturalWidth * sc, lh = logoIm.naturalHeight * sc;
-      ctx.drawImage(logoIm, 84, 90 - lh / 2, lw, lh);
-      titleX = 104 + lw;
+      ctx.drawImage(logoIm, padX + 24, 88 - lh / 2, lw, lh);
+      titleX = padX + 44 + lw;
     }
     ctx.fillStyle = accent;
     const effFont = (res.fontDisplay && res.fontDisplay !== 'theme') ? res.fontDisplay : (d.font || 'Russo One');
     const cFont = window.FGC_CUSTOM_FONTS?.resolveCanvasFamily(effFont, '"Russo One", "Barlow Condensed", sans-serif') || '"Russo One", "Barlow Condensed", sans-serif';
     if (document.fonts?.ready) { try { await document.fonts.ready; } catch {} }
     ctx.font = '800 22px "Barlow Condensed", sans-serif';
-    ctx.fillText(String(res.subtitle || 'TOURNAMENT FINALS').toUpperCase(), titleX, 74);
+    ctx.fillText(String(res.subtitle || 'TOURNAMENT FINALS').toUpperCase(), titleX, 72);
     ctx.fillStyle = d.text || '#ffffff';
-    ctx.font = `900 50px ${cFont}`;
-    ctx.fillText(String(res.title || st.tournament || 'TOP 8 RESULTS').toUpperCase(), titleX, 126);
+    ctx.font = `900 ${isVertical ? 38 : 50}px ${cFont}`;
+    ctx.fillText(String(res.title || st.tournament || 'TOP 8 RESULTS').toUpperCase(), titleX, 122);
 
-    const placements = (res.placements || []).slice(0, effLayout === 'podium-3' ? 3 : effLayout === 'top4-quad' ? 4 : 8);
+    const showTop12 = Boolean(res.showTop12) && effLayout !== 'podium-3' && effLayout !== 'top4-quad';
+    const maxCount = effLayout === 'podium-3' ? 3 : effLayout === 'top4-quad' ? 4 : (showTop12 ? 12 : 8);
+    const placements = (res.placements || []).slice(0, maxCount);
     const charImgs = await Promise.all(placements.map(pl => loadImg(buildCharRenderUrl(res.game, res.pack, pl.character))));
     const avImgs = await Promise.all(placements.map(pl => loadImg(resolveMediaSrc(pl.avatar))));
 
-    // Compute clean card rects matching active layout
+    // Compute clean card rects matching active layout & aspect ratio
     const rects = [];
-    const topY = 168, totalH = 846, gap = 18;
-    if (effLayout === 'podium-3') {
+    const topY = 164, gap = isVertical ? 14 : 18;
+    const top12H = showTop12 ? (isVertical ? 144 : 118) : 0;
+    const totalH = (H - topY - 46) - (showTop12 ? (top12H + gap) : 0);
+    if (isVertical) {
+      const h1 = Math.round(totalH * 0.36);
+      const h2 = Math.round(totalH * 0.32);
+      const h3 = totalH - h1 - h2 - gap * 2;
+      rects[0] = { x: padX, y: topY, w: innerW, h: h1 };
+      const wMid = (innerW - gap * 2) / 3;
+      for (let i = 1; i <= 3; i++) rects[i] = { x: padX + (i - 1) * (wMid + gap), y: topY + h1 + gap, w: wMid, h: h2 };
+      const wBot = (innerW - gap * 3) / 4;
+      for (let i = 4; i < 8; i++) rects[i] = { x: padX + (i - 4) * (wBot + gap), y: topY + h1 + h2 + gap * 2, w: wBot, h: h3 };
+    } else if (effLayout === 'podium-3') {
       const w = 540;
       rects[0] = { x: 690, y: topY, w: 540, h: totalH };
       rects[1] = { x: 116, y: topY + 64, w, h: totalH - 64 };
       rects[2] = { x: 1264, y: topY + 98, w, h: totalH - 98 };
     } else if (effLayout === 'top4-quad') {
-      const w = (1808 - gap * 3) / 4;
-      for (let i = 0; i < 4; i++) rects[i] = { x: 56 + i * (w + gap), y: topY, w, h: totalH };
+      const w = (innerW - gap * 3) / 4;
+      for (let i = 0; i < 4; i++) rects[i] = { x: padX + i * (w + gap), y: topY, w, h: totalH };
     } else if (effLayout === 'esports-grid') {
-      const w = (1808 - gap * 3) / 4, h = (totalH - gap) / 2;
-      for (let i = 0; i < 8; i++) rects[i] = { x: 56 + (i % 4) * (w + gap), y: topY + Math.floor(i / 4) * (h + gap), w, h };
+      const w = (innerW - gap * 3) / 4, h = (totalH - gap) / 2;
+      for (let i = 0; i < 8; i++) rects[i] = { x: padX + (i % 4) * (w + gap), y: topY + Math.floor(i / 4) * (h + gap), w, h };
     } else if (effLayout === 'podium-top') {
       const h1 = Math.round(totalH * 0.56), h2 = totalH - h1 - gap;
-      const w1 = (1808 - gap * 2) / 3;
-      rects[1] = { x: 56, y: topY + 32, w: w1, h: h1 - 32 };
-      rects[0] = { x: 56 + w1 + gap, y: topY, w: w1, h: h1 };
-      rects[2] = { x: 56 + (w1 + gap) * 2, y: topY + 44, w: w1, h: h1 - 44 };
-      const w2 = (1808 - gap * 4) / 5;
-      for (let i = 3; i < 8; i++) rects[i] = { x: 56 + (i - 3) * (w2 + gap), y: topY + h1 + gap, w: w2, h: h2 };
+      const w1 = (innerW - gap * 2) / 3;
+      rects[1] = { x: padX, y: topY + 32, w: w1, h: h1 - 32 };
+      rects[0] = { x: padX + w1 + gap, y: topY, w: w1, h: h1 };
+      rects[2] = { x: padX + (w1 + gap) * 2, y: topY + 44, w: w1, h: h1 - 44 };
+      const w2 = (innerW - gap * 4) / 5;
+      for (let i = 3; i < 8; i++) rects[i] = { x: padX + (i - 3) * (w2 + gap), y: topY + h1 + gap, w: w2, h: h2 };
     } else {
-      // champ-left (and clean export for tower-ladder)
-      const leftW = 620, rightX = 56 + leftW + gap, rightW = 1808 - leftW - gap;
+      const leftW = 620, rightX = padX + leftW + gap, rightW = innerW - leftW - gap;
       const h1 = Math.round(totalH * 0.52), h2 = totalH - h1 - gap;
-      rects[0] = { x: 56, y: topY, w: leftW, h: totalH };
+      rects[0] = { x: padX, y: topY, w: leftW, h: totalH };
       const wTop = (rightW - gap * 2) / 3;
       for (let i = 1; i <= 3; i++) rects[i] = { x: rightX + (i - 1) * (wTop + gap), y: topY, w: wTop, h: h1 };
       const wBot = (rightW - gap * 3) / 4;
       for (let i = 4; i < 8; i++) rects[i] = { x: rightX + (i - 4) * (wBot + gap), y: topY + h1 + gap, w: wBot, h: h2 };
+    }
+    if (showTop12) {
+      const y12 = topY + totalH + gap;
+      const w12 = (innerW - gap * 3) / 4;
+      for (let i = 8; i < 12; i++) rects[i] = { x: padX + (i - 8) * (w12 + gap), y: y12, w: w12, h: top12H };
     }
 
     for (let i = 0; i < placements.length; i++) {
@@ -1475,14 +1639,15 @@
       const pFlip = pl.charFlip ? -1 : 1;
       const totFlip = gFlip * pFlip;
       if (cim && res.avatarMode !== 'avatar-only') {
-        const s = Math.min(r.w / cim.naturalWidth, (r.h * 1.06) / cim.naturalHeight) * gZoom * pZoom;
-        const dw = cim.naturalWidth * s, dh = cim.naturalHeight * s;
+        const totZoom = gZoom * pZoom;
+        const baseScale = Math.min(r.w / cim.naturalWidth, (r.h * 1.08) / cim.naturalHeight);
+        const bw = cim.naturalWidth * baseScale;
+        const bh = cim.naturalHeight * baseScale;
+        const baseTop = (r.h * 1.08 - bh) * 0.22 - (r.h * 0.04);
         ctx.save();
-        const cx = r.x + r.w / 2 + gX + pX;
-        const cy = r.y + (r.h - dh) * 0.22 + gY + pY;
-        ctx.translate(cx, cy);
-        ctx.scale(totFlip, 1);
-        ctx.drawImage(cim, -dw / 2, 0, dw, dh);
+        ctx.translate(r.x + r.w / 2 + gX + pX, r.y + r.h / 2 + gY + pY);
+        ctx.scale(totZoom * totFlip, totZoom);
+        ctx.drawImage(cim, -bw / 2, baseTop - r.h / 2, bw, bh);
         ctx.restore();
       } else if (avImgs[i]) {
         const aim = avImgs[i];
@@ -1553,6 +1718,18 @@
      INTERACTIVE DIRECT IMAGE FRAMING (DRAG TO MOVE + WHEEL TO ZOOM IN PREVIEW)
      ========================================================================= */
   if (isPreview) {
+    $('top8-bracket-view')?.addEventListener('click', (e) => {
+      const box = e.target.closest('[data-bk-slot]');
+      if (!box) return;
+      selectedBracketSlot = box.dataset.bkSlot;
+      document.querySelectorAll('[data-bk-slot]').forEach(el => el.classList.toggle('is-selected', el.dataset.bkSlot === selectedBracketSlot));
+      window.parent?.postMessage({ type: 'top8-select-slot', slotId: selectedBracketSlot }, '*');
+    });
+    $('top8-matchup-view')?.addEventListener('click', (e) => {
+      const box = e.target.closest('[data-bk-slot]');
+      if (!box) return;
+      window.parent?.postMessage({ type: 'top8-select-slot', slotId: box.dataset.bkSlot }, '*');
+    });
     let dragCtx = null;
     const setSelectedCard = (idx) => {
       selectedIdx = idx;
@@ -1589,8 +1766,8 @@
       const dx = Math.round((e.clientX - dragCtx.startClientX) / sc);
       const dy = Math.round((e.clientY - dragCtx.startClientY) / sc);
       if (Math.abs(dx) > 2 || Math.abs(dy) > 2) dragCtx.moved = true;
-      dragCtx.curX = Math.max(-240, Math.min(240, dragCtx.origX + dx));
-      dragCtx.curY = Math.max(-240, Math.min(240, dragCtx.origY + dy));
+      dragCtx.curX = Math.max(-400, Math.min(400, dragCtx.origX + dx));
+      dragCtx.curY = Math.max(-400, Math.min(400, dragCtx.origY + dy));
       $('res-body').querySelectorAll(`[data-idx="${dragCtx.idx}"]`).forEach(el => {
         el.style.setProperty('--p-x', `${dragCtx.curX}px`);
         el.style.setProperty('--p-y', `${dragCtx.curY}px`);
@@ -1628,7 +1805,7 @@
       const pl = (currentState?.results?.placements || [])[idx] || {};
       const curZoom = Number(pl.charZoom ?? 100);
       const delta = e.deltaY < 0 ? 6 : -6;
-      const nextZoom = Math.max(50, Math.min(240, curZoom + delta));
+      const nextZoom = Math.max(40, Math.min(360, curZoom + delta));
       setSelectedCard(idx);
       $('res-body').querySelectorAll(`[data-idx="${idx}"]`).forEach(el => {
         el.style.setProperty('--p-zoom', (nextZoom / 100).toFixed(2));
@@ -1648,7 +1825,13 @@
   window.addEventListener('message', (ev) => {
     const d = ev.data;
     if (!d) return;
-    if (d.type === 'state-update' && d.state) { rescalePreview(); render(d.state); }
+    if (d.type === 'state-update' && d.state) { currentState = d.state; rescalePreview(); render(d.state); }
+    else if (d.type === 'top8-highlight-slot') {
+      selectedBracketSlot = String(d.slotId || '');
+      document.querySelectorAll('[data-bk-slot]').forEach(el => {
+        el.classList.toggle('is-selected', el.dataset.bkSlot === selectedBracketSlot);
+      });
+    }
     else if (d.type === 'fonts-update' && Array.isArray(d.fonts)) {
       window.FGC_CUSTOM_FONTS?.setFonts(d.fonts);
       if (currentState) render(currentState);
@@ -1678,6 +1861,8 @@
   window.addEventListener('obsSourceVisibleChanged', (e) => { if (e?.detail?.visible) onSceneShow(); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) onSceneShow(); });
 
+  window.FGC_AUDIO?.init({ role: 'results', isPreview: isPreview || isExport });
+
   let bc = null;
   try {
     bc = new BroadcastChannel('fgc_open_scorebar');
@@ -1686,6 +1871,10 @@
       else if (ev.data?.type === 'fonts' && Array.isArray(ev.data.payload)) {
         window.FGC_CUSTOM_FONTS?.setFonts(ev.data.payload);
         if (currentState) render(currentState);
+      } else if (ev.data?.type === 'sfx' && Array.isArray(ev.data.payload)) {
+        window.FGC_AUDIO?.setCustomSfx(ev.data.payload);
+      } else if (ev.data?.type === 'audio' && ev.data.payload) {
+        window.FGC_AUDIO?.handleAudioEvent(ev.data.payload);
       }
     };
   } catch {}
@@ -1694,12 +1883,12 @@
     window.FGC_CUSTOM_FONTS?.fetchAndSync().then(() => { if (currentState) render(currentState); });
     fetch('/api/state', { cache: 'no-store' }).then(r => r.json()).then(st => {
       render(st);
-      if (!isPreview && st?.results?.visible !== false) onSceneShow();
+      if (!isPreview && !isExport && st?.results?.visible !== false) onSceneShow();
     }).catch(() => {
       $('res-stage')?.classList.remove('is-booting');
     });
 
-    if (!isPreview) {
+    if (!isPreview && !isExport) {
       let activeEs = null, reconnectTimer = null, pageUnloading = false;
       const closeSSE = () => {
         pageUnloading = true;
@@ -1712,7 +1901,7 @@
       const connectSSE = () => {
         if (pageUnloading) return;
         if (activeEs) { try { activeEs.close(); } catch {} }
-        const es = new EventSource('/api/events');
+        const es = new EventSource('/api/events?client=results' + (window.obsstudio ? '&obs=1' : ''));
         activeEs = es;
         es.addEventListener('state', (ev) => {
           try {
@@ -1727,6 +1916,20 @@
             window.FGC_CUSTOM_FONTS?.setFonts(list);
             if (currentState) render(currentState);
             if (bc) bc.postMessage({ type: 'fonts', payload: list, fromSse: true });
+          } catch {}
+        });
+        es.addEventListener('sfx', (ev) => {
+          try {
+            const list = JSON.parse(ev.data);
+            window.FGC_AUDIO?.setCustomSfx(list);
+            if (bc) bc.postMessage({ type: 'sfx', payload: list, fromSse: true });
+          } catch {}
+        });
+        es.addEventListener('audio', (ev) => {
+          try {
+            const payload = JSON.parse(ev.data);
+            window.FGC_AUDIO?.handleAudioEvent(payload);
+            if (bc) bc.postMessage({ type: 'audio', payload, fromSse: true });
           } catch {}
         });
         es.onerror = () => {

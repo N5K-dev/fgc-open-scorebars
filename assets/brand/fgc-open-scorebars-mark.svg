@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="FGC Open Scorebars — Clash Bars Mark">
+  <defs>
+    <!-- Player 1 Left Wing (Molten Orange -> Hot Crimson) -->
+    <linearGradient id="p1Main" x1="12%" y1="10%" x2="90%" y2="95%">
+      <stop offset="0%" stop-color="#ff8a1e"/>
+      <stop offset="46%" stop-color="#ff491f"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <linearGradient id="p1FacetTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9f2e"/>
+      <stop offset="58%" stop-color="#ff5b1f"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="p1Fin" x1="15%" y1="0%" x2="88%" y2="100%">
+      <stop offset="0%" stop-color="#ff4d24"/>
+      <stop offset="55%" stop-color="#ec1d4a"/>
+      <stop offset="100%" stop-color="#be123c"/>
+    </linearGradient>
+
+    <!-- Player 2 Right Wing (Electric Cobalt -> Neon Violet) -->
+    <linearGradient id="p2Main" x1="88%" y1="10%" x2="10%" y2="95%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="48%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="p2FacetTop" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="56%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="p2Fin" x1="85%" y1="0%" x2="12%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="55%" stop-color="#3b5bfd"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+
+    <!-- Open-Source Code Brackets & VS Clash Core -->
+    <linearGradient id="bracketGold" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="52%" stop-color="#fef0b2"/>
+      <stop offset="100%" stop-color="#f5c063"/>
+    </linearGradient>
+    <linearGradient id="sparkOuter" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#f5c063"/>
+      <stop offset="28%" stop-color="#fff8dc"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="72%" stop-color="#fff8dc"/>
+      <stop offset="100%" stop-color="#f5c063"/>
+    </linearGradient>
+    <filter id="markShadow" x="-12%" y="-12%" width="124%" height="124%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#020617" flood-opacity="0.55"/>
+    </filter>
+    <filter id="sparkGlow" x="-40%" y="-25%" width="180%" height="150%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g filter="url(#markShadow)">
+    <!-- LEFT WING (P1) -->
+    <polygon points="34,104 222,194 159,248 222,302 243,420 137,298 159,302 106,256 135,265 75,196 82,190" fill="url(#p1Main)"/>
+    <polygon points="34,104 222,194 180,230 79,181" fill="url(#p1FacetTop)"/>
+    <polygon points="106,256 159,248 222,302 243,420 137,298 159,302" fill="url(#p1Fin)"/>
+    <polygon points="34,104 222,194 215,199 41,115" fill="#ffd89c" fill-opacity="0.45"/>
+
+    <!-- RIGHT WING (P2) -->
+    <polygon points="478,104 290,194 353,248 290,302 269,420 375,298 353,302 406,256 377,265 437,196 430,190" fill="url(#p2Main)"/>
+    <polygon points="478,104 290,194 332,230 433,181" fill="url(#p2FacetTop)"/>
+    <polygon points="406,256 353,248 290,302 269,420 375,298 353,302" fill="url(#p2Fin)"/>
+    <polygon points="478,104 290,194 297,199 471,115" fill="#d8b4fe" fill-opacity="0.45"/>
+
+    <!-- CENTRAL < ♦ > CLASH CORE -->
+    <g filter="url(#sparkGlow)">
+      <polygon points="236,204 236,225 212,248 236,271 236,292 189,248" fill="url(#bracketGold)"/>
+      <polygon points="276,204 276,225 300,248 276,271 276,292 323,248" fill="url(#bracketGold)"/>
+      <path d="M 256 144 C 258 197 265 229 276 248 C 265 267 258 299 256 352 C 254 299 247 267 236 248 C 247 229 254 197 256 144 Z" fill="url(#sparkOuter)"/>
+      <polygon points="256,210 267,248 256,286 245,248" fill="#ffffff"/>
+    </g>
+  </g>
+</svg>

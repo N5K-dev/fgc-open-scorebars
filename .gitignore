@@ -1,11 +1,10 @@
 # Local runtime state, player DB, match history, and PRIVATE API tokens (start.gg / Challonge)
 # NEVER commit data/ — server.mjs auto-generates fresh defaults on first launch!
 data/
+Referencias/
 *.tmp
 
-# Local promo/trailer studio files & raw video/audio recordings (never ship in repo)
-trailer.html
-trailer*.html
+# Raw video & audio recordings
 *.mp4
 *.webm
 *.mkv

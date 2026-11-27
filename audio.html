@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FGC Open Scorebars — Dedicated OBS Audio Hub</title>
+<link rel="icon" type="image/svg+xml" href="assets/brand/fgc-open-scorebars-icon.svg" />
+<style>
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background: transparent; overflow: hidden;
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  .hub-monitor {
+    display: none;
+    position: fixed; inset: 16px auto auto 16px;
+    padding: 12px 16px; border-radius: 12px;
+    background: rgba(11, 15, 25, 0.92); color: #f8fafc;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    font-size: 13px; line-height: 1.45; max-width: 420px;
+  }
+  body.show-monitor .hub-monitor { display: block; }
+  .hub-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .hub-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    background: rgba(34, 197, 94, 0.16); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.4);
+  }
+  .hub-pill.warn { background: rgba(245, 158, 11, 0.16); color: #fde68a; border-color: rgba(245, 158, 11, 0.45); }
+  .hub-btn {
+    padding: 5px 11px; border-radius: 7px; border: 1px solid rgba(96, 165, 250, 0.5);
+    background: #1d4ed8; color: #fff; font-weight: 700; font-size: 11.5px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="hub-monitor" id="hub-monitor">
+    <div style="font-weight:800;font-size:14px;">🔊 FGC Open Scorebars — OBS Audio Hub</div>
+    <div style="color:#94a3b8;font-size:11.5px;margin-top:3px;">
+      Transparent single-channel OBS Browser Source for all broadcast SFX.
+      Enable <b>"Control audio via OBS"</b> in OBS Browser Source properties.
+    </div>
+    <div class="hub-row">
+      <span class="hub-pill" id="hub-conn">SSE Connecting…</span>
+      <span class="hub-pill warn" id="hub-ctx">Audio: Idle</span>
+      <button type="button" class="hub-btn" id="hub-unlock">🔊 Unlock &amp; Test</button>
+    </div>
+    <div id="hub-last" style="color:#cbd5e1;font-size:11px;margin-top:8px;">Waiting for live SFX triggers…</div>
+  </div>
+
+  <script src="audio-engine.js"></script>
+  <script>
+  (() => {
+    'use strict';
+    const qs = new URLSearchParams(location.search);
+    const isObs = Boolean(window.obsstudio) || qs.get('obs') === '1';
+    if (!isObs && qs.get('quiet') !== '1') {
+      document.body.classList.add('show-monitor');
+    }
+
+    const connEl = document.getElementById('hub-conn');
+    const ctxEl = document.getElementById('hub-ctx');
+    const lastEl = document.getElementById('hub-last');
+    const unlockBtn = document.getElementById('hub-unlock');
+
+    const audio = window.FGC_AUDIO?.init({ role: 'audio-hub', isPreview: false });
+
+    function refreshUi() {
+      if (!audio) return;
+      const st = audio.getStatus();
+      if (ctxEl) {
+        ctxEl.textContent = st === 'running' ? 'Audio: Ready' : `Audio: ${st}`;
+        ctxEl.className = 'hub-pill' + (st === 'running' ? '' : ' warn');
+      }
+      const lp = audio.getLastPlayed();
+      if (lastEl && lp) {
+        lastEl.textContent = `Last SFX: ${lp.eventType} -> ${lp.sound} (${new Date(lp.ts).toLocaleTimeString()})`;
+      }
+    }
+
+    audio?.onChange(refreshUi);
+    unlockBtn?.addEventListener('click', () => {
+      audio?.previewSound('builtin:score-tick-clean', 85).then(refreshUi);
+    });
+
+    fetch('/api/state', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(st => { audio?.syncState(st); refreshUi(); })
+      .catch(() => {});
+
+    let bc = null;
+    try {
+      bc = new BroadcastChannel('fgc_open_scorebar');
+      bc.onmessage = (ev) => {
+        if (ev.data?.type === 'state' && ev.data.payload) audio?.syncState(ev.data.payload);
+        else if (ev.data?.type === 'sfx' && Array.isArray(ev.data.payload)) audio?.setCustomSfx(ev.data.payload);
+        else if (ev.data?.type === 'audio' && ev.data.payload) audio?.handleAudioEvent(ev.data.payload);
+      };
+    } catch {}
+
+    let activeEs = null, reconnectTimer = null, unloading = false;
+    const closeSSE = () => {
+      unloading = true;
+      clearTimeout(reconnectTimer);
+      if (activeEs) { try { activeEs.close(); } catch {} activeEs = null; }
+    };
+    window.addEventListener('pagehide', closeSSE);
+    window.addEventListener('beforeunload', closeSSE);
+
+    function connectSSE() {
+      if (unloading) return;
+      if (activeEs) { try { activeEs.close(); } catch {} }
+      const es = new EventSource('/api/events?client=audio' + (window.obsstudio ? '&obs=1' : ''));
+      activeEs = es;
+      es.onopen = () => {
+        if (connEl) { connEl.textContent = 'SSE Connected'; connEl.className = 'hub-pill'; }
+      };
+      es.addEventListener('state', (ev) => {
+        try { audio?.syncState(JSON.parse(ev.data)); } catch {}
+      });
+      es.addEventListener('sfx', (ev) => {
+        try { audio?.setCustomSfx(JSON.parse(ev.data)); } catch {}
+      });
+      es.addEventListener('audio', (ev) => {
+        try { audio?.handleAudioEvent(JSON.parse(ev.data)); } catch {}
+      });
+      es.onerror = () => {
+        if (connEl) { connEl.textContent = 'Reconnecting…'; connEl.className = 'hub-pill warn'; }
+        if (activeEs === es) activeEs = null;
+        try { es.close(); } catch {}
+        clearTimeout(reconnectTimer);
+        if (!unloading) reconnectTimer = setTimeout(connectSSE, 1500);
+      };
+    }
+    connectSSE();
+    refreshUi();
+  })();
+  </script>
+</body>
+</html>

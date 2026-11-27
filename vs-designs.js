@@ -7,7 +7,7 @@
   'use strict';
 
   const VS_CATEGORIES = [
-    { id: 'all',     label: 'All (42)' },
+    { id: 'all',     label: 'All (48)' },
     { id: 'arcade',  label: '🕹 Arcade' },
     { id: 'tekken',  label: '🥊 Tekken & Majors' },
     { id: 'esports', label: '📺 Esports Pro' },
@@ -594,6 +594,84 @@
       plateBg: 'rgba(8, 8, 10, 0.96)', plateText: '#ffffff',
       headerBg: '#09090b', headerText: '#ffffff', frameColor: '#000000', frameAccent: '#dc2626',
       swatch: 'linear-gradient(120deg, #52525b 48%, #dc2626 50%, #09090b 52%)'
+    },
+    {
+      id: 'gg-molten-gear', name: '★ Guilty Gear Molten Forge', cat: 'anime', tier: 'EPIC',
+      desc: 'Inspired by GG Xrd Rev 2: ornate iron gear crest spine, torn red vs. blue painterly brush banners, ember sparks, and molten magma VS.',
+      split: 'radial-clash', frame: 'tech-bezel', divider: 'iron-crest', divAnim: 'pulse', divW: 72, divTilt: 0,
+      emblem: 'molten-vs', embAnim: 'pulse', plate: 'brush-top', plateBottom: 88, header: 'skew-tag',
+      pat: 'diagonal', patOp: 18, wmOp: 10, ambient: 'energy-sparks', font: 'Black Ops One', lightBg: false,
+      bgLeft: 'radial-gradient(circle at 32% 48%, #471c12 0%, #1b1312 52%, #09080a 100%)',
+      bgRight: 'radial-gradient(circle at 68% 48%, #102a4a 0%, #111520 52%, #08090d 100%)',
+      p1: '#ef4444', p2: '#2563eb', accent: '#ff7b00', divColor: '#c49a6c',
+      plateBg: 'rgba(12, 10, 12, 0.92)', plateText: '#0b0a0c',
+      headerBg: '#120e0d', headerText: '#fbbf24', frameColor: '#3f3428', frameAccent: '#ff7b00',
+      swatch: 'linear-gradient(115deg, #dc2626 0%, #1c1614 42%, #ff6a00 50%, #111827 58%, #2563eb 100%)'
+    },
+    {
+      id: 'uni-crimson-wedge', name: '★ Under Night Crimson V-Wedge', cat: 'anime', tier: 'EPIC',
+      desc: 'Inspired by UNI II: dramatic crimson inverted V-wedge skyline chasm, top black crest notch, ghostly double-outline VS, and angled white slash plates.',
+      split: 'v-wedge', frame: 'cinematic-bars', divider: 'none', divAnim: 'static', divW: 0, divTilt: 0,
+      emblem: 'ghost-vs', embAnim: 'none', plate: 'diag-slash', plateBottom: 112, header: 'trapezoid',
+      pat: 'none', patOp: 0, wmOp: 6, ambient: 'spotlight-sway', font: 'Montserrat', lightBg: false,
+      bgLeft: 'linear-gradient(155deg, #2d323e 0%, #141820 62%, #080a0f 100%)',
+      bgRight: 'linear-gradient(205deg, #2d323e 0%, #141820 62%, #080a0f 100%)',
+      p1: '#dc2626', p2: '#dc2626', accent: '#dc2626', divColor: '#dc2626',
+      plateBg: 'rgba(10, 11, 16, 0.78)', plateText: '#ffffff',
+      headerBg: '#06070a', headerText: '#ffffff', frameColor: '#06070a', frameAccent: '#dc2626',
+      swatch: 'linear-gradient(135deg, #1f2430 34%, #b91c1c 50%, #1f2430 66%)'
+    },
+    {
+      id: 'uni-midnight-hollow', name: '★ Midnight Hollow V-Wedge', cat: 'anime', tier: 'EPIC',
+      desc: 'Moonlit sapphire-indigo inverted V-wedge cinema with ethereal silver ghost VS emblem and crisp convergent white slash plates.',
+      split: 'v-wedge', frame: 'cinematic-bars', divider: 'none', divAnim: 'static', divW: 0, divTilt: 0,
+      emblem: 'ghost-vs', embAnim: 'float', plate: 'diag-slash', plateBottom: 114, header: 'trapezoid',
+      pat: 'stars', patOp: 12, wmOp: 8, ambient: 'pulse-glow', font: 'Montserrat', lightBg: false,
+      bgLeft: 'linear-gradient(155deg, #1d263b 0%, #0d1221 64%, #060912 100%)',
+      bgRight: 'linear-gradient(205deg, #281b3b 0%, #120c22 64%, #060912 100%)',
+      p1: '#38bdf8', p2: '#a855f7', accent: '#2563eb', divColor: '#38bdf8',
+      plateBg: 'rgba(8, 12, 24, 0.8)', plateText: '#ffffff',
+      headerBg: '#060912', headerText: '#7dd3fc', frameColor: '#060912', frameAccent: '#38bdf8',
+      swatch: 'linear-gradient(135deg, #0d1221 34%, #2563eb 50%, #120c22 66%)'
+    },
+    {
+      id: 'gg-strive-metal', name: '★ Strive Heavy Brush & Steel', cat: 'anime', tier: 'EPIC',
+      desc: 'Blazing scarlet vs. gold-steel top torn brush banners, jagged industrial iron center spine, and scorching molten VS impact.',
+      split: 'diag-left', frame: 'hazard-tape', divider: 'iron-crest', divAnim: 'pulse', divW: 64, divTilt: -6,
+      emblem: 'molten-vs', embAnim: 'pulse', plate: 'brush-top', plateBottom: 88, header: 'skew-tag',
+      pat: 'chevrons', patOp: 16, wmOp: 10, ambient: 'energy-sparks', font: 'Anton', lightBg: false,
+      bgLeft: 'radial-gradient(circle at 30% 45%, #5c0c18 0%, #1a090d 55%, #090406 100%)',
+      bgRight: 'radial-gradient(circle at 70% 45%, #4a3008 0%, #1a1408 55%, #090704 100%)',
+      p1: '#e11d48', p2: '#f59e0b', accent: '#fbbf24', divColor: '#d97706',
+      plateBg: 'rgba(14, 10, 10, 0.92)', plateText: '#090708',
+      headerBg: '#12080a', headerText: '#fde047', frameColor: '#120a08', frameAccent: '#f59e0b',
+      swatch: 'linear-gradient(120deg, #e11d48 0%, #1a090d 45%, #f59e0b 100%)'
+    },
+    {
+      id: 'battle-coliseum-pro', name: '★ Battle Coliseum Studio', cat: 'esports', tier: 'EPIC',
+      desc: 'Inspired by Battle Coliseum: clean sage-slate studio canvas, bold ocean-blue tilted VS shield, and ultra-crisp white broadcast plates.',
+      split: 'vertical', frame: 'minimal-line', divider: 'hairline', divAnim: 'static', divW: 3, divTilt: 0,
+      emblem: 'diamond-shield', embAnim: 'none', plate: 'floating-clean', plateBottom: 136, header: 'floating-pill',
+      pat: 'diagonal', patOp: 8, wmOp: 0, ambient: 'none', font: 'Montserrat', lightBg: true,
+      bgLeft: 'radial-gradient(circle at 38% 42%, #dce8e9 0%, #c1d5d7 68%, #acc5c8 100%)',
+      bgRight: 'radial-gradient(circle at 62% 42%, #dce8e9 0%, #c1d5d7 68%, #acc5c8 100%)',
+      p1: '#0284c7', p2: '#0f766e', accent: '#0284c7', divColor: 'rgba(15,28,36,0.22)',
+      plateBg: 'rgba(255, 255, 255, 0.96)', plateText: '#0f1c24',
+      headerBg: '#0f1c24', headerText: '#ffffff', frameColor: 'rgba(15,28,36,0.24)', frameAccent: '#0284c7',
+      swatch: 'linear-gradient(90deg, #c1d5d7 0%, #0284c7 48%, #ffffff 52%, #0f766e 100%)'
+    },
+    {
+      id: 'evo-mainstage-clash', name: '★ EVO Main Stage Royal', cat: 'tekken', tier: 'EPIC',
+      desc: 'Electric EVO royal cobalt vs. championship crimson arena, acid-yellow perimeter trim, and scrolling chevron broadcast divider.',
+      split: 'vertical', frame: 'double-gold', divider: 'chevron-stream', divAnim: 'scroll-down', divW: 24, divTilt: 0,
+      emblem: 'winged', embAnim: 'pulse', plate: 'arcade-box', plateBottom: 162, header: 'full-ribbon',
+      pat: 'halftone', patOp: 18, wmOp: 12, ambient: 'spotlight-sway', font: 'Chakra Petch', lightBg: false,
+      bgLeft: 'radial-gradient(circle at 38% 42%, #0055ff 0%, #0228a8 56%, #001259 100%)',
+      bgRight: 'radial-gradient(circle at 62% 42%, #dc2626 0%, #7f1d1d 56%, #240606 100%)',
+      p1: '#38bdf8', p2: '#f87171', accent: '#ffe600', divColor: '#ffe600',
+      plateBg: 'rgba(6, 9, 18, 0.96)', plateText: '#ffffff',
+      headerBg: '#022ec2', headerText: '#ffe600', frameColor: '#ffe600', frameAccent: '#ffffff',
+      swatch: 'linear-gradient(90deg, #022ec2 0%, #ffe600 50%, #dc2626 100%)'
     }
   ];
 

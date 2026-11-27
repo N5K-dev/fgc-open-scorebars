@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="FGC Open Scorebars — Clash Bars Icon">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#131826"/>
+      <stop offset="52%" stop-color="#0b0e17"/>
+      <stop offset="100%" stop-color="#070910"/>
+    </linearGradient>
+    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff6a1a" stop-opacity="0.65"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.7"/>
+    </linearGradient>
+    <radialGradient id="coreHalo" cx="50%" cy="49%" r="34%">
+      <stop offset="0%" stop-color="#fff4c4" stop-opacity="0.34"/>
+      <stop offset="48%" stop-color="#ff8a2a" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#0b0e17" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Player 1 Left Wing (Molten Orange -> Hot Crimson) -->
+    <linearGradient id="p1Main" x1="12%" y1="10%" x2="90%" y2="95%">
+      <stop offset="0%" stop-color="#ff8a1e"/>
+      <stop offset="46%" stop-color="#ff491f"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <linearGradient id="p1FacetTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9f2e"/>
+      <stop offset="58%" stop-color="#ff5b1f"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="p1Fin" x1="15%" y1="0%" x2="88%" y2="100%">
+      <stop offset="0%" stop-color="#ff4d24"/>
+      <stop offset="55%" stop-color="#ec1d4a"/>
+      <stop offset="100%" stop-color="#be123c"/>
+    </linearGradient>
+
+    <!-- Player 2 Right Wing (Electric Cobalt -> Neon Violet) -->
+    <linearGradient id="p2Main" x1="88%" y1="10%" x2="10%" y2="95%">
+      <stop offset="0%" stop-color="#9333ea"/>
+      <stop offset="48%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="p2FacetTop" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="56%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="p2Fin" x1="85%" y1="0%" x2="12%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="55%" stop-color="#3b5bfd"/>
+      <stop offset="100%" stop-color="#1e40af"/>
+    </linearGradient>
+
+    <!-- Open-Source Code Brackets & VS Clash Core -->
+    <linearGradient id="bracketGold" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="52%" stop-color="#fef0b2"/>
+      <stop offset="100%" stop-color="#f5c063"/>
+    </linearGradient>
+    <linearGradient id="sparkOuter" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#f5c063"/>
+      <stop offset="28%" stop-color="#fff8dc"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="72%" stop-color="#fff8dc"/>
+      <stop offset="100%" stop-color="#f5c063"/>
+    </linearGradient>
+    <filter id="sparkGlow" x="-40%" y="-25%" width="180%" height="150%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded Obsidian App Badge -->
+  <rect x="8" y="8" width="496" height="496" rx="108" fill="url(#bgGrad)" stroke="url(#rimGrad)" stroke-width="6"/>
+  <circle cx="256" cy="250" r="180" fill="url(#coreHalo)"/>
+
+  <!-- LEFT WING (P1: Molten Orange -> Crimson) -->
+  <g id="wing-p1">
+    <!-- Main Wing Blade -->
+    <polygon points="52,118 224,200 166,249 224,298 244,406 146,294 166,298 118,256 145,264 89,202 96,196" fill="url(#p1Main)"/>
+    <!-- Crisp Top Bevel Facet -->
+    <polygon points="52,118 224,200 185,233 93,188" fill="url(#p1FacetTop)"/>
+    <!-- Crisp Lower Fin Facet -->
+    <polygon points="118,256 166,249 224,298 244,406 146,294 166,298" fill="url(#p1Fin)"/>
+    <!-- Specular Top Edge Highlight -->
+    <polygon points="52,118 224,200 218,205 58,128" fill="#ffd89c" fill-opacity="0.45"/>
+  </g>
+
+  <!-- RIGHT WING (P2: Electric Cobalt -> Neon Violet — Exact Mathematical Mirror) -->
+  <g id="wing-p2">
+    <!-- Main Wing Blade -->
+    <polygon points="460,118 288,200 346,249 288,298 268,406 366,294 346,298 394,256 367,264 423,202 416,196" fill="url(#p2Main)"/>
+    <!-- Crisp Top Bevel Facet -->
+    <polygon points="460,118 288,200 327,233 419,188" fill="url(#p2FacetTop)"/>
+    <!-- Crisp Lower Fin Facet -->
+    <polygon points="394,256 346,249 288,298 268,406 366,294 346,298" fill="url(#p2Fin)"/>
+    <!-- Specular Top Edge Highlight -->
+    <polygon points="460,118 288,200 294,205 454,128" fill="#d8b4fe" fill-opacity="0.45"/>
+  </g>
+
+  <!-- CENTRAL OPEN-SOURCE < ♦ > CLASH CORE -->
+  <g id="clash-core" filter="url(#sparkGlow)">
+    <!-- Left Open-Source Code Bracket < -->
+    <polygon points="237,208 237,227 215,249 237,271 237,290 194,249" fill="url(#bracketGold)"/>
+    <!-- Right Open-Source Code Bracket > -->
+    <polygon points="275,208 275,227 297,249 275,271 275,290 318,249" fill="url(#bracketGold)"/>
+    <!-- Center VS Clash Diamond Spark -->
+    <path d="M 256 154 C 258 202 264 232 274 249 C 264 266 258 296 256 344 C 254 296 248 266 238 249 C 248 232 254 202 256 154 Z" fill="url(#sparkOuter)"/>
+    <polygon points="256,214 266,249 256,284 246,249" fill="#ffffff"/>
+  </g>
+</svg>

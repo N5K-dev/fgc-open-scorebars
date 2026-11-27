@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Brackets &amp; Pools — FGC Open Scorebars (1920x1080)</title>
+<link rel="icon" type="image/svg+xml" href="assets/brand/fgc-open-scorebars-icon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Bebas+Neue&family=Black+Ops+One&family=Chakra+Petch:ital,wght@0,700;1,700&family=Exo+2:ital,wght@0,700;0,800;1,800&family=Montserrat:ital,wght@0,700;0,800;1,800&family=Orbitron:wght@700;900&family=Oswald:wght@600;700&family=Russo+One&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bks-bg: radial-gradient(circle at 22% 18%, #1d3fd1 0%, #091338 48%, #040714 100%);
+    --bks-bg1: #1d3fd1;
+    --bks-bg2: #040714;
+    --bks-frame: #facc15;
+    --bks-accent: #facc15;
+    --bks-accent2: #38bdf8;
+    --bks-text: #ffffff;
+    --bks-muted: #cbd5e1;
+    --bks-head-bg: #090b12;
+    --bks-head-text: #facc15;
+    --bks-cell-bg: #f1f5f9;
+    --bks-cell-text: #0b0f19;
+    --bks-cell-border: rgba(15, 23, 42, 0.25);
+    --bks-iso-bg: #facc15;
+    --bks-iso-text: #090b10;
+    --bks-score-bg: #090b10;
+    --bks-score-text: #ffffff;
+    --bks-win-bg: #dcfce7;
+    --bks-win-accent: #16a34a;
+    --bks-wire: rgba(255, 255, 255, 0.72);
+    --bks-wire-w: 2.5px;
+    --bks-radius: 6px;
+    --bks-ticker-bg: #070912;
+    --bks-ticker-text: #facc15;
+    --bks-font-display: 'Russo One', 'Barlow Condensed', sans-serif;
+    --bks-font-body: 'Barlow Condensed', 'Segoe UI', sans-serif;
+    --bks-font-scale: 1;
+    --pat-op: 0.14;
+    --pat-dur: 28s;
+    --pat-scale: 1;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: transparent;
+    font-family: var(--bks-font-body);
+    color: var(--bks-text);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+  }
+  body.preview-mode,
+  body.fitted-letterbox { background: #070910; }
+
+  #bks-scaler {
+    width: 1920px;
+    height: 1080px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: top left;
+    overflow: hidden;
+  }
+
+  #bks-stage {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 36px 22px;
+    gap: 14px;
+    opacity: 1;
+    transition: opacity 0.28s ease;
+  }
+  #bks-stage.is-hidden { opacity: 0; pointer-events: none; }
+  #bks-stage.is-booting,
+  #bks-stage.is-booting * {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* BACKDROP & SEAMLESS SCROLLING PATTERNS */
+  .bks-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: var(--bks-bg);
+    transition: background 0.28s ease;
+  }
+  #bks-stage[data-bg-mode="custom"] .bks-bg {
+    background: radial-gradient(circle at 24% 25%, var(--bks-bg1) 0%, var(--bks-bg2) 82%) !important;
+  }
+  #bks-stage[data-bg-mode="transparent"] .bks-bg,
+  #bks-stage[data-bg-mode="transparent"] .bks-pat-wrap { display: none !important; }
+
+  .bks-pat-wrap {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .bks-pattern {
+    position: absolute;
+    inset: -320px;
+    opacity: var(--pat-op, 0.14);
+    background-repeat: repeat;
+    --pat-tx: 120px;
+    --pat-ty: 120px;
+    background-size: calc(var(--pat-tx) * var(--pat-scale, 1)) calc(var(--pat-ty) * var(--pat-scale, 1));
+    will-change: transform;
+  }
+  .bks-pattern[data-pat="none"] { display: none; }
+  .bks-pattern[data-light="0"] { filter: invert(1); }
+  .bks-pattern[data-pat="diagonal"] { --pat-tx: 64px; --pat-ty: 64px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M-16,80 L80,-16 M-16,16 L16,-16 M48,80 L80,48' stroke='%23000' stroke-width='16' stroke-opacity='0.28'/%3E%3C/svg%3E"); }
+  .bks-pattern[data-pat="grid"]     { --pat-tx: 70px; --pat-ty: 70px; background-image: linear-gradient(rgba(0,0,0,0.34) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(0,0,0,0.34) 1.5px, transparent 1.5px); }
+  .bks-pattern[data-pat="halftone"] { --pat-tx: 26px; --pat-ty: 26px; background-image: radial-gradient(rgba(0,0,0,0.42) 22%, transparent 26%); }
+  .bks-pattern[data-pat="hex"]      { --pat-tx: 90px; --pat-ty: 78px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='78' viewBox='0 0 90 78'%3E%3Cpolygon points='22,2 68,2 88,39 68,76 22,76 2,39' fill='none' stroke='%23000' stroke-width='2.5' stroke-opacity='0.34'/%3E%3C/svg%3E"); }
+  .bks-pattern[data-pat="chevrons"] { --pat-tx: 80px; --pat-ty: 80px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M8,52 L40,22 L72,52' fill='none' stroke='%23000' stroke-width='5' stroke-opacity='0.32'/%3E%3C/svg%3E"); }
+  .bks-pattern[data-pat="symbols"]  { --pat-tx: 140px; --pat-ty: 140px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%23000' stroke-width='4' stroke-opacity='0.4'%3E%3Cpolygon points='35,18 51,46 19,46'/%3E%3Ccircle cx='105' cy='32' r='14'/%3E%3Crect x='21' y='90' width='26' height='26'/%3E%3Cpath d='M92,90 L118,116 M118,90 L92,116'/%3E%3C/g%3E%3C/svg%3E"); }
+  .bks-pattern[data-pat="rings"]    { --pat-tx: 120px; --pat-ty: 120px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='40' fill='none' stroke='%23000' stroke-width='3' stroke-opacity='0.3'/%3E%3C/svg%3E"); }
+  .bks-pattern[data-pat="stars"]    { --pat-tx: 120px; --pat-ty: 120px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M30,10 L34,26 L50,30 L34,34 L30,50 L26,34 L10,30 L26,26 Z' fill='%23000' fill-opacity='0.35'/%3E%3C/svg%3E"); }
+
+  .bks-pattern[data-pat-dir="diag-dr"] { animation: bkPatDR var(--pat-dur) linear infinite; }
+  .bks-pattern[data-pat-dir="diag-ul"] { animation: bkPatUL var(--pat-dur) linear infinite; }
+  .bks-pattern[data-pat-dir="up"]      { animation: bkPatUp var(--pat-dur) linear infinite; }
+  .bks-pattern[data-pat-dir="down"]    { animation: bkPatDn var(--pat-dur) linear infinite; }
+  .bks-pattern[data-pat-dir="left"]    { animation: bkPatLt var(--pat-dur) linear infinite; }
+  .bks-pattern[data-pat-dir="right"]   { animation: bkPatRt var(--pat-dur) linear infinite; }
+  .bks-pattern.paused { animation-play-state: paused !important; }
+  @keyframes bkPatDR { from { transform: translate3d(0,0,0); } to { transform: translate3d(calc(var(--pat-tx) * var(--pat-scale)), calc(var(--pat-ty) * var(--pat-scale)), 0); } }
+  @keyframes bkPatUL { from { transform: translate3d(0,0,0); } to { transform: translate3d(calc(var(--pat-tx) * var(--pat-scale) * -1), calc(var(--pat-ty) * var(--pat-scale) * -1), 0); } }
+  @keyframes bkPatUp { from { transform: translate3d(0,0,0); } to { transform: translate3d(0, calc(var(--pat-ty) * var(--pat-scale) * -1), 0); } }
+  @keyframes bkPatDn { from { transform: translate3d(0,0,0); } to { transform: translate3d(0, calc(var(--pat-ty) * var(--pat-scale)), 0); } }
+  @keyframes bkPatLt { from { transform: translate3d(0,0,0); } to { transform: translate3d(calc(var(--pat-tx) * var(--pat-scale) * -1), 0, 0); } }
+  @keyframes bkPatRt { from { transform: translate3d(0,0,0); } to { transform: translate3d(calc(var(--pat-tx) * var(--pat-scale)), 0, 0); } }
+
+  /* MAIN PERIMETER FRAME SHELL */
+  .bks-shell {
+    position: relative;
+    z-index: 10;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 28px 18px;
+    border-radius: calc(var(--bks-radius) + 6px);
+    border: 3px solid var(--bks-frame);
+    background: rgba(5, 8, 16, 0.18);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
+    gap: 14px;
+    overflow: hidden;
+  }
+  #bks-stage[data-light="1"] .bks-shell { background: rgba(255, 255, 255, 0.35); }
+  #bks-stage[data-cell-style="glass"] .bks-shell { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+  /* HEADER ARCHITECTURES */
+  .bks-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid color-mix(in srgb, var(--bks-frame) 45%, transparent);
+    flex-shrink: 0;
+  }
+  #bks-stage[data-header-style="cpt-banner"] .bks-header {
+    background: var(--bks-head-bg);
+    padding: 12px 24px;
+    border-radius: var(--bks-radius);
+    border-bottom: 4px solid var(--bks-accent);
+  }
+  #bks-stage[data-header-style="evo-underline"] .bks-header {
+    background: var(--bks-head-bg);
+    padding: 10px 24px;
+    border-bottom: 4px solid var(--bks-accent);
+    border-radius: 2px;
+  }
+  .bks-header-left { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .bks-logo {
+    width: 66px; height: 66px; object-fit: contain;
+    border-radius: 10px; background: rgba(0,0,0,0.3); padding: 4px;
+    border: 1.5px solid var(--bks-frame);
+    display: none; flex-shrink: 0;
+  }
+  .bks-logo.active { display: block; }
+  .bks-title {
+    font-family: var(--bks-font-display);
+    font-size: calc(44px * var(--bks-font-scale));
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bks-text);
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #bks-stage[data-header-style="cpt-banner"] .bks-title { color: var(--bks-head-text); }
+  .bks-sub {
+    font-size: calc(17px * var(--bks-font-scale));
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bks-accent);
+    margin-top: 4px;
+  }
+  .bks-mode-pill {
+    padding: 8px 18px;
+    border-radius: var(--bks-radius);
+    background: var(--bks-accent);
+    color: #090b10;
+    font-family: var(--bks-font-display);
+    font-size: calc(18px * var(--bks-font-scale));
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  #bks-stage[data-light="1"] .bks-mode-pill { color: #ffffff; }
+
+  /* MAIN DYNAMIC CONTENT HOST */
+  .bks-content {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TREE / BRACKET ENGINE */
+  .bks-tree-wrap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .bks-svg-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .bks-svg-lines path {
+    fill: none;
+    stroke: var(--bks-wire);
+    stroke-width: var(--bks-wire-w);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  #bks-stage[data-connector="step-glow"] .bks-svg-lines path {
+    filter: drop-shadow(0 0 6px var(--bks-wire));
+  }
+
+  .bks-zone {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bks-zone.winners { flex: 1.05; }
+  .bks-zone.losers  { flex: 1; padding-top: 12px; border-top: 2px solid color-mix(in srgb, var(--bks-frame) 36%, transparent); }
+  .bks-zone-tag {
+    font-size: calc(13px * var(--bks-font-scale));
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bks-accent);
+  }
+  .bks-zone.losers .bks-zone-tag { color: var(--bks-accent2); }
+  .bks-grid {
+    flex: 1;
+    display: grid;
+    gap: 12px 44px;
+    align-items: center;
+  }
+  .bks-grid.winners-cols { grid-template-columns: repeat(4, 1fr); }
+  .bks-grid.winners-cols.no-reset { grid-template-columns: repeat(3, 1fr); }
+  .bks-grid.losers-cols { grid-template-columns: repeat(4, 1fr); }
+  .bks-grid.losers-cols.no-reset { grid-template-columns: repeat(3, 1fr); }
+
+  .bks-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 14px;
+    height: 100%;
+  }
+  .bks-col.compact-4 { gap: 6px; }
+  .bks-col.compact-4 .bks-row { min-height: 31px; }
+  .bks-col.compact-4 .bks-name-wrap { font-size: calc(16px * var(--bks-font-scale)); }
+  .bks-col.compact-4 .bks-score { font-size: calc(19px * var(--bks-font-scale)); min-width: 38px; }
+  .bks-col-head {
+    padding: 6px 12px;
+    background: var(--bks-head-bg);
+    color: var(--bks-head-text);
+    border-bottom: 3px solid var(--bks-accent);
+    border-radius: var(--bks-radius) var(--bks-radius) 0 0;
+    font-family: var(--bks-font-display);
+    font-size: calc(14px * var(--bks-font-scale));
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  #bks-stage[data-header-style="minimal"] .bks-col-head {
+    background: transparent;
+    color: var(--bks-muted);
+    border-bottom: 1.5px solid color-mix(in srgb, var(--bks-frame) 35%, transparent);
+    padding: 2px 6px 5px;
+  }
+
+  /* MATCH BOXES & CELL GEOMETRIES */
+  .bks-match {
+    position: relative;
+    background: var(--bks-cell-bg);
+    border: 2px solid var(--bks-cell-border);
+    border-radius: var(--bks-radius);
+    overflow: hidden;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  #bks-stage[data-cell-style="chamfer"] .bks-match {
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    border-radius: 0;
+  }
+  #bks-stage[data-cell-style="angled"] .bks-match {
+    transform: skewX(-4deg);
+    border-radius: 3px;
+  }
+  #bks-stage[data-cell-style="angled"] .bks-match > * { transform: skewX(4deg); }
+  #bks-stage[data-cell-style="glass"] .bks-match {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .bks-match.is-active {
+    border-color: var(--bks-accent);
+    box-shadow: 0 0 0 2px var(--bks-accent), 0 0 24px color-mix(in srgb, var(--bks-accent) 42%, transparent);
+  }
+  .bks-match.is-selected {
+    outline: 3px solid #38bdf8;
+    outline-offset: 2px;
+  }
+  .bks-match-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 10px;
+    background: rgba(0, 0, 0, 0.24);
+    font-size: calc(11px * var(--bks-font-scale));
+    font-weight: 900;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--bks-muted);
+  }
+  #bks-stage[data-light-cell="1"] .bks-match-head {
+    background: #1e293b;
+    color: #e2e8f0;
+  }
+  .bks-live-dot { color: #4ade80; font-weight: 900; }
+  .bks-qual-tag { color: var(--bks-accent); font-weight: 900; }
+
+  .bks-row {
+    display: flex;
+    align-items: stretch;
+    min-height: 44px;
+    border-top: 1px solid var(--bks-cell-border);
+    color: var(--bks-cell-text);
+  }
+  .bks-row.is-winner { background: var(--bks-win-bg); }
+  .bks-row.is-loser { opacity: 0.54; }
+  .bks-iso {
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 7px;
+    background: var(--bks-iso-bg);
+    color: var(--bks-iso-text);
+    font-size: calc(13px * var(--bks-font-scale));
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+  .bks-flag-svg { width: 22px; height: 15px; border-radius: 2px; overflow: hidden; display: block; flex-shrink: 0; }
+  .bks-flag-svg svg { width: 100%; height: 100%; display: block; }
+  .bks-seed {
+    min-width: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    font-size: calc(12px * var(--bks-font-scale));
+    font-weight: 900;
+    color: var(--bks-accent);
+    background: rgba(0, 0, 0, 0.16);
+    flex-shrink: 0;
+  }
+  #bks-stage[data-light-cell="1"] .bks-seed { color: #b45309; background: rgba(15, 23, 42, 0.07); }
+  .bks-name-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 12px;
+    font-family: var(--bks-font-display);
+    font-size: calc(20px * var(--bks-font-scale));
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bks-name { overflow: hidden; text-overflow: ellipsis; }
+  .bks-sp { font-family: var(--bks-font-body); font-size: calc(15px * var(--bks-font-scale)); font-weight: 800; opacity: 0.72; flex-shrink: 0; }
+  .bks-score {
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bks-score-bg);
+    color: var(--bks-score-text);
+    font-family: var(--bks-font-display);
+    font-size: calc(24px * var(--bks-font-scale));
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .bks-row.is-winner .bks-score {
+    background: var(--bks-win-accent);
+    color: #051b0e;
+  }
+
+  /* MODE 2: POOLS / GROUPS PROGRESS GRID */
+  .bks-pools-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bks-pools-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .bks-pool-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bks-cell-bg);
+    color: var(--bks-cell-text);
+    border: 2px solid var(--bks-cell-border);
+    border-radius: var(--bks-radius);
+    overflow: hidden;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+    cursor: pointer;
+  }
+  .bks-pool-card.is-selected { outline: 3px solid #38bdf8; outline-offset: 2px; }
+  .bks-pool-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--bks-head-bg);
+    color: var(--bks-head-text);
+    border-bottom: 3px solid var(--bks-accent);
+  }
+  .bks-pool-title-wrap { display: flex; align-items: baseline; gap: 10px; }
+  .bks-pool-code {
+    font-family: var(--bks-font-display);
+    font-size: calc(24px * var(--bks-font-scale));
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .bks-pool-sub { font-size: calc(14px * var(--bks-font-scale)); font-weight: 700; opacity: 0.8; text-transform: uppercase; }
+  .bks-pool-status {
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: calc(12px * var(--bks-font-scale));
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+  }
+  .bks-pool-status.is-live { background: rgba(34,197,94,0.22); color: #4ade80; border: 1px solid rgba(34,197,94,0.55); }
+  .bks-pool-status.is-complete { background: rgba(250,204,21,0.22); color: #fde047; border: 1px solid rgba(250,204,21,0.55); }
+
+  .bks-pool-cols-hdr {
+    display: grid;
+    grid-template-columns: 42px 1fr 74px 106px;
+    align-items: center;
+    padding: 5px 14px;
+    background: rgba(0, 0, 0, 0.18);
+    font-size: calc(11px * var(--bks-font-scale));
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: var(--bks-muted);
+    text-transform: uppercase;
+  }
+  #bks-stage[data-light-cell="1"] .bks-pool-cols-hdr { background: rgba(15, 23, 42, 0.08); color: #475569; }
+  .bks-pool-rows { flex: 1; display: flex; flex-direction: column; }
+  .bks-pool-row {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 42px 1fr 74px 106px;
+    align-items: center;
+    padding: 4px 14px;
+    border-top: 1px solid var(--bks-cell-border);
+    border-left: 5px solid transparent;
+  }
+  .bks-pool-row.is-winners { background: var(--bks-win-bg); border-left-color: var(--bks-win-accent); }
+  .bks-pool-row.is-losers  { border-left-color: var(--bks-accent); }
+  .bks-pool-row.is-out     { opacity: 0.56; }
+  .bks-pr-rank { font-family: var(--bks-font-display); font-size: calc(20px * var(--bks-font-scale)); font-weight: 900; opacity: 0.85; }
+  .bks-pr-player { display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; }
+  .bks-pr-player .bks-iso { min-width: auto; padding: 2px 6px; border-radius: 4px; }
+  .bks-pr-name {
+    font-family: var(--bks-font-display);
+    font-size: calc(20px * var(--bks-font-scale));
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bks-pr-wl {
+    font-family: var(--bks-font-display);
+    font-size: calc(19px * var(--bks-font-scale));
+    font-weight: 900;
+    text-align: center;
+  }
+  .bks-pr-pill {
+    justify-self: end;
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-size: calc(12px * var(--bks-font-scale));
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(100, 116, 139, 0.25);
+    color: var(--bks-cell-text);
+  }
+  .bks-pr-pill.is-winners { background: var(--bks-win-accent); color: #051b0e; }
+  .bks-pr-pill.is-losers  { background: var(--bks-accent); color: #090b10; }
+  .bks-pr-pill.is-alive   { background: var(--bks-accent2); color: #090b10; }
+
+  /* MODE 4: TOP 16 STANDINGS BOARD */
+  .bks-t16-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .bks-standings-col {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .bks-t16-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px 0 0;
+    background: var(--bks-cell-bg);
+    color: var(--bks-cell-text);
+    border: 1.5px solid var(--bks-cell-border);
+    border-left: 6px solid transparent;
+    border-radius: var(--bks-radius);
+    overflow: hidden;
+  }
+  .bks-t16-row.is-winners { background: var(--bks-win-bg); border-left-color: var(--bks-win-accent); }
+  .bks-t16-row.is-losers  { border-left-color: var(--bks-accent); }
+  .bks-t16-row.is-out     { opacity: 0.64; }
+  .bks-t16-rank {
+    width: 48px;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bks-score-bg);
+    color: var(--bks-score-text);
+    font-family: var(--bks-font-display);
+    font-size: calc(22px * var(--bks-font-scale));
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .bks-t16-row .bks-iso { align-self: stretch; }
+  .bks-t16-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+  .bks-t16-name {
+    font-family: var(--bks-font-display);
+    font-size: calc(22px * var(--bks-font-scale));
+    font-weight: 900;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.05;
+  }
+  .bks-t16-char { font-size: calc(13px * var(--bks-font-scale)); font-weight: 800; opacity: 0.72; text-transform: uppercase; }
+
+  /* BROADCAST TICKER FOOTER */
+  .bks-ticker {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 22px;
+    border-radius: var(--bks-radius);
+    background: var(--bks-ticker-bg);
+    border: 2px solid var(--bks-frame);
+    color: var(--bks-ticker-text);
+    font-family: var(--bks-font-display);
+    font-size: calc(16px * var(--bks-font-scale));
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .bks-ticker.hidden-el { display: none !important; }
+  .bks-ticker-pill {
+    padding: 3px 12px;
+    border-radius: 4px;
+    background: var(--bks-accent);
+    color: #090b10;
+    font-size: calc(13px * var(--bks-font-scale));
+    font-weight: 900;
+  }
+  #bks-stage[data-design="bk-evo-2026-royal"] .bks-ticker-pill { background: #05070e; color: #ffe600; }
+
+  /* ENTRY CHOREOGRAPHIES */
+  #bks-stage.playing.anim-columns .bks-col,
+  #bks-stage.playing.anim-columns .bks-pool-card,
+  #bks-stage.playing.anim-columns .bks-t16-row { animation: bkColIn 0.55s calc(var(--col-i, 0) * 90ms) cubic-bezier(0.16, 1, 0.3, 1) both; }
+  @keyframes bkColIn { from { opacity: 0; transform: translateX(-36px); } to { opacity: 1; transform: none; } }
+
+  #bks-stage.playing.anim-cascade .bks-anim-item { animation: bkCascIn 0.52s calc(var(--col-i, 0) * 70ms) cubic-bezier(0.16, 1, 0.3, 1) both; }
+  @keyframes bkCascIn { from { opacity: 0; transform: translateY(34px) scale(0.96); } to { opacity: 1; transform: none; } }
+
+  #bks-stage.playing.anim-zoom-pop .bks-anim-item { animation: bkZoomIn 0.48s calc(var(--col-i, 0) * 60ms) cubic-bezier(0.2, 1.35, 0.35, 1) both; }
+  @keyframes bkZoomIn { from { opacity: 0; transform: scale(0.84); } to { opacity: 1; transform: none; } }
+
+  #bks-stage.playing.anim-wipe-left .bks-shell { animation: bkWipeIn 0.58s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  @keyframes bkWipeIn { from { clip-path: inset(0 100% 0 0); opacity: 0.4; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
+
+  #bks-stage.playing.anim-fade .bks-shell { animation: bkFadeIn 0.5s ease both; }
+  @keyframes bkFadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+<div id="bks-scaler">
+  <div id="bks-stage" class="is-booting" data-design="bk-cpt-combo-breaker" data-bg-mode="theme" data-header-style="cpt-banner" data-cell-style="sharp" data-connector="orthogonal" data-light="0" data-light-cell="1">
+    <div class="bks-bg"></div>
+    <div class="bks-pat-wrap"><div class="bks-pattern" id="bks-pattern" data-pat="diagonal" data-pat-dir="diag-dr" data-light="0"></div></div>
+
+    <div class="bks-shell">
+      <header class="bks-header">
+        <div class="bks-header-left">
+          <img class="bks-logo" id="bks-logo" alt="" crossorigin="anonymous" />
+          <div style="min-width:0;">
+            <div class="bks-title" id="bks-title">TOP 8 BRACKET</div>
+            <div class="bks-sub" id="bks-sub">DOUBLE ELIMINATION FINALS</div>
+          </div>
+        </div>
+        <div class="bks-mode-pill" id="bks-mode-pill">TOP 8 BRACKET</div>
+      </header>
+
+      <main class="bks-content" id="bks-content"></main>
+    </div>
+
+    <footer class="bks-ticker" id="bks-ticker">
+      <span class="bks-ticker-pill" id="bks-ticker-game">FGC</span>
+      <span id="bks-ticker-text">#FGCOPEN · LIVE TOURNAMENT BRACKET</span>
+      <span id="bks-ticker-right">LIVE</span>
+    </footer>
+  </div>
+</div>
+
+<script src="flags.js"></script>
+<script src="top8-engine.js"></script>
+<script src="brackets-designs.js"></script>
+<script src="brackets-engine.js"></script>
+<script src="custom-fonts.js"></script>
+<script src="audio-engine.js"></script>
+<script>
+(() => {
+  const FLAGS_MAP = window.FGC_FLAGS || {};
+  const DESIGN_MAP = window.FGC_BRACKET_DESIGN_MAP || {};
+  const FALLBACK_DESIGN = (window.FGC_BRACKET_DESIGNS && window.FGC_BRACKET_DESIGNS[0]) || {
+    id: 'bk-cpt-combo-breaker', headerStyle: 'cpt-banner', cellStyle: 'sharp', connectorStyle: 'orthogonal',
+    wireWidth: 2.5, cellRadius: 4, pat: 'diagonal', patOp: 14, entry: 'columns',
+    fontDisplay: 'Russo One', fontBody: 'Barlow Condensed', lightBg: false,
+    bg: 'radial-gradient(circle at 22% 18%, #1d3fd1 0%, #091338 48%, #040714 100%)',
+    frameColor: '#facc15', accent: '#facc15', accent2: '#38bdf8', text: '#ffffff', muted: '#cbd5e1',
+    headBg: '#090b12', headText: '#facc15', cellBg: '#f1f5f9', cellText: '#0b0f19',
+    cellBorder: 'rgba(15,23,42,0.25)', isoBg: '#facc15', isoText: '#090b10',
+    scoreBg: '#090b10', scoreText: '#ffffff', winBg: '#dcfce7', winAccent: '#16a34a',
+    wireColor: 'rgba(255,255,255,0.72)', tickerBg: '#070912', tickerText: '#facc15'
+  };
+  const FONT_STACKS = {
+    'Barlow Condensed': `'Barlow Condensed', 'Bahnschrift', sans-serif`,
+    'Chakra Petch':     `'Chakra Petch', 'Bahnschrift', sans-serif`,
+    'Orbitron':         `'Orbitron', 'Chakra Petch', sans-serif`,
+    'Teko':             `'Teko', 'Barlow Condensed', sans-serif`,
+    'Russo One':        `'Russo One', 'Impact', sans-serif`,
+    'Oswald':           `'Oswald', 'Barlow Condensed', sans-serif`,
+    'Bebas Neue':       `'Bebas Neue', 'Impact', sans-serif`,
+    'Anton':            `'Anton', 'Impact', sans-serif`,
+    'Exo 2':            `'Exo 2', 'Segoe UI', sans-serif`,
+    'Black Ops One':    `'Black Ops One', 'Impact', sans-serif`,
+    'Montserrat':       `'Montserrat', 'Segoe UI', sans-serif`
+  };
+  const MODE_BADGES = {
+    'top8-de': 'TOP 8 BRACKET',
+    'pools-groups': 'POOLS / GROUPS',
+    'pool-tree': 'POOL BRACKET',
+    'top16-table': 'TOP 16 STANDINGS'
+  };
+  const ENTRY_CLASSES = ['anim-columns', 'anim-cascade', 'anim-zoom-pop', 'anim-wipe-left', 'anim-fade'];
+
+  const qs = new URLSearchParams(location.search);
+  const isPreview = qs.has('preview');
+  const isExport = qs.has('export');
+  const forcedMode = (qs.get('mode') || '').toLowerCase();
+  const isHttp = location.protocol === 'http:' || location.protocol === 'https:';
+  const $ = (id) => document.getElementById(id);
+
+  let currentState = null;
+  let lastIntroNonce = 0;
+  let selectedSlot = '';
+  let selectedPoolId = '';
+
+  if (isPreview) document.body.classList.add('preview-mode');
+
+  const rescale = () => {
+    const w = window.innerWidth, h = window.innerHeight;
+    if (!w || !h) return;
+    const sc = $('bks-scaler');
+    if (!isPreview && w === 1920 && h === 1080) {
+      sc.style.transform = 'none';
+      document.body.classList.remove('fitted-letterbox');
+      return;
+    }
+    const s = Math.min(w / 1920, h / 1080);
+    const ox = Math.max(0, (w - 1920 * s) / 2);
+    const oy = Math.max(0, (h - 1080 * s) / 2);
+    sc.style.transform = `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px) scale(${s})`;
+    const isTrans = currentState?.brackets?.bgMode === 'transparent';
+    document.body.classList.toggle('fitted-letterbox', !window.obsstudio && !isTrans);
+  };
+  window.addEventListener('resize', rescale);
+  rescale();
+
+  function resolveMediaSrc(raw) {
+    const u = String(raw || '').trim();
+    if (!u) return '';
+    if (u.startsWith('/media/') || u.startsWith('data:')) return u;
+    if (/^https?:\/\//i.test(u) && isHttp) return `/api/avatar-proxy?url=${encodeURIComponent(u)}`;
+    return u;
+  }
+
+  function isLightHex(str) {
+    const m = String(str || '').match(/#([0-9a-fA-F]{6})/);
+    if (!m) return false;
+    const n = parseInt(m[1], 16);
+    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 155;
+  }
+
+  function speedToDuration(speed0to100, slowSec, fastSec) {
+    const s = Math.max(0, Math.min(100, Number(speed0to100 ?? 35)));
+    if (s === 0) return { paused: true, dur: `${slowSec}s` };
+    return { paused: false, dur: `${(slowSec * Math.pow(fastSec / slowSec, s / 100)).toFixed(2)}s` };
+  }
+
+  let entryTimer = null;
+  function triggerEntry(animName) {
+    const stage = $('bks-stage');
+    stage.classList.remove('playing', ...ENTRY_CLASSES);
+    void stage.offsetWidth;
+    const cls = `anim-${animName || 'columns'}`;
+    stage.classList.add('playing', ENTRY_CLASSES.includes(cls) ? cls : 'anim-columns');
+    clearTimeout(entryTimer);
+    entryTimer = setTimeout(() => stage.classList.remove('playing', ...ENTRY_CLASSES), 1800);
+  }
+
+  function render(st) {
+    if (!st) return;
+    currentState = st;
+    window.FGC_AUDIO?.syncState(st);
+    const bk = st.brackets || {};
+    const res = st.results || {};
+    const d = DESIGN_MAP[bk.design] || FALLBACK_DESIGN;
+    const stage = $('bks-stage');
+    const root = document.documentElement;
+
+    const effMode = ['top8-de', 'pools-groups', 'pool-tree', 'top16-table'].includes(forcedMode)
+      ? forcedMode : (bk.mode || 'top8-de');
+    const effHeader = (bk.headerStyle && bk.headerStyle !== 'theme') ? bk.headerStyle : (d.headerStyle || 'cpt-banner');
+    const effCell = (bk.cellStyle && bk.cellStyle !== 'theme') ? bk.cellStyle : (d.cellStyle || 'sharp');
+    const effConn = (bk.connectorStyle && bk.connectorStyle !== 'theme') ? bk.connectorStyle : (d.connectorStyle || 'orthogonal');
+    const effPat = (bk.pattern && bk.pattern !== 'theme') ? bk.pattern : (d.pat || 'diagonal');
+    const effEntry = (bk.entryAnim && bk.entryAnim !== 'theme') ? bk.entryAnim : (d.entry || 'columns');
+    const effFontDisplay = (bk.fontDisplay && bk.fontDisplay !== 'theme') ? bk.fontDisplay : (d.fontDisplay || 'Russo One');
+    const effFontBody = (bk.fontBody && bk.fontBody !== 'theme') ? bk.fontBody : (d.fontBody || 'Barlow Condensed');
+
+    const ccObj = (bk.customColors && typeof bk.customColors === 'object') ? bk.customColors : {};
+    const cc = typeof bk.customColors === 'boolean' ? bk.customColors : Boolean(ccObj.enabled);
+    const getC = (k, fb) => (cc ? (ccObj[k] || bk[k] || fb) : fb);
+
+    const cellBgVal = getC('cellBg', d.cellBg);
+    stage.classList.toggle('is-hidden', bk.visible === false);
+    stage.dataset.design = d.id;
+    stage.dataset.mode = effMode;
+    stage.dataset.bgMode = bk.bgMode || 'theme';
+    stage.dataset.headerStyle = effHeader;
+    stage.dataset.cellStyle = effCell;
+    stage.dataset.connector = effConn;
+    stage.dataset.light = d.lightBg ? '1' : '0';
+    stage.dataset.lightCell = isLightHex(cellBgVal) ? '1' : '0';
+
+    root.style.setProperty('--bks-bg', d.bg);
+    root.style.setProperty('--bks-bg1', bk.bgColor1 || '#1d3fd1');
+    root.style.setProperty('--bks-bg2', bk.bgColor2 || '#040714');
+    root.style.setProperty('--bks-frame', getC('frameColor', d.frameColor));
+    root.style.setProperty('--bks-accent', getC('accentColor', d.accent));
+    root.style.setProperty('--bks-accent2', getC('accentColor2', d.accent2));
+    root.style.setProperty('--bks-text', getC('textColor', d.text));
+    root.style.setProperty('--bks-muted', d.muted);
+    root.style.setProperty('--bks-head-bg', getC('headBg', d.headBg));
+    root.style.setProperty('--bks-head-text', getC('headText', d.headText));
+    root.style.setProperty('--bks-cell-bg', cellBgVal);
+    root.style.setProperty('--bks-cell-text', getC('cellText', d.cellText));
+    root.style.setProperty('--bks-cell-border', d.cellBorder);
+    root.style.setProperty('--bks-iso-bg', getC('isoBg', d.isoBg));
+    root.style.setProperty('--bks-iso-text', getC('isoText', d.isoText));
+    root.style.setProperty('--bks-score-bg', getC('scoreBg', d.scoreBg));
+    root.style.setProperty('--bks-score-text', getC('scoreText', d.scoreText));
+    root.style.setProperty('--bks-win-bg', d.winBg);
+    root.style.setProperty('--bks-win-accent', getC('winAccent', d.winAccent));
+    root.style.setProperty('--bks-wire', getC('wireColor', d.wireColor));
+    root.style.setProperty('--bks-wire-w', `${Number(bk.connectorThickness ?? bk.wireWidth ?? d.wireWidth ?? 2.5)}px`);
+    const effRad = (typeof bk.cellRadius === 'number' && bk.cellRadius >= 0) ? bk.cellRadius : (d.cellRadius ?? 6);
+    root.style.setProperty('--bks-radius', `${effRad}px`);
+    root.style.setProperty('--bks-ticker-bg', d.tickerBg);
+    root.style.setProperty('--bks-ticker-text', d.tickerText);
+    root.style.setProperty('--bks-font-scale', (Number(bk.fontScale ?? 100) / 100).toFixed(2));
+
+    const dispStack = window.FGC_CUSTOM_FONTS?.resolveFontStack(effFontDisplay, FONT_STACKS) || FONT_STACKS[effFontDisplay] || FONT_STACKS['Russo One'];
+    const bodyStack = window.FGC_CUSTOM_FONTS?.resolveFontStack(effFontBody, FONT_STACKS) || FONT_STACKS[effFontBody] || FONT_STACKS['Barlow Condensed'];
+    root.style.setProperty('--bks-font-display', dispStack);
+    root.style.setProperty('--bks-font-body', bodyStack);
+
+    // Pattern
+    const patEl = $('bks-pattern');
+    patEl.dataset.pat = effPat;
+    patEl.dataset.patDir = bk.patternDir || 'diag-dr';
+    patEl.dataset.light = d.lightBg ? '1' : '0';
+    const pt = speedToDuration(bk.patternSpeed ?? 35, 60, 2.4);
+    patEl.classList.toggle('paused', pt.paused);
+    root.style.setProperty('--pat-dur', pt.dur);
+    const patOp = (typeof bk.patternOpacity === 'number' && bk.patternOpacity >= 0) ? bk.patternOpacity : (d.patOp ?? 14);
+    root.style.setProperty('--pat-op', (patOp / 100).toFixed(2));
+    root.style.setProperty('--pat-scale', (Number(bk.patternScale ?? 100) / 100).toFixed(2));
+
+    // Header & Logo
+    $('bks-title').textContent = bk.title || res.title || st.tournament || 'TOURNAMENT BRACKET';
+    $('bks-sub').textContent = bk.subtitle || res.subtitle || 'DOUBLE ELIMINATION FINALS';
+    $('bks-mode-pill').textContent = bk.badgeText || MODE_BADGES[effMode] || 'BRACKET';
+
+    const rawLogo = bk.logoUrl || res.logoUrl || st.vs?.logoUrl || '';
+    const logoUrl = bk.showLogo !== false && rawLogo ? resolveMediaSrc(rawLogo) : '';
+    const logoEl = $('bks-logo');
+    if (logoUrl) {
+      if (logoEl.getAttribute('src') !== logoUrl) logoEl.src = logoUrl;
+      logoEl.classList.add('active');
+    } else {
+      logoEl.classList.remove('active');
+    }
+
+    // Ticker footer
+    const showTick = bk.showTicker !== false;
+    $('bks-ticker').classList.toggle('hidden-el', !showTick);
+    $('bks-ticker-game').textContent = (res.game || st.vs?.game || 'FGC').toUpperCase();
+    $('bks-ticker-text').textContent = (bk.tickerText || st.top8?.bracketTickerText || '').trim() || `${$('bks-title').textContent} · LIVE BROADCAST`;
+    $('bks-ticker-right').textContent = res.entrantsCount ? `${res.entrantsCount} ENTRANTS` : (st.format || 'FT3');
+
+    // Render active mode
+    window.FGC_BRACKETS_ENGINE?.renderBracketsStage($('bks-content'), st, {
+      forcedMode: effMode,
+      connectorStyle: effConn,
+      FLAGS_MAP,
+      isPreview,
+      selectedSlot,
+      selectedPoolId
+    });
+    rescale();
+
+    const wasBooting = stage.classList.contains('is-booting');
+    if (wasBooting) {
+      void stage.offsetWidth;
+      stage.classList.remove('is-booting');
+      lastIntroNonce = bk.introNonce || 0;
+    } else if (bk.introNonce && bk.introNonce !== lastIntroNonce) {
+      lastIntroNonce = bk.introNonce;
+      triggerEntry(effEntry);
+    }
+  }
+
+  // Click-to-edit bracket match or pool card inside panel preview!
+  if (isPreview) {
+    $('bks-content').addEventListener('click', (e) => {
+      const m = e.target.closest('[data-bk-slot]');
+      if (m) {
+        selectedSlot = m.dataset.bkSlot;
+        document.querySelectorAll('[data-bk-slot]').forEach(el => el.classList.toggle('is-selected', el.dataset.bkSlot === selectedSlot));
+        window.parent?.postMessage({ type: 'brackets-select-slot', slotId: selectedSlot, mode: currentState?.brackets?.mode || 'top8-de' }, '*');
+        return;
+      }
+      const pool = e.target.closest('[data-pool-id]');
+      if (pool) {
+        selectedPoolId = pool.dataset.poolId;
+        document.querySelectorAll('[data-pool-id]').forEach(el => el.classList.toggle('is-selected', el.dataset.poolId === selectedPoolId));
+        window.parent?.postMessage({ type: 'brackets-select-pool', poolId: selectedPoolId }, '*');
+      }
+    });
+  }
+
+  // Sync engine: postMessage (preview) + SSE + BroadcastChannel
+  window.addEventListener('message', (ev) => {
+    const d = ev.data;
+    if (!d) return;
+    if (d.type === 'state-update' && d.state) render(d.state);
+    else if (d.type === 'fonts-update' && Array.isArray(d.fonts)) {
+      window.FGC_CUSTOM_FONTS?.setFonts(d.fonts);
+      if (currentState) render(currentState);
+    } else if (d.type === 'test-brackets-entry') {
+      const bk = currentState?.brackets || {};
+      const des = DESIGN_MAP[bk.design] || FALLBACK_DESIGN;
+      triggerEntry((bk.entryAnim && bk.entryAnim !== 'theme') ? bk.entryAnim : des.entry);
+    } else if (d.type === 'brackets-highlight-slot') {
+      selectedSlot = String(d.slotId || '');
+      document.querySelectorAll('[data-bk-slot]').forEach(el => el.classList.toggle('is-selected', el.dataset.bkSlot === selectedSlot));
+    }
+  });
+
+  const onShow = () => {
+    if (currentState?.brackets?.visible !== false) {
+      const bk = currentState?.brackets || {};
+      const des = DESIGN_MAP[bk.design] || FALLBACK_DESIGN;
+      triggerEntry((bk.entryAnim && bk.entryAnim !== 'theme') ? bk.entryAnim : des.entry);
+    }
+  };
+  window.addEventListener('obsSourceActiveChanged', (e) => { if (e?.detail?.active) onShow(); });
+  window.addEventListener('obsSourceVisibleChanged', (e) => { if (e?.detail?.visible) onShow(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) onShow(); });
+
+  window.FGC_AUDIO?.init({ role: 'brackets', isPreview: isPreview || isExport });
+
+  let bc = null;
+  try {
+    bc = new BroadcastChannel('fgc_open_scorebar');
+    bc.onmessage = (ev) => {
+      if (ev.data?.type === 'state' && ev.data.payload) render(ev.data.payload);
+      else if (ev.data?.type === 'fonts' && Array.isArray(ev.data.payload)) {
+        window.FGC_CUSTOM_FONTS?.setFonts(ev.data.payload);
+        if (currentState) render(currentState);
+      } else if (ev.data?.type === 'sfx' && Array.isArray(ev.data.payload)) {
+        window.FGC_AUDIO?.setCustomSfx(ev.data.payload);
+      } else if (ev.data?.type === 'audio' && ev.data.payload) {
+        window.FGC_AUDIO?.handleAudioEvent(ev.data.payload);
+      }
+    };
+  } catch {}
+
+  if (isHttp) {
+    window.FGC_CUSTOM_FONTS?.fetchAndSync().then(() => { if (currentState) render(currentState); });
+    fetch('/api/state', { cache: 'no-store' }).then(r => r.json()).then(st => {
+      render(st);
+      if (!isPreview && !isExport && st?.brackets?.visible !== false) onShow();
+    }).catch(() => $('bks-stage')?.classList.remove('is-booting'));
+
+    if (!isPreview && !isExport) {
+      let activeEs = null, reconnectTimer = null, unloading = false;
+      const closeSSE = () => { unloading = true; clearTimeout(reconnectTimer); if (activeEs) { try { activeEs.close(); } catch {} activeEs = null; } };
+      window.addEventListener('pagehide', closeSSE);
+      window.addEventListener('beforeunload', closeSSE);
+      const connectSSE = () => {
+        if (unloading) return;
+        if (activeEs) { try { activeEs.close(); } catch {} }
+        const es = new EventSource('/api/events?client=brackets' + (window.obsstudio ? '&obs=1' : ''));
+        activeEs = es;
+        es.addEventListener('state', (ev) => { try { const data = JSON.parse(ev.data); render(data); if (bc) bc.postMessage({ type: 'state', payload: data, fromSse: true }); } catch {} });
+        es.addEventListener('fonts', (ev) => { try { const list = JSON.parse(ev.data); window.FGC_CUSTOM_FONTS?.setFonts(list); if (currentState) render(currentState); if (bc) bc.postMessage({ type: 'fonts', payload: list, fromSse: true }); } catch {} });
+        es.addEventListener('sfx', (ev) => { try { const list = JSON.parse(ev.data); window.FGC_AUDIO?.setCustomSfx(list); if (bc) bc.postMessage({ type: 'sfx', payload: list, fromSse: true }); } catch {} });
+        es.addEventListener('audio', (ev) => { try { const payload = JSON.parse(ev.data); window.FGC_AUDIO?.handleAudioEvent(payload); if (bc) bc.postMessage({ type: 'audio', payload, fromSse: true }); } catch {} });
+        es.onerror = () => { if (activeEs === es) activeEs = null; try { es.close(); } catch {} clearTimeout(reconnectTimer); if (!unloading) reconnectTimer = setTimeout(connectSSE, 1500); };
+      };
+      const isObs = Boolean(window.obsstudio);
+      if (!isObs && navigator.locks && typeof navigator.locks.request === 'function' && bc) {
+        navigator.locks.request('fgc_open_scorebar_sse_leader', () => new Promise((resolve) => {
+          if (unloading) return resolve();
+          connectSSE();
+          window.addEventListener('pagehide', resolve, { once: true });
+          window.addEventListener('beforeunload', resolve, { once: true });
+        })).catch(() => connectSSE());
+      } else {
+        connectSSE();
+      }
+    }
+  } else {
+    try {
+      const cached = localStorage.getItem('fgc_open_scorebar_state_v1');
+      if (cached) render(JSON.parse(cached));
+      else $('bks-stage')?.classList.remove('is-booting');
+    } catch { $('bks-stage')?.classList.remove('is-booting'); }
+  }
+})();
+</script>
+</body>
+</html>

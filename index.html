@@ -4,12 +4,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FGC Open Scorebar — Multi-Game Broadcast Overlay (Tekken 8 &amp; SF6)</title>
+  <title>FGC Open Scorebar — Multi-Game Broadcast Overlay (T8, SF6, 2XKO, Fatal Fury, Smash, Avatar, MK1)</title>
+  <link rel="icon" type="image/svg+xml" href="assets/brand/fgc-open-scorebars-icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&family=Bebas+Neue&family=Black+Ops+One&family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Exo+2:ital,wght@0,700;0,800;1,800&family=Montserrat:ital,wght@0,700;0,800;1,800&family=Orbitron:wght@700;800;900&family=Oswald:wght@600;700&family=Rajdhani:wght@600;700&family=Russo+One&family=Teko:wght@600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&family=Bebas+Neue&family=Black+Ops+One&family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Cinzel:wght@700;800;900&family=Exo+2:ital,wght@0,700;0,800;1,800&family=Montserrat:ital,wght@0,700;0,800;1,800&family=Orbitron:wght@700;800;900&family=Oswald:wght@600;700&family=Rajdhani:wght@600;700&family=Russo+One&family=Teko:wght@600;700&display=swap"
     rel="stylesheet" />
+  <link rel="stylesheet" href="game-scorebars.css" />
   <style>
     /* =========================================================================
      FGC OPEN SCOREBAR — TEKKEN 8 PRECISION 1920x1080 CANVAS
@@ -536,7 +538,7 @@
       padding: 0 11px 0 16px;
     }
 
-    #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p1 .flags-group.hidden-el ~ .player-info {
+    #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p1 .flags-group.hidden-el~.player-info {
       padding-left: 86px;
     }
 
@@ -544,7 +546,7 @@
       padding: 0 16px 0 11px;
     }
 
-    #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p2 .flags-group.hidden-el ~ .player-info {
+    #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p2 .flags-group.hidden-el~.player-info {
       padding-right: 86px;
     }
 
@@ -866,40 +868,42 @@
       clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 7px 100%);
     }
 
-    /* On SF6 Drive / CPT / Metro, tuck side-peek cleanly inside wing beside score so Round Wins stay 100% visible */
+    /* On SF6 Drive / CPT / Metro, peek cleanly into the open y=0..22px gap ABOVE Round Wins (NEVER overlaps names or Round Wins!) */
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-drive"] .mp-tag,
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-cpt"] .mp-tag,
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-metro"] .mp-tag {
-      top: 50%;
-      height: 19px;
-      padding: 0 9px;
-      font-size: 8.5px;
-      border-radius: 3px;
-      z-index: 15;
-      transform: translateY(-50%) scale(0.86);
+      top: 0;
+      height: 21px;
+      font-size: 8px;
+      letter-spacing: 0.08em;
+      z-index: 1;
     }
 
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-drive"] .sb-wing.p1 .mp-tag,
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-cpt"] .sb-wing.p1 .mp-tag,
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-metro"] .sb-wing.p1 .mp-tag {
-      left: auto;
-      right: calc(68px + var(--blade-slant, 14px));
-      clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 100%, 6px 100%);
+      left: calc(100% - var(--blade-slant, 18px) - 2px);
+      right: auto;
+      padding: 0 11px 0 18px;
+      clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+      transform: translateX(-20px);
     }
 
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-drive"] .sb-wing.p2 .mp-tag,
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-cpt"] .sb-wing.p2 .mp-tag,
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-metro"] .sb-wing.p2 .mp-tag {
-      right: auto;
-      left: calc(68px + var(--blade-slant, 14px));
-      clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+      right: calc(100% - var(--blade-slant, 18px) - 2px);
+      left: auto;
+      padding: 0 18px 0 11px;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%);
+      transform: translateX(20px);
     }
 
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-drive"] .sb-wing.match-point .mp-tag,
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-cpt"] .sb-wing.match-point .mp-tag,
     #scorebar-root[data-mp-style="side-peek"][data-layout="sf6-metro"] .sb-wing.match-point .mp-tag {
       opacity: 1;
-      transform: translateY(-50%) scale(1);
+      transform: translateX(0);
     }
 
     /* Wing Inner Plate & Flex Directions */
@@ -1076,6 +1080,13 @@
       width: 100%;
       height: 100%;
       display: block;
+      transform: scale(var(--flag-zoom, 1)) translate(var(--flag-shift-x, 0%), var(--flag-shift-y, 0%));
+      filter: saturate(var(--flag-sat, 1)) brightness(var(--flag-bright, 0.98));
+      transform-origin: center center;
+    }
+
+    .sb-wing.p2 .flag-wrap svg {
+      transform: scale(var(--flag-zoom, 1)) translate(calc(var(--flag-shift-x, 0%) * -1), var(--flag-shift-y, 0%));
     }
 
     .flag-wrap.hidden-el {
@@ -1535,18 +1546,23 @@
 
     #scorebar-root[data-score-slant="italic"] .score-num {
       font-style: italic !important;
-      transform: none !important;
+      --score-skew: 0deg;
     }
 
     .score-box.pop .score-num {
       animation: scorePop var(--score-dur, 0.45s) cubic-bezier(0.22, 1.4, 0.36, 1);
     }
 
+    .score-box.pop[data-score-dir="down"] .score-num {
+      animation: scorePopDown var(--score-dur, 0.45s) cubic-bezier(0.22, 1.3, 0.36, 1);
+    }
+
     .score-box.pop::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.75) 50%, transparent 80%);
+      pointer-events: none;
+      background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.78) 50%, transparent 80%);
       animation: scoreFlash var(--score-dur, 0.45s) ease-out forwards;
     }
 
@@ -1555,8 +1571,26 @@
         transform: skewX(var(--score-skew, 0deg)) scale(1);
       }
 
-      40% {
-        transform: skewX(var(--score-skew, 0deg)) scale(1.42);
+      38% {
+        transform: skewX(var(--score-skew, 0deg)) scale(1.44);
+      }
+
+      100% {
+        transform: skewX(var(--score-skew, 0deg)) scale(1);
+      }
+    }
+
+    @keyframes scorePopDown {
+      0% {
+        transform: skewX(var(--score-skew, 0deg)) scale(1);
+      }
+
+      35% {
+        transform: skewX(var(--score-skew, 0deg)) scale(0.68);
+      }
+
+      72% {
+        transform: skewX(var(--score-skew, 0deg)) scale(1.12);
       }
 
       100% {
@@ -1578,6 +1612,8 @@
 
     /* Center Round / Phase Banner */
     .sb-center {
+      position: relative;
+      z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -3526,13 +3562,13 @@
     #scorebar-root[data-flag-style="fade-blend"] .flag-wrap svg {
       width: 100%;
       height: 100%;
-      transform: scale(var(--flag-zoom, 1.08)) translateX(var(--flag-shift-x, 0%));
+      transform: scale(var(--flag-zoom, 1)) translate(var(--flag-shift-x, 0%), var(--flag-shift-y, 0%));
       filter: saturate(var(--flag-sat, 1)) brightness(var(--flag-bright, 0.96));
       transform-origin: center center;
     }
 
     #scorebar-root[data-flag-style="fade-blend"] .sb-wing.p2 .flag-wrap svg {
-      transform: scale(var(--flag-zoom, 1.08)) translateX(calc(var(--flag-shift-x, 0%) * -1));
+      transform: scale(var(--flag-zoom, 1)) translate(calc(var(--flag-shift-x, 0%) * -1), var(--flag-shift-y, 0%));
     }
 
     #scorebar-root[data-flag-style="fade-blend"] .sb-wing.p1 .flags-group:not(.hidden-el)~.player-info {
@@ -4413,6 +4449,10 @@
       animation: scoreRoll var(--score-dur, 0.45s) cubic-bezier(0.22, 1.3, 0.36, 1) !important;
     }
 
+    #scorebar-root[data-score-anim="roll"] .score-box.pop[data-score-dir="down"] .score-num {
+      animation: scoreRollDown var(--score-dur, 0.45s) cubic-bezier(0.22, 1.3, 0.36, 1) !important;
+    }
+
     #scorebar-root[data-score-anim="shockwave"] .score-box.pop::after {
       background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, transparent 70%) !important;
       animation: scoreShock var(--score-dur, 0.45s) ease-out forwards !important;
@@ -4440,6 +4480,18 @@
     @keyframes scoreRoll {
       0% {
         transform: skewX(var(--score-skew, 0deg)) translateY(100%);
+        opacity: 0;
+      }
+
+      100% {
+        transform: skewX(var(--score-skew, 0deg)) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes scoreRollDown {
+      0% {
+        transform: skewX(var(--score-skew, 0deg)) translateY(-100%);
         opacity: 0;
       }
 
@@ -4500,15 +4552,81 @@
         <div class="guide-box" style="left:834px;top:0;width:252px;height:42px;">SF6 SAFE CENTER</div>
         <div class="guide-box" style="left:244px;top:0;width:586px;height:31px;opacity:.55;">SFL TOP 31px</div>
       </div>
+      <div id="hud-guides-2xko">
+        <div class="guide-box danger" style="left:0;top:0;width:222px;height:156px;">P1 DUO PORTRAITS</div>
+        <div class="guide-box danger" style="right:0;top:0;width:222px;height:156px;">P2 DUO PORTRAITS</div>
+        <div class="guide-box danger" style="left:224px;top:36px;width:636px;height:122px;">2XKO P1 HEALTH + ASSIST +
+          BREAK (y:36-158)</div>
+        <div class="guide-box danger" style="right:224px;top:36px;width:636px;height:122px;">2XKO P2 HEALTH + ASSIST +
+          BREAK (y:36-158)</div>
+        <div class="guide-box" style="left:226px;top:0;width:628px;height:35px;">2XKO SAFE TOP WING P1 (y:0-35)</div>
+        <div class="guide-box" style="right:226px;top:0;width:628px;height:35px;">2XKO SAFE TOP WING P2 (y:0-35)</div>
+        <div class="guide-box" style="left:864px;top:0;width:192px;height:82px;">OPEN CENTER CREST</div>
+      </div>
+      <div id="hud-guides-ffcotw">
+        <div class="guide-box danger" style="left:0;top:0;width:176px;height:118px;">P1 PORTRAIT</div>
+        <div class="guide-box danger" style="right:0;top:0;width:176px;height:118px;">P2 PORTRAIT</div>
+        <div class="guide-box danger" style="left:812px;top:28px;width:72px;height:28px;">P1 WINS</div>
+        <div class="guide-box danger" style="right:812px;top:28px;width:72px;height:28px;">P2 WINS</div>
+        <div class="guide-box danger" style="left:894px;top:24px;width:132px;height:124px;">GOLD TIMER (y:24-148)</div>
+        <div class="guide-box danger" style="left:180px;top:56px;width:708px;height:68px;">COTW P1 HEALTH + S.P.G. + REV
+          (y:56-124)</div>
+        <div class="guide-box danger" style="right:180px;top:56px;width:708px;height:68px;">COTW P2 HEALTH + S.P.G. +
+          REV (y:56-124)</div>
+        <div class="guide-box" style="left:182px;top:8px;width:620px;height:44px;">COTW SAFE WING P1 (x:182-802)</div>
+        <div class="guide-box" style="right:182px;top:8px;width:620px;height:44px;">COTW SAFE WING P2 (x:1118-1738)
+        </div>
+        <div class="guide-box" style="left:824px;top:0;width:272px;height:24px;">COTW TOP RIBBON (y:0-24)</div>
+      </div>
+      <div id="hud-guides-ssbu">
+        <div class="guide-box danger" style="right:20px;top:24px;width:270px;height:84px;">SWITCH TIMER (TOP-RIGHT —
+          KEEP CLEAR!)</div>
+        <div class="guide-box danger" style="left:80px;bottom:0;width:1760px;height:225px;">IN-GAME DAMAGE % &amp;
+          STOCKS HUD (NINTENDO SWITCH — KEEP CLEAR!)</div>
+        <div class="guide-box" style="left:26px;top:18px;width:292px;height:94px;">SAFE ROUND / STAGE</div>
+        <div class="guide-box" style="left:400px;top:16px;width:1120px;height:122px;">CENTERED SMASH SCOREBAR ZONE
+          (x:400-1520 · DEAD CENTER)</div>
+      </div>
+      <div id="hud-guides-avatar">
+        <div class="guide-box danger" style="left:0;top:10px;width:216px;height:112px;">P1 PORTRAIT</div>
+        <div class="guide-box danger" style="right:0;top:10px;width:216px;height:112px;">P2 PORTRAIT</div>
+        <div class="guide-box danger" style="left:786px;top:26px;width:94px;height:24px;">P1 WINS</div>
+        <div class="guide-box danger" style="right:786px;top:26px;width:94px;height:24px;">P2 WINS</div>
+        <div class="guide-box danger" style="left:216px;top:54px;width:658px;height:106px;">AVATAR P1 HP + SPIRIT + CHI (y:54-160)</div>
+        <div class="guide-box danger" style="right:216px;top:54px;width:658px;height:106px;">AVATAR P2 HP + SPIRIT + CHI (y:54-160)</div>
+        <div class="guide-box danger" style="left:884px;top:26px;width:152px;height:152px;">DIAMOND TIMER (y:26-178)</div>
+        <div class="guide-box" style="left:220px;top:6px;width:544px;height:40px;">AVATAR SAFE WING P1 (x:220-764)</div>
+        <div class="guide-box" style="right:220px;top:6px;width:544px;height:40px;">AVATAR SAFE WING P2 (x:1156-1700)</div>
+        <div class="guide-box" style="left:872px;top:0;width:176px;height:24px;">TOP CROWN (y:0-24)</div>
+      </div>
+      <div id="hud-guides-mk1">
+        <div class="guide-box danger" style="left:30px;top:37px;width:868px;height:30px;">MK1 P1 HEALTH BAR (y:37-67)</div>
+        <div class="guide-box danger" style="right:30px;top:37px;width:868px;height:30px;">MK1 P2 HEALTH BAR (y:37-67)</div>
+        <div class="guide-box danger" style="left:846px;top:12px;width:50px;height:22px;">ORBS</div>
+        <div class="guide-box danger" style="right:846px;top:12px;width:50px;height:22px;">ORBS</div>
+        <div class="guide-box danger" style="left:916px;top:10px;width:88px;height:88px;">ENSO TIMER (y:10-98)</div>
+        <div class="guide-box danger" style="left:28px;top:76px;width:320px;height:104px;">P1 FIGHTER + KAMEO</div>
+        <div class="guide-box danger" style="right:28px;top:76px;width:320px;height:104px;">P2 FIGHTER + KAMEO</div>
+        <div class="guide-box" style="left:236px;top:3px;width:600px;height:32px;">MK1 SAFE WING P1 (x:236-836 · ORBS CLEAR!)</div>
+        <div class="guide-box" style="right:236px;top:3px;width:600px;height:32px;">MK1 SAFE WING P2 (x:1084-1684 · ORBS CLEAR!)</div>
+        <div class="guide-box" style="left:872px;top:101px;width:176px;height:23px;">SAFE UNDER-TIMER CREST (y:101-124)</div>
+      </div>
     </div>
 
     <!-- MAIN SCOREBAR OVERLAY (Starts primed off-screen so OBS scene activation plays full intro cleanly) -->
     <div id="scorebar-root" class="hidden no-trans" data-theme="t8-native-hud" data-layout="blade"
       data-score-pos="inner" data-entry-anim="split-wings" data-intro-stagger="on">
       <div class="arch-bridge"></div>
+      <div class="sb-stage-art" id="stage-art" aria-hidden="true"></div>
 
       <!-- PLAYER 1 WING -->
-      <div class="sb-wing p1" id="wing-p1">
+      <div class="sb-wing p1 sb-hit" id="wing-p1" data-sb-el="p1-wing" data-sb-drag="p1Wing" data-sb-label="🎨 P1 Wing / Plate (Drag to move)">
+        <div class="sb-art-layer" id="p1-art" aria-hidden="true"></div>
+        <div class="pro-meta-strip sb-hit" id="p1-meta-strip" data-sb-el="p1-meta" data-sb-drag="p1Meta" data-sb-label="🏷️ P1 Meta Strip (Drag to move)">
+          <span class="meta-seed hidden-el sb-hit" id="p1-meta-seed" data-sb-el="p1-seed" data-sb-drag="p1Meta" data-sb-label="🔢 P1 Seed"></span>
+          <span class="meta-handle hidden-el sb-hit" id="p1-meta-handle" data-sb-el="p1-handle" data-sb-drag="p1Meta" data-sb-label="📱 P1 @Handle"></span>
+          <span class="meta-pronouns hidden-el sb-hit" id="p1-meta-pronouns" data-sb-el="p1-pronouns" data-sb-drag="p1Meta" data-sb-label="💬 P1 Pronouns"></span>
+        </div>
         <div class="kazuya-glove-fx" aria-hidden="true">
           <div class="kazuya-glove-body"></div>
           <div class="kazuya-glove-studs"></div>
@@ -4516,36 +4634,47 @@
         <div class="wing-plate">
           <div class="kazuya-wing-bg" aria-hidden="true"></div>
           <div class="blade-edge" aria-hidden="true"></div>
-          <div class="flags-group hidden-el" id="p1-flags">
-            <span class="flag-wrap flag-primary hidden-el" id="p1-flag"></span>
-            <span class="flag-wrap flag-region hidden-el" id="p1-region"></span>
+          <div class="flags-group hidden-el sb-hit" id="p1-flags" data-sb-el="p1-flags" data-sb-drag="p1Wing" data-sb-label="🏳️ P1 Flags (Style & Fade)">
+            <span class="flag-wrap flag-primary hidden-el sb-hit" id="p1-flag" data-sb-el="p1-flag" data-sb-drag="p1Wing" data-sb-label="🏳️ P1 Country Flag"></span>
+            <span class="flag-wrap flag-region hidden-el sb-hit" id="p1-region" data-sb-el="p1-region" data-sb-drag="p1Wing" data-sb-label="🗺️ P1 Region / State Flag"></span>
             <span class="flag-slash" aria-hidden="true"></span>
           </div>
-          <span class="iso-tag hidden-el" id="p1-iso"></span>
+          <span class="iso-tag hidden-el sb-hit" id="p1-iso" data-sb-el="p1-iso" data-sb-drag="p1Wing" data-sb-label="🏷️ Country ISO Tag"></span>
           <div class="player-info">
-            <span class="bracket-badge" id="p1-bracket"></span>
+            <span class="seed-chip hidden-el sb-hit" id="p1-seed" data-sb-el="p1-seed" data-sb-drag="p1Wing" data-sb-label="🔢 P1 Seed"></span>
+            <span class="bracket-badge sb-hit" id="p1-bracket" data-sb-el="p1-bracket" data-sb-drag="p1Wing" data-sb-label="🏆 P1 Bracket [W]/[L]"></span>
             <div class="name-block">
-              <span class="sponsor-tag" id="p1-sponsor"></span>
-              <span class="player-name" id="p1-name">PLAYER 1</span>
+              <span class="sponsor-tag sb-hit" id="p1-sponsor" data-sb-el="p1-sponsor" data-sb-drag="p1Wing" data-sb-label="🏷️ P1 Sponsor / Tag"></span>
+              <span class="player-name sb-hit" id="p1-name" data-sb-el="p1-name" data-sb-drag="p1Wing" data-sb-label="👤 P1 Name (Click to edit · Drag Wing)"></span>
+              <span class="partner-wrap hidden-el sb-hit" id="p1-partner-wrap" data-sb-el="p1-partner" data-sb-drag="p1Wing" data-sb-label="🤝 P1 Partner Name"><span class="partner-sep">/</span><span
+                  class="partner-tag" id="p1-partner"></span></span>
             </div>
-            <span class="char-pill hidden-el" id="p1-char"></span>
+            <span class="char-pill hidden-el sb-hit" id="p1-char" data-sb-el="p1-char" data-sb-drag="p1Wing" data-sb-label="🥊 P1 Character"></span>
+            <span class="variant-chip hidden-el sb-hit" id="p1-variant" data-sb-el="p1-variant" data-sb-drag="p1Wing" data-sb-label="⚡ P1 Fuse / Control Style"><img id="p1-variant-img" alt=""
+                style="display:none;" /><span id="p1-variant-txt"></span></span>
           </div>
           <span class="ornament-left" aria-hidden="true">❖</span>
-          <div class="score-box" id="p1-score-box">
+          <div class="score-box sb-hit" id="p1-score-box" data-sb-el="p1-score" data-sb-drag="p1Wing" data-sb-label="🔢 P1 Score">
             <span class="score-num" id="p1-score">0</span>
           </div>
         </div>
-        <div class="mp-tag" id="p1-mp-tag">MATCH POINT</div>
+        <div class="mp-tag sb-hit" id="p1-mp-tag" data-sb-el="p1-mp" data-sb-drag="p1Mp" data-sb-label="🔥 P1 Match Point (Drag to move)">MATCH POINT</div>
       </div>
 
       <!-- CENTER ROUND / PHASE BANNER -->
-      <div class="sb-center" id="sb-center">
-        <span class="round-text" id="round-text">ROUND 1</span>
-        <span class="format-pill" id="format-pill">FT3</span>
+      <div class="sb-center sb-hit" id="sb-center" data-sb-el="center" data-sb-drag="center" data-sb-label="🏆 Center Banner (Drag to move)">
+        <span class="round-text sb-hit" id="round-text" data-sb-el="round" data-sb-drag="center" data-sb-label="🏆 Round / Phase Text">ROUND 1</span>
+        <span class="format-pill sb-hit" id="format-pill" data-sb-el="format" data-sb-drag="center" data-sb-label="📋 Match Format (FT/BO)">FT3</span>
       </div>
 
       <!-- PLAYER 2 WING -->
-      <div class="sb-wing p2" id="wing-p2">
+      <div class="sb-wing p2 sb-hit" id="wing-p2" data-sb-el="p2-wing" data-sb-drag="p2Wing" data-sb-label="🎨 P2 Wing / Plate (Drag to move)">
+        <div class="sb-art-layer" id="p2-art" aria-hidden="true"></div>
+        <div class="pro-meta-strip sb-hit" id="p2-meta-strip" data-sb-el="p2-meta" data-sb-drag="p2Meta" data-sb-label="🏷️ P2 Meta Strip (Drag to move)">
+          <span class="meta-pronouns hidden-el sb-hit" id="p2-meta-pronouns" data-sb-el="p2-pronouns" data-sb-drag="p2Meta" data-sb-label="💬 P2 Pronouns"></span>
+          <span class="meta-handle hidden-el sb-hit" id="p2-meta-handle" data-sb-el="p2-handle" data-sb-drag="p2Meta" data-sb-label="📱 P2 @Handle"></span>
+          <span class="meta-seed hidden-el sb-hit" id="p2-meta-seed" data-sb-el="p2-seed" data-sb-drag="p2Meta" data-sb-label="🔢 P2 Seed"></span>
+        </div>
         <div class="kazuya-glove-fx" aria-hidden="true">
           <div class="kazuya-glove-body"></div>
           <div class="kazuya-glove-studs"></div>
@@ -4553,60 +4682,261 @@
         <div class="wing-plate">
           <div class="kazuya-wing-bg" aria-hidden="true"></div>
           <div class="blade-edge" aria-hidden="true"></div>
-          <div class="flags-group hidden-el" id="p2-flags">
-            <span class="flag-wrap flag-primary hidden-el" id="p2-flag"></span>
-            <span class="flag-wrap flag-region hidden-el" id="p2-region"></span>
+          <div class="flags-group hidden-el sb-hit" id="p2-flags" data-sb-el="p2-flags" data-sb-drag="p2Wing" data-sb-label="🏳️ P2 Flags (Style & Fade)">
+            <span class="flag-wrap flag-primary hidden-el sb-hit" id="p2-flag" data-sb-el="p2-flag" data-sb-drag="p2Wing" data-sb-label="🏳️ P2 Country Flag"></span>
+            <span class="flag-wrap flag-region hidden-el sb-hit" id="p2-region" data-sb-el="p2-region" data-sb-drag="p2Wing" data-sb-label="🗺️ P2 Region / State Flag"></span>
             <span class="flag-slash" aria-hidden="true"></span>
           </div>
-          <span class="iso-tag hidden-el" id="p2-iso"></span>
+          <span class="iso-tag hidden-el sb-hit" id="p2-iso" data-sb-el="p2-iso" data-sb-drag="p2Wing" data-sb-label="🏷️ Country ISO Tag"></span>
           <div class="player-info">
-            <span class="bracket-badge" id="p2-bracket"></span>
+            <span class="seed-chip hidden-el sb-hit" id="p2-seed" data-sb-el="p2-seed" data-sb-drag="p2Wing" data-sb-label="🔢 P2 Seed"></span>
+            <span class="bracket-badge sb-hit" id="p2-bracket" data-sb-el="p2-bracket" data-sb-drag="p2Wing" data-sb-label="🏆 P2 Bracket [W]/[L]"></span>
             <div class="name-block">
-              <span class="sponsor-tag" id="p2-sponsor"></span>
-              <span class="player-name" id="p2-name">PLAYER 2</span>
+              <span class="sponsor-tag sb-hit" id="p2-sponsor" data-sb-el="p2-sponsor" data-sb-drag="p2Wing" data-sb-label="🏷️ P2 Sponsor / Tag"></span>
+              <span class="player-name sb-hit" id="p2-name" data-sb-el="p2-name" data-sb-drag="p2Wing" data-sb-label="👤 P2 Name (Click to edit · Drag Wing)"></span>
+              <span class="partner-wrap hidden-el sb-hit" id="p2-partner-wrap" data-sb-el="p2-partner" data-sb-drag="p2Wing" data-sb-label="🤝 P2 Partner Name"><span class="partner-sep">/</span><span
+                  class="partner-tag" id="p2-partner"></span></span>
             </div>
-            <span class="char-pill hidden-el" id="p2-char"></span>
+            <span class="char-pill hidden-el sb-hit" id="p2-char" data-sb-el="p2-char" data-sb-drag="p2Wing" data-sb-label="🥊 P2 Character"></span>
+            <span class="variant-chip hidden-el sb-hit" id="p2-variant" data-sb-el="p2-variant" data-sb-drag="p2Wing" data-sb-label="⚡ P2 Fuse / Control Style"><img id="p2-variant-img" alt=""
+                style="display:none;" /><span id="p2-variant-txt"></span></span>
           </div>
           <span class="ornament-right" aria-hidden="true">❖</span>
-          <div class="score-box" id="p2-score-box">
+          <div class="score-box sb-hit" id="p2-score-box" data-sb-el="p2-score" data-sb-drag="p2Wing" data-sb-label="🔢 P2 Score">
             <span class="score-num" id="p2-score">0</span>
           </div>
         </div>
-        <div class="mp-tag" id="p2-mp-tag">MATCH POINT</div>
+        <div class="mp-tag sb-hit" id="p2-mp-tag" data-sb-el="p2-mp" data-sb-drag="p2Mp" data-sb-label="🔥 P2 Match Point (Drag to move)">MATCH POINT</div>
       </div>
     </div>
 
-    <!-- OPTIONAL COMMENTATOR LOWER-THIRD -->
-    <div id="commentator-bar">
-      <div class="caster-item" id="caster1-wrap">
-        <svg class="caster-mic" viewBox="0 0 24 24">
-          <path
-            d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 1 0-2 0 3 3 0 0 1-6 0 1 1 0 1 0-2 0 5 5 0 0 0 4 4.9V19H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.1A5 5 0 0 0 17 11z" />
-        </svg>
-        <span class="caster-name" id="c1-name">CASTER 1</span>
-        <span class="caster-handle" id="c1-handle">@caster1</span>
+    <!-- DEDICATED SUPER SMASH BROS. ULTIMATE NATIVE OVERLAY (Independent from Tekken/SF6 HUD!) -->
+    <div id="smash-root" class="hidden no-trans" data-variant="major-singles" data-style="major" data-doubles="off"
+      data-show-bottom="on">
+      <div class="sm-top-cluster">
+        <!-- Top-Left Round / Best-Of / Stage Info Box -->
+        <div class="sm-info-box sb-hit" id="sm-info-box" data-sb-el="center" data-sb-drag="smInfo" data-sb-label="🏆 Round / Stage Box (Drag to move)">
+          <div class="sm-info-top">
+            <span class="sm-format-badge sb-hit" id="sm-format" data-sb-el="format" data-sb-drag="smInfo" data-sb-label="📋 Match Format (BO/FT)">BEST OF 5</span>
+          </div>
+          <div class="sm-round-label sb-hit" id="sm-round" data-sb-el="round" data-sb-drag="smInfo" data-sb-label="🏆 Round / Phase Label">WINNERS SEMIS</div>
+          <div class="sm-stage-pill hidden-el sb-hit" id="sm-stage-pill" data-sb-el="smash-stage" data-sb-drag="smInfo" data-sb-label="🗺️ Smash Stage">
+            <img id="sm-stage-img" alt="" style="display:none;" />
+            <span id="sm-stage-txt"></span>
+          </div>
+        </div>
+
+        <!-- Top-Center Twin Competitive Bars + Center Tournament Logo (Stops before Switch Top-Right Timer!) -->
+        <div class="sm-match-group">
+          <!-- P1 / Team 1 -->
+          <div class="sm-side p1" id="sm-side-p1">
+            <div class="sm-mp-float hidden-el sb-hit" id="sm-p1-mp-float" data-sb-el="p1-mp" data-sb-drag="smP1" data-sb-label="🔥 P1 Match Point">MATCH POINT</div>
+            <div class="sm-bar sb-hit" data-sb-el="p1-wing" data-sb-drag="smP1" data-sb-label="🎨 P1 Smash Bar (Drag to move)">
+              <div class="sm-port-stripe"></div>
+              <div class="sm-in-flags hidden-el sb-hit" id="sm-p1-in-flags" data-sb-el="p1-flags" data-sb-drag="smP1" data-sb-label="🏳️ P1 Flags (Inside Bar)">
+                <div class="sm-in-flags-row row-p1" id="sm-p1-in-row1">
+                  <span class="sm-in-flag-wrap hidden-el sb-hit" id="sm-p1-in-flag" data-sb-el="p1-flag" data-sb-drag="smP1" data-sb-label="🏳️ P1 Country Flag"></span>
+                  <span class="sm-in-flag-wrap hidden-el sb-hit" id="sm-p1-in-region" data-sb-el="p1-region" data-sb-drag="smP1" data-sb-label="🗺️ P1 Region Flag"></span>
+                </div>
+                <div class="sm-in-flags-row row-p2 hidden-el" id="sm-p1-in-row2">
+                  <span class="sm-in-flag-wrap hidden-el sb-hit" id="sm-p1-in-pflag" data-sb-el="p1-partner-flag" data-sb-drag="smP1" data-sb-label="🏳️ Teammate 1 Country Flag"></span>
+                  <span class="sm-in-flag-wrap hidden-el sb-hit" id="sm-p1-in-pregion" data-sb-el="p1-partner-region" data-sb-drag="smP1" data-sb-label="🗺️ Teammate 1 Region Flag"></span>
+                </div>
+              </div>
+              <div class="sm-player-body">
+                <div class="sm-name-col">
+                  <div class="sm-name-line">
+                    <span class="sm-stock-inline hidden-el sb-hit" id="sm-p1-stock-inline" data-sb-el="p1-char" data-sb-drag="smP1" data-sb-label="🌟 P1 Fighter Stock Icon"><img id="sm-p1-stock-inline-img"
+                        alt="" /></span>
+                    <span class="sm-sponsor sb-hit" id="sm-p1-sponsor" data-sb-el="p1-sponsor" data-sb-drag="smP1" data-sb-label="🏷️ P1 Sponsor / Tag"></span>
+                    <span class="sm-name sb-hit" id="sm-p1-name" data-sb-el="p1-name" data-sb-drag="smP1" data-sb-label="👤 P1 Name (Click to edit · Drag Bar)">PLAYER 1</span>
+                    <span class="sm-row-flags hidden-el sb-hit" id="sm-p1-row-flags" data-sb-el="p1-flags" data-sb-drag="smP1" data-sb-label="🏳️ P1 Flags">
+                      <span class="sm-row-flag-wrap hidden-el sb-hit" id="sm-p1-rflag" data-sb-el="p1-flag" data-sb-drag="smP1" data-sb-label="🏳️ P1 Country Flag"></span>
+                      <span class="sm-row-flag-wrap hidden-el sb-hit" id="sm-p1-rregion" data-sb-el="p1-region" data-sb-drag="smP1" data-sb-label="🗺️ P1 Region Flag"></span>
+                    </span>
+                  </div>
+                  <div class="sm-doubles-row" id="sm-p1-doubles-row">
+                    <span class="sm-partner-stock hidden-el sb-hit" id="sm-p1-pstock" data-sb-el="p1-partner-char" data-sb-drag="smP1" data-sb-label="🌟 Team 1 Teammate Fighter"><img id="sm-p1-pstock-img"
+                        alt="" /></span>
+                    <span class="sm-partner-name sb-hit" id="sm-p1-partner" data-sb-el="p1-partner" data-sb-drag="smP1" data-sb-label="🤝 Team 1 Teammate Name">PARTNER 1</span>
+                    <span class="sm-partner-pronouns sb-hit" id="sm-p1-ppronouns" data-sb-el="p1-partner-pronouns" data-sb-drag="smP1" data-sb-label="💬 Teammate 1 Pronouns"></span>
+                    <span class="sm-row-flags hidden-el sb-hit" id="sm-p1-prow-flags" data-sb-el="p1-partner-flag" data-sb-drag="smP1" data-sb-label="🏳️ Teammate 1 Flags">
+                      <span class="sm-row-flag-wrap hidden-el sb-hit" id="sm-p1-prflag" data-sb-el="p1-partner-flag" data-sb-drag="smP1" data-sb-label="🏳️ Teammate 1 Country Flag"></span>
+                      <span class="sm-row-flag-wrap hidden-el sb-hit" id="sm-p1-prregion" data-sb-el="p1-partner-region" data-sb-drag="smP1" data-sb-label="🗺️ Teammate 1 Region Flag"></span>
+                    </span>
+                  </div>
+                </div>
+                <span class="sm-mp-inline hidden-el sb-hit" id="sm-p1-mp-in" data-sb-el="p1-mp" data-sb-drag="smP1" data-sb-label="🔥 P1 Match Point">MATCH POINT</span>
+                <div class="sm-stock-wrap hidden-el sb-hit" id="sm-p1-stock" data-sb-el="p1-char" data-sb-drag="smP1" data-sb-label="🌟 P1 Fighter Stock Icon"><img id="sm-p1-stock-img" alt="" /></div>
+              </div>
+              <div class="sm-score-box sb-hit" id="sm-p1-score-box" data-sb-el="p1-score" data-sb-drag="smP1" data-sb-label="🔢 P1 Score"><span class="sm-score-num" id="sm-p1-score">0</span></div>
+            </div>
+            <div class="sm-subrow" id="sm-p1-subrow">
+              <span class="sm-pill seed hidden-el sb-hit" id="sm-p1-seed" data-sb-el="p1-seed" data-sb-drag="smP1Sub" data-sb-label="🔢 P1 Seed (Drag sub-row)"></span>
+              <span class="sm-flags-pill hidden-el sb-hit" id="sm-p1-flags" data-sb-el="p1-flags" data-sb-drag="smP1Sub" data-sb-label="🏳️ P1 Flags (Drag sub-row)">
+                <span class="sm-flag-svg hidden-el sb-hit" id="sm-p1-flag" data-sb-el="p1-flag" data-sb-drag="smP1Sub" data-sb-label="🏳️ P1 Country Flag"></span>
+                <span class="sm-flag-svg hidden-el sb-hit" id="sm-p1-region" data-sb-el="p1-region" data-sb-drag="smP1Sub" data-sb-label="🗺️ P1 Region Flag"></span>
+              </span>
+              <span class="sm-flags-pill hidden-el sb-hit" id="sm-p1-pflags" data-sb-el="p1-partner-flag" data-sb-drag="smP1Sub" data-sb-label="🏳️ Teammate 1 Flags (Drag sub-row)">
+                <span class="sm-flag-svg hidden-el sb-hit" id="sm-p1-pflag" data-sb-el="p1-partner-flag" data-sb-drag="smP1Sub" data-sb-label="🏳️ Teammate 1 Country Flag"></span>
+                <span class="sm-flag-svg hidden-el sb-hit" id="sm-p1-pregion" data-sb-el="p1-partner-region" data-sb-drag="smP1Sub" data-sb-label="🗺️ Teammate 1 Region Flag"></span>
+              </span>
+              <span class="sm-pill pronouns hidden-el sb-hit" id="sm-p1-pronouns" data-sb-el="p1-pronouns" data-sb-drag="smP1Sub" data-sb-label="💬 P1 Pronouns"></span>
+              <span class="sm-pill hidden-el sb-hit" id="sm-p1-bracket" data-sb-el="p1-bracket" data-sb-drag="smP1Sub" data-sb-label="🏆 P1 Bracket [W]/[L]"></span>
+              <span class="sm-pill mp hidden-el sb-hit" id="sm-p1-mp" data-sb-el="p1-mp" data-sb-drag="smP1Sub" data-sb-label="🔥 P1 Match Point">MATCH POINT</span>
+            </div>
+          </div>
+
+          <!-- Center Square Tournament Logo Card (Supports Event Logo, Vector Smash Ball Emblem, or Hidden!) -->
+          <div class="sm-center-logo sb-hit" id="sm-center-logo" data-sb-el="smash-logo" data-sb-drag="smLogo" data-sb-label="🏷️ Center Logo / Smash Emblem (Drag to move)">
+            <img id="sm-logo-img" alt="" style="display:none;" />
+            <div class="sm-center-logo-fallback" id="sm-logo-fallback" aria-label="Super Smash Bros. Emblem">
+              <svg class="smash-ball-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <mask id="smash-ball-cut">
+                    <rect width="100" height="100" fill="#fff"/>
+                    <rect x="26" y="0" width="15" height="100" fill="#000"/>
+                    <rect x="0" y="61" width="100" height="10" fill="#000"/>
+                  </mask>
+                </defs>
+                <circle cx="50" cy="50" r="44" fill="currentColor" mask="url(#smash-ball-cut)"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- P2 / Team 2 -->
+          <div class="sm-side p2" id="sm-side-p2">
+            <div class="sm-mp-float hidden-el sb-hit" id="sm-p2-mp-float" data-sb-el="p2-mp" data-sb-drag="smP2" data-sb-label="🔥 P2 Match Point">MATCH POINT</div>
+            <div class="sm-bar sb-hit" data-sb-el="p2-wing" data-sb-drag="smP2" data-sb-label="🎨 P2 Smash Bar (Drag to move)">
+              <div class="sm-port-stripe"></div>
+              <div class="sm-in-flags hidden-el sb-hit" id="sm-p2-in-flags" data-sb-el="p2-flags" data-sb-drag="smP2" data-sb-label="🏳️ P2 Flags (Inside Bar)">
+                <div class="sm-in-flags-row row-p1" id="sm-p2-in-row1">
+                  <span class="sm-in-flag-wrap hidden-el sb-hit" id="sm-p2-in-flag" data-sb-el="p2-flag" data-sb-drag="smP2" data-sb-label="🏳️ P2 Country Flag"></span>
+                  <span class="sm-in-flag-wrap hidden-el sb-hit" id="sm-p2-in-region" data-sb-el="p2-region" data-sb-drag="smP2" data-sb-label="🗺️ P2 Region Flag"></span>
+                </div>
+                <div class="sm-in-flags-row row-p2 hidden-el" id="sm-p2-in-row2">
+                  <span class="sm-in-flag-wrap hidden-el sb-hit" id="sm-p2-in-pflag" data-sb-el="p2-partner-flag" data-sb-drag="smP2" data-sb-label="🏳️ Teammate 2 Country Flag"></span>
+                  <span class="sm-in-flag-wrap hidden-el sb-hit" id="sm-p2-in-pregion" data-sb-el="p2-partner-region" data-sb-drag="smP2" data-sb-label="🗺️ Teammate 2 Region Flag"></span>
+                </div>
+              </div>
+              <div class="sm-player-body">
+                <div class="sm-name-col">
+                  <div class="sm-name-line">
+                    <span class="sm-stock-inline hidden-el sb-hit" id="sm-p2-stock-inline" data-sb-el="p2-char" data-sb-drag="smP2" data-sb-label="🌟 P2 Fighter Stock Icon"><img id="sm-p2-stock-inline-img"
+                        alt="" /></span>
+                    <span class="sm-sponsor sb-hit" id="sm-p2-sponsor" data-sb-el="p2-sponsor" data-sb-drag="smP2" data-sb-label="🏷️ P2 Sponsor / Tag"></span>
+                    <span class="sm-name sb-hit" id="sm-p2-name" data-sb-el="p2-name" data-sb-drag="smP2" data-sb-label="👤 P2 Name (Click to edit · Drag Bar)">PLAYER 2</span>
+                    <span class="sm-row-flags hidden-el sb-hit" id="sm-p2-row-flags" data-sb-el="p2-flags" data-sb-drag="smP2" data-sb-label="🏳️ P2 Flags">
+                      <span class="sm-row-flag-wrap hidden-el sb-hit" id="sm-p2-rflag" data-sb-el="p2-flag" data-sb-drag="smP2" data-sb-label="🏳️ P2 Country Flag"></span>
+                      <span class="sm-row-flag-wrap hidden-el sb-hit" id="sm-p2-rregion" data-sb-el="p2-region" data-sb-drag="smP2" data-sb-label="🗺️ P2 Region Flag"></span>
+                    </span>
+                  </div>
+                  <div class="sm-doubles-row" id="sm-p2-doubles-row">
+                    <span class="sm-partner-stock hidden-el sb-hit" id="sm-p2-pstock" data-sb-el="p2-partner-char" data-sb-drag="smP2" data-sb-label="🌟 Team 2 Teammate Fighter"><img id="sm-p2-pstock-img"
+                        alt="" /></span>
+                    <span class="sm-partner-name sb-hit" id="sm-p2-partner" data-sb-el="p2-partner" data-sb-drag="smP2" data-sb-label="🤝 Team 2 Teammate Name">PARTNER 2</span>
+                    <span class="sm-partner-pronouns sb-hit" id="sm-p2-ppronouns" data-sb-el="p2-partner-pronouns" data-sb-drag="smP2" data-sb-label="💬 Teammate 2 Pronouns"></span>
+                    <span class="sm-row-flags hidden-el sb-hit" id="sm-p2-prow-flags" data-sb-el="p2-partner-flag" data-sb-drag="smP2" data-sb-label="🏳️ Teammate 2 Flags">
+                      <span class="sm-row-flag-wrap hidden-el sb-hit" id="sm-p2-prflag" data-sb-el="p2-partner-flag" data-sb-drag="smP2" data-sb-label="🏳️ Teammate 2 Country Flag"></span>
+                      <span class="sm-row-flag-wrap hidden-el sb-hit" id="sm-p2-prregion" data-sb-el="p2-partner-region" data-sb-drag="smP2" data-sb-label="🗺️ Teammate 2 Region Flag"></span>
+                    </span>
+                  </div>
+                </div>
+                <span class="sm-mp-inline hidden-el sb-hit" id="sm-p2-mp-in" data-sb-el="p2-mp" data-sb-drag="smP2" data-sb-label="🔥 P2 Match Point">MATCH POINT</span>
+                <div class="sm-stock-wrap hidden-el sb-hit" id="sm-p2-stock" data-sb-el="p2-char" data-sb-drag="smP2" data-sb-label="🌟 P2 Fighter Stock Icon"><img id="sm-p2-stock-img" alt="" /></div>
+              </div>
+              <div class="sm-score-box sb-hit" id="sm-p2-score-box" data-sb-el="p2-score" data-sb-drag="smP2" data-sb-label="🔢 P2 Score"><span class="sm-score-num" id="sm-p2-score">0</span></div>
+            </div>
+            <div class="sm-subrow" id="sm-p2-subrow">
+              <span class="sm-pill seed hidden-el sb-hit" id="sm-p2-seed" data-sb-el="p2-seed" data-sb-drag="smP2Sub" data-sb-label="🔢 P2 Seed (Drag sub-row)"></span>
+              <span class="sm-flags-pill hidden-el sb-hit" id="sm-p2-flags" data-sb-el="p2-flags" data-sb-drag="smP2Sub" data-sb-label="🏳️ P2 Flags (Drag sub-row)">
+                <span class="sm-flag-svg hidden-el sb-hit" id="sm-p2-flag" data-sb-el="p2-flag" data-sb-drag="smP2Sub" data-sb-label="🏳️ P2 Country Flag"></span>
+                <span class="sm-flag-svg hidden-el sb-hit" id="sm-p2-region" data-sb-el="p2-region" data-sb-drag="smP2Sub" data-sb-label="🗺️ P2 Region Flag"></span>
+              </span>
+              <span class="sm-flags-pill hidden-el sb-hit" id="sm-p2-pflags" data-sb-el="p2-partner-flag" data-sb-drag="smP2Sub" data-sb-label="🏳️ Teammate 2 Flags (Drag sub-row)">
+                <span class="sm-flag-svg hidden-el sb-hit" id="sm-p2-pflag" data-sb-el="p2-partner-flag" data-sb-drag="smP2Sub" data-sb-label="🏳️ Teammate 2 Country Flag"></span>
+                <span class="sm-flag-svg hidden-el sb-hit" id="sm-p2-pregion" data-sb-el="p2-partner-region" data-sb-drag="smP2Sub" data-sb-label="🗺️ Teammate 2 Region Flag"></span>
+              </span>
+              <span class="sm-pill pronouns hidden-el sb-hit" id="sm-p2-pronouns" data-sb-el="p2-pronouns" data-sb-drag="smP2Sub" data-sb-label="💬 P2 Pronouns"></span>
+              <span class="sm-pill hidden-el sb-hit" id="sm-p2-bracket" data-sb-el="p2-bracket" data-sb-drag="smP2Sub" data-sb-label="🏆 P2 Bracket [W]/[L]"></span>
+              <span class="sm-pill mp hidden-el sb-hit" id="sm-p2-mp" data-sb-el="p2-mp" data-sb-drag="smP2Sub" data-sb-label="🔥 P2 Match Point">MATCH POINT</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="caster-sep" id="caster-sep"></div>
-      <div class="caster-item" id="caster2-wrap">
-        <svg class="caster-mic" viewBox="0 0 24 24">
-          <path
-            d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 1 0-2 0 3 3 0 0 1-6 0 1 1 0 1 0-2 0 5 5 0 0 0 4 4.9V19H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.1A5 5 0 0 0 17 11z" />
-        </svg>
-        <span class="caster-name" id="c2-name">CASTER 2</span>
-        <span class="caster-handle" id="c2-handle">@caster2</span>
+
+      <div id="smash-bottom-ticker">SUPER SMASH BROS. ULTIMATE</div>
+    </div>
+
+    <!-- PRESET-ADAPTIVE EVENT BAR (Works across ALL games incl. Smash, with Start.gg/Manual Logo & Zero-Overlap!) -->
+    <div id="bottom-event-bar" class="sb-hit" data-shape="trapezoid" data-pos="bottom-center" data-anim="slide-up"
+      data-sb-el="eb-bar" data-sb-drag="eventBar" data-sb-label="🏷️ Event Bar (Drag to move)">
+      <div class="beb-logo-badge hidden-el sb-hit" id="beb-logo-wrap" data-sb-el="eb-logo" data-sb-drag="eventBar" data-sb-label="🏷️ Event Bar Logo"><img id="beb-logo-img" alt="" /></div>
+      <div class="beb-plate">
+        <div class="beb-inline-logo hidden-el sb-hit" id="beb-logo-left" data-sb-el="eb-logo" data-sb-drag="eventBar" data-sb-label="🏷️ Event Bar Logo"><img id="beb-logo-left-img" alt="" /></div>
+        <div class="beb-text-col">
+          <div class="beb-title sb-hit" id="beb-title" data-sb-el="eb-title" data-sb-drag="eventBar" data-sb-label="📝 Event Bar Title">TOURNAMENT LIVE</div>
+          <div class="beb-sub sb-hit" id="beb-sub" data-sb-el="eb-sub" data-sb-drag="eventBar" data-sb-label="📝 Event Bar Subtitle">BRACKET · BEST OF 5</div>
+          <div class="beb-ticker hidden-el sb-hit" id="beb-ticker" data-sb-el="eb-ticker" data-sb-drag="eventBar" data-sb-label="📡 Event Bar Ticker / Social"></div>
+        </div>
+        <div class="beb-inline-logo hidden-el sb-hit" id="beb-logo-right" data-sb-el="eb-logo" data-sb-drag="eventBar" data-sb-label="🏷️ Event Bar Logo"><img id="beb-logo-right-img" alt="" /></div>
+      </div>
+    </div>
+
+    <!-- PRESET-ADAPTIVE COMMENTATORS BAR (Up to 3 Casters, Auto-Stacks Above Event Bar — Zero Overlap!) -->
+    <div id="commentator-bar" class="sb-hit" data-shape="blade" data-layout="single-bar" data-pos="bottom-center" data-icon="mic"
+      data-sep="line" data-anim="slide-up" data-sb-el="cm-bar" data-sb-drag="commentators" data-sb-label="🎙 Commentators Bar (Drag to move)">
+      <div class="caster-logo-mini hidden-el sb-hit" id="caster-logo-wrap" data-sb-el="cm-logo" data-sb-drag="commentators" data-sb-label="🏷️ Commentators Logo"><img id="caster-logo-img" alt="" /></div>
+      <div class="caster-item sb-hit" id="caster1-wrap" data-sb-el="c1" data-sb-drag="commentators" data-sb-label="🎙 Commentator 1">
+        <span class="caster-icon-slot sb-hit" id="c1-icon" data-sb-el="cm-icon" data-sb-drag="commentators" data-sb-label="🎙 Caster Icon Badge"></span>
+        <div class="caster-text-wrap">
+          <span class="caster-name sb-hit" id="c1-name" data-sb-el="c1" data-sb-drag="commentators" data-sb-label="🎙 Commentator 1 Name">CASTER 1</span>
+          <span class="caster-handle sb-hit" id="c1-handle" data-sb-el="c1-handle" data-sb-drag="commentators" data-sb-label="📱 Commentator 1 @Handle">@caster1</span>
+          <span class="caster-role sb-hit" id="c1-role" data-sb-el="c1-role" data-sb-drag="commentators" data-sb-label="🎭 Commentator 1 Role"></span>
+        </div>
+      </div>
+      <div class="caster-sep sb-hit" id="caster-sep" data-sb-el="cm-sep" data-sb-drag="commentators" data-sb-label="⚡ Caster Divider Style"></div>
+      <div class="caster-item sb-hit" id="caster2-wrap" data-sb-el="c2" data-sb-drag="commentators" data-sb-label="🎙 Commentator 2">
+        <span class="caster-icon-slot sb-hit" id="c2-icon" data-sb-el="cm-icon" data-sb-drag="commentators" data-sb-label="🎙 Caster Icon Badge"></span>
+        <div class="caster-text-wrap">
+          <span class="caster-name sb-hit" id="c2-name" data-sb-el="c2" data-sb-drag="commentators" data-sb-label="🎙 Commentator 2 Name">CASTER 2</span>
+          <span class="caster-handle sb-hit" id="c2-handle" data-sb-el="c2-handle" data-sb-drag="commentators" data-sb-label="📱 Commentator 2 @Handle">@caster2</span>
+          <span class="caster-role sb-hit" id="c2-role" data-sb-el="c2-role" data-sb-drag="commentators" data-sb-label="🎭 Commentator 2 Role"></span>
+        </div>
+      </div>
+      <div class="caster-sep sb-hit" id="caster-sep-2" style="display:none;" data-sb-el="cm-sep" data-sb-drag="commentators" data-sb-label="⚡ Caster Divider Style"></div>
+      <div class="caster-item sb-hit" id="caster3-wrap" style="display:none;" data-sb-el="c3" data-sb-drag="commentators" data-sb-label="🎙 Commentator 3">
+        <span class="caster-icon-slot sb-hit" id="c3-icon" data-sb-el="cm-icon" data-sb-drag="commentators" data-sb-label="🎙 Caster Icon Badge"></span>
+        <div class="caster-text-wrap">
+          <span class="caster-name sb-hit" id="c3-name" data-sb-el="c3" data-sb-drag="commentators" data-sb-label="🎙 Commentator 3 Name"></span>
+          <span class="caster-handle sb-hit" id="c3-handle" data-sb-el="c3-handle" data-sb-drag="commentators" data-sb-label="📱 Commentator 3 @Handle"></span>
+          <span class="caster-role sb-hit" id="c3-role" data-sb-el="c3-role" data-sb-drag="commentators" data-sb-label="🎭 Commentator 3 Role"></span>
+        </div>
       </div>
     </div>
   </div>
+  <!-- Preview-Only Interactive Selection & Hover UI (Outside #stage so position:fixed is crisp 1:1 viewport pixels!) -->
+  <div id="sb-hover-box"></div>
+  <div id="sb-select-box"></div>
+  <div id="sb-mirror-box"></div>
+  <div id="sb-resize-handle" title="Drag edge to shorten or lengthen (double-click to reset)">↔</div>
+  <div id="sb-resize-handle-alt" title="Drag edge to shorten or lengthen (double-click to reset)">↔</div>
+  <div id="sb-hover-pill"></div>
 
   <script src="flags.js"></script>
   <script src="sf6-themes.js"></script>
+  <script src="game-presets.js"></script>
+  <script src="preset-art.js"></script>
   <script src="custom-fonts.js"></script>
+  <script src="audio-engine.js"></script>
   <script>
     (() => {
       /* =========================================================================
-         THEME METADATA REGISTRY (33 Tekken 8/FGC + 24 Street Fighter 6 Themes)
+         THEME METADATA REGISTRY (33 T8/FGC + 24 SF6 + Multi-Game Presets)
          ========================================================================= */
       const SF6_THEME_MAP = window.FGC_SF6_THEME_MAP || {};
+      const GAME_THEME_MAP = window.FGC_GAME_THEME_MAP || {};
+      const GAME_PROFILES = window.FGC_GAME_PROFILES || {};
       const THEME_CONFIG = {
         't8-native-hud': { layout: 'blade', scorePos: 'inner', flagStyle: 'blade-twt', centerStyle: 'trapezoid', outerBlade: 'on', slant: 26 },
         't8-pbrd-kazuya-fists': { layout: 'kazuya-fists', scorePos: 'inner', flagStyle: 'classic', centerStyle: 'trapezoid', outerBlade: 'off', slant: 0 },
@@ -4645,10 +4975,14 @@
       for (const sf6 of (window.FGC_SF6_THEMES || [])) {
         THEME_CONFIG[sf6.id] = { ...sf6.cfg };
       }
+      for (const gt of (window.FGC_GAME_THEMES || [])) {
+        THEME_CONFIG[gt.id] = { ...gt.cfg };
+      }
 
       const FONT_STACKS = {
         'Barlow Condensed': `'Barlow Condensed', 'Bahnschrift', sans-serif`,
         'Chakra Petch': `'Chakra Petch', 'Bahnschrift', sans-serif`,
+        'Cinzel': `'Cinzel', Georgia, serif`,
         'Orbitron': `'Orbitron', 'Chakra Petch', sans-serif`,
         'Teko': `'Teko', 'Barlow Condensed', sans-serif`,
         'Rajdhani': `'Rajdhani', 'Bahnschrift', sans-serif`,
@@ -4750,14 +5084,13 @@
       window.addEventListener('resize', updateStageScale);
       updateStageScale();
 
-      /* Preview Query Parameters (?preview=t8|sf6|checker|green&guides=1) */
+      /* Preview Query Parameters (?preview=t8|sf6|2xko|ffcotw|ssbu|checker|green&guides=1) */
       const params = new URLSearchParams(window.location.search);
       function applyPreviewMode(mode, guides) {
-        document.body.classList.remove('bg-t8', 'bg-sf6', 'bg-checker', 'bg-green');
-        if (mode === 't8') document.body.classList.add('bg-t8');
-        else if (mode === 'sf6') document.body.classList.add('bg-sf6');
-        else if (mode === 'checker') document.body.classList.add('bg-checker');
-        else if (mode === 'green') document.body.classList.add('bg-green');
+        document.body.classList.remove('bg-t8', 'bg-sf6', 'bg-2xko', 'bg-ffcotw', 'bg-ssbu', 'bg-avatar', 'bg-mk1', 'bg-checker', 'bg-green');
+        if (['t8', 'sf6', '2xko', 'ffcotw', 'ssbu', 'avatar', 'mk1', 'checker', 'green'].includes(mode)) {
+          document.body.classList.add(`bg-${mode}`);
+        }
         document.body.classList.toggle('show-guides', Boolean(guides));
       }
       if (params.has('preview')) {
@@ -4769,6 +5102,9 @@
          ========================================================================= */
       const els = {
         root: document.getElementById('scorebar-root'),
+        stageArt: document.getElementById('stage-art'),
+        p1Art: document.getElementById('p1-art'),
+        p2Art: document.getElementById('p2-art'),
         wingP1: document.getElementById('wing-p1'),
         wingP2: document.getElementById('wing-p2'),
         p1Name: document.getElementById('p1-name'),
@@ -4791,17 +5127,143 @@
         p2Bracket: document.getElementById('p2-bracket'),
         p1Char: document.getElementById('p1-char'),
         p2Char: document.getElementById('p2-char'),
+        p1Seed: document.getElementById('p1-seed'),
+        p2Seed: document.getElementById('p2-seed'),
+        p1PartnerWrap: document.getElementById('p1-partner-wrap'),
+        p2PartnerWrap: document.getElementById('p2-partner-wrap'),
+        p1Partner: document.getElementById('p1-partner'),
+        p2Partner: document.getElementById('p2-partner'),
+        p1Variant: document.getElementById('p1-variant'),
+        p2Variant: document.getElementById('p2-variant'),
+        p1VariantImg: document.getElementById('p1-variant-img'),
+        p2VariantImg: document.getElementById('p2-variant-img'),
+        p1VariantTxt: document.getElementById('p1-variant-txt'),
+        p2VariantTxt: document.getElementById('p2-variant-txt'),
+        p1MetaSeed: document.getElementById('p1-meta-seed'),
+        p2MetaSeed: document.getElementById('p2-meta-seed'),
+        p1MetaHandle: document.getElementById('p1-meta-handle'),
+        p2MetaHandle: document.getElementById('p2-meta-handle'),
+        p1MetaPronouns: document.getElementById('p1-meta-pronouns'),
+        p2MetaPronouns: document.getElementById('p2-meta-pronouns'),
         p1MpTag: document.getElementById('p1-mp-tag'),
         p2MpTag: document.getElementById('p2-mp-tag'),
         roundText: document.getElementById('round-text'),
         formatPill: document.getElementById('format-pill'),
+        bottomBar: document.getElementById('bottom-event-bar'),
+        bebLogoWrap: document.getElementById('beb-logo-wrap'),
+        bebLogoImg: document.getElementById('beb-logo-img'),
+        bebLogoLeft: document.getElementById('beb-logo-left'),
+        bebLogoLeftImg: document.getElementById('beb-logo-left-img'),
+        bebLogoRight: document.getElementById('beb-logo-right'),
+        bebLogoRightImg: document.getElementById('beb-logo-right-img'),
+        bebTitle: document.getElementById('beb-title'),
+        bebSub: document.getElementById('beb-sub'),
+        bebTicker: document.getElementById('beb-ticker'),
+        smashRoot: document.getElementById('smash-root'),
+        smFormat: document.getElementById('sm-format'),
+        smRound: document.getElementById('sm-round'),
+        smStagePill: document.getElementById('sm-stage-pill'),
+        smStageImg: document.getElementById('sm-stage-img'),
+        smStageTxt: document.getElementById('sm-stage-txt'),
+        smLogoImg: document.getElementById('sm-logo-img'),
+        smLogoFallback: document.getElementById('sm-logo-fallback'),
+        smCenterLogo: document.getElementById('sm-center-logo'),
+        smSideP1: document.getElementById('sm-side-p1'),
+        smSideP2: document.getElementById('sm-side-p2'),
+        smP1InFlags: document.getElementById('sm-p1-in-flags'),
+        smP2InFlags: document.getElementById('sm-p2-in-flags'),
+        smP1InRow1: document.getElementById('sm-p1-in-row1'),
+        smP2InRow1: document.getElementById('sm-p2-in-row1'),
+        smP1InRow2: document.getElementById('sm-p1-in-row2'),
+        smP2InRow2: document.getElementById('sm-p2-in-row2'),
+        smP1InFlag: document.getElementById('sm-p1-in-flag'),
+        smP2InFlag: document.getElementById('sm-p2-in-flag'),
+        smP1InRegion: document.getElementById('sm-p1-in-region'),
+        smP2InRegion: document.getElementById('sm-p2-in-region'),
+        smP1InPFlag: document.getElementById('sm-p1-in-pflag'),
+        smP2InPFlag: document.getElementById('sm-p2-in-pflag'),
+        smP1InPRegion: document.getElementById('sm-p1-in-pregion'),
+        smP2InPRegion: document.getElementById('sm-p2-in-pregion'),
+        smP1RowFlags: document.getElementById('sm-p1-row-flags'),
+        smP2RowFlags: document.getElementById('sm-p2-row-flags'),
+        smP1RFlag: document.getElementById('sm-p1-rflag'),
+        smP2RFlag: document.getElementById('sm-p2-rflag'),
+        smP1RRegion: document.getElementById('sm-p1-rregion'),
+        smP2RRegion: document.getElementById('sm-p2-rregion'),
+        smP1PRowFlags: document.getElementById('sm-p1-prow-flags'),
+        smP2PRowFlags: document.getElementById('sm-p2-prow-flags'),
+        smP1PRFlag: document.getElementById('sm-p1-prflag'),
+        smP2PRFlag: document.getElementById('sm-p2-prflag'),
+        smP1PRRegion: document.getElementById('sm-p1-prregion'),
+        smP2PRRegion: document.getElementById('sm-p2-prregion'),
+        smP1PFlags: document.getElementById('sm-p1-pflags'),
+        smP2PFlags: document.getElementById('sm-p2-pflags'),
+        smP1PFlag: document.getElementById('sm-p1-pflag'),
+        smP2PFlag: document.getElementById('sm-p2-pflag'),
+        smP1PRegion: document.getElementById('sm-p1-pregion'),
+        smP2PRegion: document.getElementById('sm-p2-pregion'),
+        smP1MpIn: document.getElementById('sm-p1-mp-in'),
+        smP2MpIn: document.getElementById('sm-p2-mp-in'),
+        smP1MpFloat: document.getElementById('sm-p1-mp-float'),
+        smP2MpFloat: document.getElementById('sm-p2-mp-float'),
+        smBottomTicker: document.getElementById('smash-bottom-ticker'),
+        smP1Sponsor: document.getElementById('sm-p1-sponsor'),
+        smP2Sponsor: document.getElementById('sm-p2-sponsor'),
+        smP1Name: document.getElementById('sm-p1-name'),
+        smP2Name: document.getElementById('sm-p2-name'),
+        smP1Partner: document.getElementById('sm-p1-partner'),
+        smP2Partner: document.getElementById('sm-p2-partner'),
+        smP1PPronouns: document.getElementById('sm-p1-ppronouns'),
+        smP2PPronouns: document.getElementById('sm-p2-ppronouns'),
+        smP1PStock: document.getElementById('sm-p1-pstock'),
+        smP2PStock: document.getElementById('sm-p2-pstock'),
+        smP1PStockImg: document.getElementById('sm-p1-pstock-img'),
+        smP2PStockImg: document.getElementById('sm-p2-pstock-img'),
+        smP1Stock: document.getElementById('sm-p1-stock'),
+        smP2Stock: document.getElementById('sm-p2-stock'),
+        smP1StockImg: document.getElementById('sm-p1-stock-img'),
+        smP2StockImg: document.getElementById('sm-p2-stock-img'),
+        smP1StockInline: document.getElementById('sm-p1-stock-inline'),
+        smP2StockInline: document.getElementById('sm-p2-stock-inline'),
+        smP1StockInlineImg: document.getElementById('sm-p1-stock-inline-img'),
+        smP2StockInlineImg: document.getElementById('sm-p2-stock-inline-img'),
+        smP1ScoreBox: document.getElementById('sm-p1-score-box'),
+        smP2ScoreBox: document.getElementById('sm-p2-score-box'),
+        smP1Score: document.getElementById('sm-p1-score'),
+        smP2Score: document.getElementById('sm-p2-score'),
+        smP1Seed: document.getElementById('sm-p1-seed'),
+        smP2Seed: document.getElementById('sm-p2-seed'),
+        smP1Flags: document.getElementById('sm-p1-flags'),
+        smP2Flags: document.getElementById('sm-p2-flags'),
+        smP1Flag: document.getElementById('sm-p1-flag'),
+        smP2Flag: document.getElementById('sm-p2-flag'),
+        smP1Region: document.getElementById('sm-p1-region'),
+        smP2Region: document.getElementById('sm-p2-region'),
+        smP1Pronouns: document.getElementById('sm-p1-pronouns'),
+        smP2Pronouns: document.getElementById('sm-p2-pronouns'),
+        smP1Bracket: document.getElementById('sm-p1-bracket'),
+        smP2Bracket: document.getElementById('sm-p2-bracket'),
+        smP1Mp: document.getElementById('sm-p1-mp'),
+        smP2Mp: document.getElementById('sm-p2-mp'),
         casterBar: document.getElementById('commentator-bar'),
+        casterLogoWrap: document.getElementById('caster-logo-wrap'),
+        casterLogoImg: document.getElementById('caster-logo-img'),
+        c1Icon: document.getElementById('c1-icon'),
+        c2Icon: document.getElementById('c2-icon'),
+        c3Icon: document.getElementById('c3-icon'),
         c1Name: document.getElementById('c1-name'),
         c1Handle: document.getElementById('c1-handle'),
+        c1Role: document.getElementById('c1-role'),
         c2Name: document.getElementById('c2-name'),
         c2Handle: document.getElementById('c2-handle'),
+        c2Role: document.getElementById('c2-role'),
+        c3Name: document.getElementById('c3-name'),
+        c3Handle: document.getElementById('c3-handle'),
+        c3Role: document.getElementById('c3-role'),
         c2Wrap: document.getElementById('caster2-wrap'),
-        cSep: document.getElementById('caster-sep')
+        c3Wrap: document.getElementById('caster3-wrap'),
+        cSep: document.getElementById('caster-sep'),
+        cSep2: document.getElementById('caster-sep-2')
       };
 
       let prevP1Score = null;
@@ -4819,6 +5281,7 @@
       if (isPreviewMode) {
         // Panel iframe preview starts immediately visible without delaying the operator
         els.root.classList.remove('hidden', 'no-trans');
+        els.smashRoot.classList.remove('hidden', 'no-trans');
       }
 
       function snapHiddenForNextScene() {
@@ -4828,6 +5291,8 @@
         introPending = true;
         els.root.classList.remove('intro-flash');
         els.root.classList.add('no-trans', 'hidden');
+        els.smashRoot.classList.add('no-trans', 'hidden');
+        els.bottomBar.classList.remove('visible');
         els.casterBar.classList.remove('visible');
       }
 
@@ -4853,6 +5318,9 @@
           introPending = false;
           els.root.classList.remove('no-trans');
           els.root.classList.add('hidden');
+          els.smashRoot.classList.remove('no-trans');
+          els.smashRoot.classList.add('hidden');
+          els.bottomBar.classList.remove('visible');
           els.casterBar.classList.remove('visible');
           return;
         }
@@ -4861,7 +5329,11 @@
         if (customDelayMs === undefined && st.sceneAutoIntro === false) {
           introPending = false;
           els.root.classList.remove('hidden');
-          requestAnimationFrame(() => els.root.classList.remove('no-trans'));
+          els.smashRoot.classList.remove('hidden');
+          requestAnimationFrame(() => {
+            els.root.classList.remove('no-trans');
+            els.smashRoot.classList.remove('no-trans');
+          });
           if (latestState?.showCommentators) els.casterBar.classList.add('visible');
           return;
         }
@@ -4870,25 +5342,31 @@
         introPending = true;
         els.root.classList.remove('intro-flash');
         els.root.classList.add('no-trans', 'hidden');
+        els.smashRoot.classList.add('no-trans', 'hidden');
+        els.bottomBar.classList.remove('visible');
         els.casterBar.classList.remove('visible');
 
         introTimer = setTimeout(() => {
           introPending = false;
           if (latestState && latestState.visible === false) {
             els.root.classList.remove('no-trans');
+            els.smashRoot.classList.remove('no-trans');
             return;
           }
           els.root.classList.remove('no-trans');
+          els.smashRoot.classList.remove('no-trans');
           // Force browser reflow so CSS transitions animate cleanly from off-screen pose -> visible pose!
           void els.root.offsetWidth;
           requestAnimationFrame(() => {
             els.root.classList.remove('hidden');
+            els.smashRoot.classList.remove('hidden');
             triggerIntroFlash();
           });
-          if (latestState?.showCommentators) {
+          if (latestState?.showCommentators || latestState?.showBottomBar) {
             casterIntroTimer = setTimeout(() => {
-              if (latestState?.showCommentators && latestState?.visible !== false) {
-                els.casterBar.classList.add('visible');
+              if (latestState?.visible !== false) {
+                if (latestState?.showBottomBar) els.bottomBar.classList.add('visible');
+                if (latestState?.showCommentators) els.casterBar.classList.add('visible');
               }
             }, 220);
           }
@@ -4905,6 +5383,8 @@
           introPending = false;
           els.root.classList.remove('no-trans');
           els.root.classList.toggle('hidden', latestState.visible === false);
+          els.smashRoot.classList.remove('no-trans');
+          els.smashRoot.classList.toggle('hidden', latestState.visible === false);
           return;
         }
         playSceneIntro();
@@ -4944,13 +5424,21 @@
         return name.replace(/\s+(Kazama|Mishima|Williams|Fury|Chaolan|Law|Phoenix)$/i, '').toUpperCase();
       }
 
-      function triggerScorePop(boxEl) {
+      function triggerScorePop(boxEl, dir = 'up', durMs = 450) {
+        if (!boxEl) return;
+        clearTimeout(boxEl._popTimer);
         boxEl.classList.remove('pop');
+        delete boxEl.dataset.scoreDir;
         void boxEl.offsetWidth;
+        boxEl.dataset.scoreDir = dir;
         boxEl.classList.add('pop');
+        boxEl._popTimer = setTimeout(() => {
+          boxEl.classList.remove('pop');
+          delete boxEl.dataset.scoreDir;
+        }, Math.max(240, Number(durMs || 450)) + 120);
       }
 
-      function renderSingleFlag(el, code) {
+      function renderSingleFlag(el, code, fitMode) {
         const clean = String(code || '').toUpperCase().trim();
         const item = clean ? FLAGS_MAP[clean] : null;
         if (!item) {
@@ -4960,18 +5448,19 @@
           return false;
         }
         el.classList.remove('hidden-el');
-        el.innerHTML = item.svg;
+        const par = fitMode === 'cover' ? 'xMidYMid slice' : fitMode === 'contain' ? 'xMidYMid meet' : 'none';
+        el.innerHTML = item.svg.replace(/preserveAspectRatio="[^"]*"/, `preserveAspectRatio="${par}"`);
         el.title = item.name;
         return true;
       }
 
-      function renderFlagGroup(groupEl, primaryEl, regionEl, primaryCode, regionCode, mode) {
+      function renderFlagGroup(groupEl, primaryEl, regionEl, primaryCode, regionCode, mode, fitMode) {
         const m = mode || 'both';
         if (m === 'none') {
           groupEl.classList.add('hidden-el');
           groupEl.classList.remove('is-dual');
-          renderSingleFlag(primaryEl, '');
-          renderSingleFlag(regionEl, '');
+          renderSingleFlag(primaryEl, '', fitMode);
+          renderSingleFlag(regionEl, '', fitMode);
           return;
         }
         const wantPrimary = m === 'both' || m === 'country';
@@ -4980,8 +5469,8 @@
         let rCode = wantRegion ? String(regionCode || '').toUpperCase().trim() : '';
         if (pCode && rCode && pCode === rCode) rCode = '';
 
-        const hasP = renderSingleFlag(primaryEl, pCode);
-        const hasR = renderSingleFlag(regionEl, rCode);
+        const hasP = renderSingleFlag(primaryEl, pCode, fitMode);
+        const hasR = renderSingleFlag(regionEl, rCode, fitMode);
         groupEl.classList.toggle('hidden-el', !hasP && !hasR);
         groupEl.classList.toggle('is-dual', hasP && hasR);
       }
@@ -5003,6 +5492,7 @@
       function applyState(state, opts = {}) {
         if (!state || typeof state !== 'object') return;
         latestState = state;
+        window.FGC_AUDIO?.syncState(state);
 
         // 1. Theme, Layout, Shape, Integrated Flags & Style Studio Engine
         const themeId = THEME_CONFIG[state.theme] ? state.theme : 't8-twt-2026-official';
@@ -5017,15 +5507,64 @@
         const activeCenterStyle = (st.centerStyle && st.centerStyle !== 'theme') ? st.centerStyle : (cfg.centerStyle || 'theme');
         const activeOuterBlade = (st.outerBlade && st.outerBlade !== 'theme') ? st.outerBlade : (cfg.outerBlade || 'off');
         const sf6Theme = SF6_THEME_MAP[themeId] || null;
+        const gameTheme = GAME_THEME_MAP[themeId] || null;
+        const activeGameProfile = gameTheme?.gameProfile || (sf6Theme ? 'sf6' : (cfg.gameProfile || 'tekken8'));
+        const isSmash = activeGameProfile === 'ssbu';
         const effectiveShape = (st.shape && st.shape !== 'theme') ? st.shape : (sf6Theme?.cfg?.shape || '');
 
         els.root.dataset.theme = themeId;
+        els.root.dataset.game = activeGameProfile;
+        if (els.stageArt && els.stageArt.dataset.artTheme !== themeId) {
+          els.stageArt.dataset.artTheme = themeId;
+          const art = window.FGC_GET_PRESET_ART ? window.FGC_GET_PRESET_ART(themeId) : null;
+          els.stageArt.innerHTML = art?.stageSvg || '';
+          if (els.p1Art) els.p1Art.innerHTML = art?.p1Svg || '';
+          if (els.p2Art) els.p2Art.innerHTML = art?.p2Svg || '';
+        }
         els.root.dataset.layout = activeLayout;
         els.root.dataset.scorePos = (st.scorePosOverride && st.scorePosOverride !== 'theme') ? st.scorePosOverride : cfg.scorePos;
         els.root.dataset.shape = effectiveShape;
         els.root.dataset.flagStyle = activeFlagStyle;
         els.root.dataset.centerStyle = activeCenterStyle !== 'theme' ? activeCenterStyle : '';
         els.root.dataset.outerBlade = activeOuterBlade;
+
+        if (gameTheme && !isSmash) {
+          const pv = gameTheme.pv || {};
+          els.root.style.setProperty('--gp-bg-p1', pv.bg1 || pv.bg || '#111520');
+          els.root.style.setProperty('--gp-bg-p2', pv.bg2 || pv.bg1 || pv.bg || '#111520');
+          els.root.style.setProperty('--gp-p1', pv.p1 || '#ccff00');
+          els.root.style.setProperty('--gp-p2', pv.p2 || '#00e5ff');
+          els.root.style.setProperty('--gp-sc1', pv.sc1 || pv.p1 || '#ccff00');
+          els.root.style.setProperty('--gp-sc2', pv.sc2 || pv.p2 || '#00e5ff');
+          els.root.style.setProperty('--gp-sct1', pv.sct || '#ffffff');
+          els.root.style.setProperty('--gp-sct2', pv.sct2 || pv.sct || '#ffffff');
+          els.root.style.setProperty('--gp-cbg', pv.cbg || '#111520');
+          els.root.style.setProperty('--gp-cborder', pv.cborder || pv.p1 || '#facc15');
+          els.root.style.setProperty('--gp-ct', pv.ct || '#ffffff');
+          els.root.style.setProperty('--gp-tx', pv.tx || '#ffffff');
+          els.root.style.setProperty('--gp-sp1', pv.sp1 || pv.p1 || '#facc15');
+          els.root.style.setProperty('--gp-sp2', pv.sp2 || pv.p2 || '#facc15');
+          els.root.style.setProperty('--gp-glow1', pv.glow1 || 'transparent');
+          els.root.style.setProperty('--gp-glow2', pv.glow2 || 'transparent');
+          els.root.style.setProperty('--gp-font', FONT_STACKS[gameTheme.cfg?.font] || FONT_STACKS['Barlow Condensed']);
+          // Sync base accent vars so outer .blade-edge, .flag-slash & theme MP tags match 2XKO / CotW / T8 Meta 100%!
+          els.root.style.setProperty('--p1-accent', pv.p1 || '#ccff00');
+          els.root.style.setProperty('--p2-accent', pv.p2 || '#00e5ff');
+          els.root.style.setProperty('--p1-glow', pv.p1 || '#ccff00');
+          els.root.style.setProperty('--p2-glow', pv.p2 || '#00e5ff');
+          els.root.style.setProperty('--center-accent', pv.cborder || pv.p1 || '#facc15');
+          els.root.style.setProperty('--score-bg-p1', pv.sc1 || pv.p1 || '#e11d48');
+          els.root.style.setProperty('--score-bg-p2', pv.sc2 || pv.p2 || '#2563eb');
+          els.root.style.setProperty('--score-text', pv.sct || '#ffffff');
+          els.root.style.setProperty('--sponsor-color', pv.sp1 || pv.p1 || '#fde047');
+          els.root.style.setProperty('--art-p1', pv.p1 || '#f59e0b');
+          els.root.style.setProperty('--art-p2', pv.p2 || '#38bdf8');
+          els.root.style.setProperty('--art-accent', pv.cborder || pv.p1 || '#eab308');
+        } else {
+          for (const v of ['--p1-accent', '--p2-accent', '--p1-glow', '--p2-glow', '--center-accent', '--score-bg-p1', '--score-bg-p2', '--score-text', '--sponsor-color']) {
+            els.root.style.removeProperty(v);
+          }
+        }
 
         if (sf6Theme) {
           const pv = sf6Theme.pv;
@@ -5064,7 +5603,9 @@
         els.root.dataset.texture = st.texture || 'none';
         els.root.dataset.textShadow = st.textShadow || 'broadcast';
         els.root.dataset.entryAnim = st.entryAnim || 'split-wings';
-        els.root.dataset.scoreAnim = st.scoreAnim || 'pop';
+        const activeScoreAnim = st.scoreAnim || 'pop';
+        els.root.dataset.scoreAnim = activeScoreAnim;
+        if (els.smashRoot) els.smashRoot.dataset.scoreAnim = activeScoreAnim;
         els.root.dataset.animSpeed = st.animSpeed || 'normal';
         const speedFallback = st.animSpeed === 'fast' ? 240 : st.animSpeed === 'cinematic' ? 780 : 450;
         const animDurMs = Math.max(150, Math.min(2500, Number(st.animDuration || speedFallback)));
@@ -5073,6 +5614,7 @@
         els.root.style.setProperty('--stagger-delay', `${Math.round(animDurMs * 0.27)}ms`);
         els.root.style.setProperty('--flash-dur', `${Math.max(0.55, (animDurMs / 1000) * 1.15).toFixed(2)}s`);
         els.root.style.setProperty('--score-dur', `${(scoreDurMs / 1000).toFixed(2)}s`);
+        if (els.smashRoot) els.smashRoot.style.setProperty('--score-dur', `${(scoreDurMs / 1000).toFixed(2)}s`);
         els.root.dataset.introStagger = st.introStagger === false ? 'off' : 'on';
         els.root.dataset.mpStyle = st.mpStyle || 'side-peek';
         els.root.dataset.mpColor = st.mpColor || 'fire';
@@ -5121,8 +5663,9 @@
         els.root.style.setProperty('--flag-opacity', (Number(st.flagOpacity ?? 100) / 100).toFixed(2));
         els.root.style.setProperty('--flag-mask-p1', buildFlagFadeMask('p1', st));
         els.root.style.setProperty('--flag-mask-p2', buildFlagFadeMask('p2', st));
-        els.root.style.setProperty('--flag-zoom', (Number(st.flagZoom ?? 108) / 100).toFixed(2));
+        els.root.style.setProperty('--flag-zoom', (Number(st.flagZoom ?? 100) / 100).toFixed(2));
         els.root.style.setProperty('--flag-shift-x', `${Number(st.flagShiftX ?? 0)}%`);
+        els.root.style.setProperty('--flag-shift-y', `${Number(st.flagShiftY ?? 0)}%`);
         els.root.style.setProperty('--flag-sat', (Number(st.flagSaturation ?? 100) / 100).toFixed(2));
         els.root.style.setProperty('--flag-bright', (Number(st.flagBrightness ?? 96) / 100).toFixed(2));
 
@@ -5151,7 +5694,8 @@
         // 2. Live HUD Tweaks & Custom Colors / Gradients
         els.root.style.setProperty('--offset-y', `${Number(tw.offsetY || 0)}px`);
         els.root.style.setProperty('--user-scale', (Number(tw.scale || 100) / 100).toFixed(3));
-        els.root.style.setProperty('--wing-spread', `${Number(tw.wingSpread || 0)}px`);
+        const wsSafe = Math.max(-300, Math.min(220, Number(tw.wingSpread || 0)));
+        els.root.style.setProperty('--wing-spread', `${wsSafe}px`);
         els.root.style.setProperty('--user-opacity', (Number(tw.opacity ?? 100) / 100).toFixed(2));
 
         const useCustom = Boolean(st.customColors || tw.customColors);
@@ -5226,6 +5770,9 @@
           els.root.style.setProperty('--c-pill-text', isLightHex(cAcc) ? '#0b0d14' : '#ffffff');
           els.root.style.setProperty('--c-text', st.textColor || '#ffffff');
           els.root.style.setProperty('--c-sponsor', st.sponsorColor || '#ffbe4f');
+          els.root.style.setProperty('--art-p1', p1a);
+          els.root.style.setProperty('--art-p2', p2a);
+          els.root.style.setProperty('--art-accent', cAcc);
         } else {
           delete els.root.dataset.fillMode;
         }
@@ -5240,16 +5787,110 @@
 
         const s1 = Number(p1.score ?? 0);
         const s2 = Number(p2.score ?? 0);
-        if (prevP1Score !== null && s1 !== prevP1Score) triggerScorePop(els.p1ScoreBox);
-        if (prevP2Score !== null && s2 !== prevP2Score) triggerScorePop(els.p2ScoreBox);
+        if (prevP1Score !== null && s1 !== prevP1Score) {
+          const dir1 = s1 > prevP1Score ? 'up' : 'down';
+          triggerScorePop(els.p1ScoreBox, dir1, scoreDurMs);
+          triggerScorePop(els.smP1ScoreBox, dir1, scoreDurMs);
+        }
+        if (prevP2Score !== null && s2 !== prevP2Score) {
+          const dir2 = s2 > prevP2Score ? 'up' : 'down';
+          triggerScorePop(els.p2ScoreBox, dir2, scoreDurMs);
+          triggerScorePop(els.smP2ScoreBox, dir2, scoreDurMs);
+        }
         prevP1Score = s1;
         prevP2Score = s2;
         els.p1Score.textContent = s1;
         els.p2Score.textContent = s2;
 
+        // Seed, Partner (2XKO duo), Variant (2XKO Fuse / Fatal Fury Arcade-Smart), Pro Meta Strip
+        const showSeed = Boolean(state.showSeed);
+        const fmtSeed = (v) => {
+          const s = String(v ?? '').trim();
+          return (s && s !== '0') ? (s.toLowerCase().startsWith('seed') ? s : `SEED ${s}`) : '';
+        };
+        const fmtSeedCompact = (v) => {
+          const s = String(v ?? '').trim().replace(/^seed\s*/i, '').replace(/^#/, '');
+          return (s && s !== '0') ? `#${s}` : '';
+        };
+        const seed1 = showSeed ? fmtSeed(p1.seed) : '';
+        const seed2 = showSeed ? fmtSeed(p2.seed) : '';
+        const seedCompact1 = showSeed ? fmtSeedCompact(p1.seed) : '';
+        const seedCompact2 = showSeed ? fmtSeedCompact(p2.seed) : '';
+        const metaStripActive = !isSmash && (Boolean(state.showMetaStrip) || Boolean(cfg.forceMetaStrip)) &&
+          Boolean(seed1 || seed2 || p1.handle || p2.handle || p1.pronouns || p2.pronouns);
+        els.root.dataset.metaStrip = metaStripActive ? 'on' : 'off';
+
+        // Inline seed chip (ultra-compact "#1" so narrow HUD wings never truncate player names!)
+        els.p1Seed.textContent = seedCompact1;
+        els.p2Seed.textContent = seedCompact2;
+        els.p1Seed.classList.toggle('hidden-el', !seedCompact1 || metaStripActive);
+        els.p2Seed.classList.toggle('hidden-el', !seedCompact2 || metaStripActive);
+
+        // Top Pro Meta Strip (Ref: Scorebar Tekken Referencia 1.png)
+        els.p1MetaSeed.textContent = seed1;
+        els.p1MetaSeed.classList.toggle('hidden-el', !seed1);
+        els.p2MetaSeed.textContent = seed2;
+        els.p2MetaSeed.classList.toggle('hidden-el', !seed2);
+        const h1 = String(p1.handle || '').trim();
+        const h2 = String(p2.handle || '').trim();
+        els.p1MetaHandle.textContent = h1 ? (h1.startsWith('@') ? h1 : `@${h1}`) : '';
+        els.p1MetaHandle.classList.toggle('hidden-el', !h1);
+        els.p2MetaHandle.textContent = h2 ? (h2.startsWith('@') ? h2 : `@${h2}`) : '';
+        els.p2MetaHandle.classList.toggle('hidden-el', !h2);
+        const pr1 = state.showPronouns !== false ? String(p1.pronouns || '').trim() : '';
+        const pr2 = state.showPronouns !== false ? String(p2.pronouns || '').trim() : '';
+        els.p1MetaPronouns.textContent = pr1;
+        els.p1MetaPronouns.classList.toggle('hidden-el', !pr1);
+        els.p2MetaPronouns.textContent = pr2;
+        els.p2MetaPronouns.classList.toggle('hidden-el', !pr2);
+
+        // 2XKO Duo Partner Name
+        const showPartnerInline = activeGameProfile === '2xko';
+        const pt1 = showPartnerInline ? String(p1.partnerName || '').trim() : '';
+        const pt2 = showPartnerInline ? String(p2.partnerName || '').trim() : '';
+        els.p1Partner.textContent = pt1;
+        els.p2Partner.textContent = pt2;
+        els.p1PartnerWrap.classList.toggle('hidden-el', !pt1);
+        els.p2PartnerWrap.classList.toggle('hidden-el', !pt2);
+
+        // Game-Adaptive Variant Chip (2XKO Fuse / CotW Control Style / Avatar Support / MK1 Kameo with live icon!)
+        const renderVariant = (wrapEl, imgEl, txtEl, val) => {
+          const clean = (state.showVariant !== false && ['2xko', 'ffcotw', 'avatar', 'mk1'].includes(activeGameProfile))
+            ? String(val || '').trim() : '';
+          if (!clean) {
+            wrapEl.classList.add('hidden-el');
+            return;
+          }
+          wrapEl.classList.remove('hidden-el');
+          const shortLbl = activeGameProfile === 'ffcotw'
+            ? (clean.toLowerCase().includes('smart') ? 'S' : 'A')
+            : activeGameProfile === 'mk1'
+              ? clean.replace(/^Jackson "Jax" Briggs$/i, 'Jax')
+              : clean;
+          txtEl.textContent = shortLbl;
+          if (activeGameProfile === 'avatar') {
+            imgEl.dataset.src = '';
+            imgEl.style.display = 'none';
+            return;
+          }
+          const assetGame = activeGameProfile === '2xko' ? 'riotpl' : activeGameProfile === 'mk1' ? 'mk1' : 'ffcotw';
+          const wantUrl = `/api/assets/variant?game=${assetGame}&name=${encodeURIComponent(clean)}`;
+          if (location.protocol.startsWith('http') && imgEl.dataset.src !== wantUrl) {
+            imgEl.dataset.src = wantUrl;
+            imgEl.onload = () => { imgEl.style.display = 'block'; };
+            imgEl.onerror = () => { imgEl.style.display = 'none'; };
+            imgEl.src = wantUrl;
+          } else if (!location.protocol.startsWith('http')) {
+            imgEl.style.display = 'none';
+          }
+        };
+        renderVariant(els.p1Variant, els.p1VariantImg, els.p1VariantTxt, p1.variant);
+        renderVariant(els.p2Variant, els.p2VariantImg, els.p2VariantTxt, p2.variant);
+
         const flagMode = state.flagMode || (state.showFlags === false ? 'none' : 'both');
-        renderFlagGroup(els.p1Flags, els.p1Flag, els.p1Region, p1.flag, p1.region, flagMode);
-        renderFlagGroup(els.p2Flags, els.p2Flag, els.p2Region, p2.flag, p2.region, flagMode);
+        const flagFit = st.flagFit || 'fit';
+        renderFlagGroup(els.p1Flags, els.p1Flag, els.p1Region, p1.flag, p1.region, flagMode, flagFit);
+        renderFlagGroup(els.p2Flags, els.p2Flag, els.p2Region, p2.flag, p2.region, flagMode, flagFit);
 
         // TWT 2026 3-Letter Broadcast ISO Code (works with flags ON or even flags OFF when Tag ISO = ON!)
         const showIso = st.showIsoCode === 'on' || (st.showIsoCode !== 'off' && activeFlagStyle === 'twt-code');
@@ -5272,13 +5913,21 @@
         renderBracket(els.p2Bracket, p2.bracket);
 
         const showChars = Boolean(state.showCharacters);
-        els.p1Char.textContent = shortCharName(p1.character);
-        els.p2Char.textContent = shortCharName(p2.character);
-        els.p1Char.classList.toggle('hidden-el', !showChars || !p1.character);
-        els.p2Char.classList.toggle('hidden-el', !showChars || !p2.character);
+        const formatCharLabel = (p) => {
+          const c1 = shortCharName(p.character);
+          const c2 = activeGameProfile === '2xko' ? shortCharName(p.secondaryChar) : '';
+          if (c1 && c2) return `${c1} + ${c2}`;
+          return c1 || c2 || '';
+        };
+        const ch1 = formatCharLabel(p1);
+        const ch2 = formatCharLabel(p2);
+        els.p1Char.textContent = ch1;
+        els.p2Char.textContent = ch2;
+        els.p1Char.classList.toggle('hidden-el', !showChars || !ch1);
+        els.p2Char.classList.toggle('hidden-el', !showChars || !ch2);
 
         // 4. Center Round / Format
-        els.roundText.textContent = state.round || 'TEKKEN 8';
+        els.roundText.textContent = state.round || (GAME_PROFILES[activeGameProfile]?.shortName || 'FGC');
         const showFmt = state.showFormat !== false && Boolean(state.format);
         els.formatPill.textContent = state.format || '';
         els.formatPill.classList.toggle('hidden-el', !showFmt);
@@ -5291,18 +5940,517 @@
         els.wingP1.classList.toggle('match-point', p1MP);
         els.wingP2.classList.toggle('match-point', p2MP);
 
-        // 6. Commentators Lower-Third
+        // 5B. Dedicated Super Smash Bros. Ultimate Native Overlay (#smash-root)
+        els.smashRoot.classList.toggle('is-active', isSmash);
+        const portPalette = GAME_PROFILES.ssbu?.portColors || {};
+        const smP1Col = useCustom ? (st.p1Color1 || tw.p1Color || '#ef4444') : (portPalette[p1.variant] || gameTheme?.pv?.p1 || '#ef4444');
+        const smP2Col = useCustom ? (st.p2Color1 || tw.p2Color || '#2563eb') : (portPalette[p2.variant] || gameTheme?.pv?.p2 || '#2563eb');
+        const smAcc = useCustom ? (st.centerAccent || '#facc15') : (gameTheme?.pv?.cborder || '#facc15');
+        const smIsLight = !useCustom && Boolean(gameTheme?.pv?.isLight);
+        if (isSmash) {
+          const smVariant = gameTheme?.cfg?.smashVariant || 'major-singles';
+          const smStyle = gameTheme?.cfg?.smashStyle || (smVariant.includes('pill') ? 'pill' : 'major');
+          const isSmDoubles = Boolean(gameTheme?.cfg?.is2v2 || gameTheme?.is2v2 || smVariant.includes('2v2') || smVariant.includes('doubles'));
+          const smFlagPos = st.smashFlagPos || 'below';
+          const smInfoPos = st.smashInfoPos || 'left';
+          const smMpStyle = st.mpStyle || 'under-wing';
+          const smFlagStyle = (st.flagStyle && st.flagStyle !== 'theme') ? st.flagStyle : 'classic';
+
+          els.smashRoot.dataset.variant = smVariant;
+          els.smashRoot.dataset.style = smStyle;
+          els.smashRoot.dataset.doubles = isSmDoubles ? 'on' : 'off';
+          els.smashRoot.dataset.showBottom = Boolean(state.showBottomBar) ? 'on' : 'off';
+          els.smashRoot.dataset.shape = (st.shape && st.shape !== 'theme') ? st.shape : '';
+          els.smashRoot.dataset.centerStyle = (st.centerStyle && st.centerStyle !== 'theme') ? st.centerStyle : '';
+          els.smashRoot.dataset.borderStyle = (st.borderStyle && st.borderStyle !== 'theme') ? st.borderStyle : '';
+          els.smashRoot.dataset.scorePos = (st.scorePosOverride && st.scorePosOverride !== 'theme') ? st.scorePosOverride : '';
+          els.smashRoot.dataset.glow = st.glow || 'subtle';
+          els.smashRoot.dataset.texture = st.texture || 'none';
+          els.smashRoot.dataset.textShadow = st.textShadow || 'broadcast';
+          els.smashRoot.dataset.italic = (st.italic && st.italic !== 'theme') ? st.italic : '';
+          els.smashRoot.dataset.uppercase = st.uppercase === false ? 'false' : 'true';
+          els.smashRoot.dataset.mpStyle = smMpStyle;
+          els.smashRoot.dataset.mpColor = st.mpColor || 'fire';
+          els.smashRoot.dataset.flagPos = smFlagPos;
+          els.smashRoot.dataset.flagStyle = smFlagStyle;
+          els.smashRoot.dataset.infoPos = smInfoPos;
+          if (!introPending) {
+            els.smashRoot.classList.toggle('hidden', state.visible === false);
+          }
+
+          // Smash Tweaks, Typography, Flag Fade & Surface/Custom Colors
+          els.smashRoot.style.setProperty('--offset-y', `${Number(tw.offsetY || 0)}px`);
+          els.smashRoot.style.setProperty('--user-scale', (Number(tw.scale || 100) / 100).toFixed(3));
+          els.smashRoot.style.setProperty('--wing-spread', `${wsSafe}px`);
+          els.smashRoot.style.setProperty('--user-opacity', (Number(tw.opacity ?? 100) / 100).toFixed(2));
+          els.smashRoot.style.setProperty('--font-scale', (Number(st.fontScale ?? 100) / 100).toFixed(2));
+          els.smashRoot.style.setProperty('--letter-spacing', `${(Number(st.letterSpacing ?? 4) / 100).toFixed(2)}em`);
+          els.smashRoot.style.setProperty('--score-dur', `${(scoreDurMs / 1000).toFixed(2)}s`);
+          els.smashRoot.style.setProperty('--flag-opacity', (Number(st.flagOpacity ?? 100) / 100).toFixed(2));
+          els.smashRoot.style.setProperty('--flag-mask-p1', buildFlagFadeMask('p1', st));
+          els.smashRoot.style.setProperty('--flag-mask-p2', buildFlagFadeMask('p2', st));
+          els.smashRoot.style.setProperty('--flag-zoom', (Number(st.flagZoom ?? 100) / 100).toFixed(2));
+          els.smashRoot.style.setProperty('--flag-shift-x', `${Number(st.flagShiftX ?? 0)}%`);
+          els.smashRoot.style.setProperty('--flag-shift-y', `${Number(st.flagShiftY ?? 0)}%`);
+          els.smashRoot.style.setProperty('--flag-sat', (Number(st.flagSaturation ?? 100) / 100).toFixed(2));
+          els.smashRoot.style.setProperty('--flag-bright', (Number(st.flagBrightness ?? 96) / 100).toFixed(2));
+          if (Number(st.barHeight) >= 44) {
+            els.smashRoot.dataset.barH = '1';
+            els.smashRoot.style.setProperty('--bar-h', `${Number(st.barHeight)}px`);
+          } else {
+            delete els.smashRoot.dataset.barH;
+            els.smashRoot.style.removeProperty('--bar-h');
+          }
+
+          els.smashRoot.style.setProperty('--sm-p1', smP1Col);
+          els.smashRoot.style.setProperty('--sm-p2', smP2Col);
+          els.smashRoot.style.setProperty('--sm-accent', smAcc);
+          els.smashRoot.style.setProperty('--sm-text', useCustom ? (st.textColor || '#ffffff') : (smIsLight ? '#0f172a' : '#ffffff'));
+          els.smashRoot.style.setProperty('--sm-sponsor', useCustom ? (st.sponsorColor || '#fde047') : (gameTheme?.pv?.sp1 || '#fde047'));
+          els.smashRoot.classList.toggle('custom-colors', useCustom);
+          if (useCustom) {
+            const fillMode = st.fillMode || 'gradient';
+            els.smashRoot.dataset.fillMode = fillMode;
+            const isLightHex = (hex) => {
+              const h = String(hex || '#000000').replace('#', '');
+              const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h.padEnd(6, '0');
+              const r = parseInt(full.slice(0, 2), 16) || 0;
+              const g = parseInt(full.slice(2, 4), 16) || 0;
+              const b = parseInt(full.slice(4, 6), 16) || 0;
+              return (0.299 * r + 0.587 * g + 0.114 * b) > 168;
+            };
+            const a = Math.max(0.22, Math.min(1, Number(st.bgAlpha ?? 94) / 100));
+            const bg1Hex = st.bgColor1 || '#181c28';
+            const bg2Hex = st.bgColor2 || '#0c0f16';
+            const c1Hex = st.centerColor1 || bg1Hex;
+            const c2Hex = st.centerColor2 || bg2Hex;
+            const ang = Number(st.bgAngle ?? 180);
+            const p1b = st.p1Color2 || smP1Col;
+            const p2b = st.p2Color2 || smP2Col;
+
+            let bgFill = `linear-gradient(${ang}deg, ${hexToRgba(bg1Hex, a)}, ${hexToRgba(bg2Hex, a)})`;
+            let infoFill = `linear-gradient(${ang}deg, ${hexToRgba(c1Hex, a)}, ${hexToRgba(c2Hex, a)})`;
+            let p1Sc = `linear-gradient(135deg, ${smP1Col}, ${p1b})`;
+            let p2Sc = `linear-gradient(135deg, ${smP2Col}, ${p2b})`;
+            if (fillMode === 'solid') {
+              bgFill = hexToRgba(bg1Hex, a);
+              infoFill = hexToRgba(c1Hex, a);
+              p1Sc = smP1Col;
+              p2Sc = smP2Col;
+            } else if (fillMode === 'metallic') {
+              bgFill = `linear-gradient(${ang}deg, ${hexToRgba(bg1Hex, a)} 0%, ${hexToRgba(bg2Hex, a)} 30%, ${hexToRgba(bg1Hex, a)} 55%, ${hexToRgba(bg2Hex, a)} 80%, ${hexToRgba(bg1Hex, a)} 100%)`;
+              infoFill = `linear-gradient(${ang}deg, ${hexToRgba(c1Hex, a)} 0%, ${hexToRgba(c2Hex, a)} 50%, ${hexToRgba(c1Hex, a)} 100%)`;
+            }
+            els.smashRoot.style.setProperty('--sm-bg', bgFill);
+            els.smashRoot.style.setProperty('--sm-c-bg-fill', bgFill);
+            els.smashRoot.style.setProperty('--sm-c-info-fill', infoFill);
+            els.smashRoot.style.setProperty('--sm-c-glass-bg', hexToRgba(bg1Hex, Math.min(0.82, Math.max(0.24, a))));
+            els.smashRoot.style.setProperty('--sm-glass-blur', `${Math.max(4, Math.min(28, Number(st.glassBlur ?? 14)))}px`);
+            els.smashRoot.style.setProperty('--sm-glass-border', (Math.max(0, Math.min(60, Number(st.glassBorder ?? 22))) / 100).toFixed(2));
+            els.smashRoot.style.setProperty('--sm-c-p1-score', p1Sc);
+            els.smashRoot.style.setProperty('--sm-c-p2-score', p2Sc);
+            els.smashRoot.style.setProperty('--sm-c-p1-score-tx', isLightHex(smP1Col) ? '#0b0d14' : '#ffffff');
+            els.smashRoot.style.setProperty('--sm-c-p2-score-tx', isLightHex(smP2Col) ? '#0b0d14' : '#ffffff');
+          } else {
+            delete els.smashRoot.dataset.fillMode;
+            for (const v of ['--sm-bg', '--sm-c-bg-fill', '--sm-c-info-fill', '--sm-c-glass-bg', '--sm-c-p1-score', '--sm-c-p2-score', '--sm-c-p1-score-tx', '--sm-c-p2-score-tx']) {
+              els.smashRoot.style.removeProperty(v);
+            }
+          }
+          const smFont = resolvedNameFont || FONT_STACKS[gameTheme?.cfg?.font] || FONT_STACKS['Barlow Condensed'];
+          els.smashRoot.style.setProperty('--sm-font', smFont);
+          if (resolvedScoreFont) els.smashRoot.style.setProperty('--sm-score-font', resolvedScoreFont);
+          else els.smashRoot.style.removeProperty('--sm-score-font');
+
+          // Top-left Round / Best-Of / Optional Stage Indicator
+          els.smRound.textContent = state.round || 'WINNERS SEMIS';
+          const smFmtMap = { BO3: 'BEST OF 3', BO5: 'BEST OF 5', FT2: 'FIRST TO 2', FT3: 'FIRST TO 3', FT5: 'FIRST TO 5' };
+          const smFmtLabel = smFmtMap[String(state.format || '').toUpperCase()] || state.format || '';
+          els.smFormat.textContent = showFmt ? smFmtLabel : '';
+          els.smFormat.style.display = (showFmt && smFmtLabel) ? '' : 'none';
+
+          const stgName = state.showStage ? String(state.stageName || '').trim() : '';
+          if (stgName) {
+            els.smStagePill.classList.remove('hidden-el');
+            els.smStageTxt.textContent = stgName;
+            const stgUrl = `/api/assets/stage?game=ssbu&name=${encodeURIComponent(stgName)}`;
+            if (location.protocol.startsWith('http') && els.smStageImg.dataset.src !== stgUrl) {
+              els.smStageImg.dataset.src = stgUrl;
+              els.smStageImg.onload = () => { els.smStageImg.style.display = 'block'; };
+              els.smStageImg.onerror = () => { els.smStageImg.style.display = 'none'; };
+              els.smStageImg.src = stgUrl;
+            }
+          } else {
+            els.smStagePill.classList.add('hidden-el');
+          }
+
+          // Center Tournament Logo Card (Honors Show Logo checkbox, Auto-Sync toggle & Smash Logo Mode!)
+          const ebCfgLogo = state.eventBar || {};
+          const smLogoMode = st.smashLogoMode || 'auto'; // 'auto' | 'smash-ball' | 'hidden'
+          const showEventLogoBox = ebCfgLogo.showLogo !== false;
+          const smLogoUrl = ebCfgLogo.syncLogo !== false
+            ? (state.vs?.logoUrl || ebCfgLogo.logoUrl || '')
+            : (ebCfgLogo.logoUrl || '');
+
+          if (smLogoMode === 'hidden' || (smLogoMode === 'auto' && !showEventLogoBox)) {
+            els.smCenterLogo.classList.add('hidden-el');
+          } else if (smLogoMode === 'smash-ball' || !smLogoUrl) {
+            els.smCenterLogo.classList.remove('hidden-el');
+            els.smLogoImg.dataset.src = '';
+            els.smLogoImg.style.display = 'none';
+            els.smLogoFallback.style.display = 'flex';
+          } else {
+            els.smCenterLogo.classList.remove('hidden-el');
+            if (els.smLogoImg.dataset.src !== smLogoUrl) {
+              els.smLogoImg.dataset.src = smLogoUrl;
+              els.smLogoImg.onload = () => {
+                els.smLogoImg.style.display = 'block';
+                els.smLogoFallback.style.display = 'none';
+              };
+              els.smLogoImg.onerror = () => {
+                els.smLogoImg.style.display = 'none';
+                els.smLogoFallback.style.display = 'flex';
+              };
+              els.smLogoImg.src = smLogoUrl;
+            } else if (els.smLogoImg.complete && els.smLogoImg.naturalWidth > 0) {
+              els.smLogoImg.style.display = 'block';
+              els.smLogoFallback.style.display = 'none';
+            }
+          }
+
+          // Helper for SSBU Character Stock Head Icons (/api/assets/stock?game=ssbu&char=...)
+          const renderStockIcon = (wrapEl, imgEl, charName) => {
+            if (!wrapEl || !imgEl) return;
+            const c = (state.showStockIcon !== false) ? String(charName || '').trim() : '';
+            if (!c || !location.protocol.startsWith('http')) {
+              wrapEl.classList.add('hidden-el');
+              return;
+            }
+            const url = `/api/assets/stock?game=ssbu&char=${encodeURIComponent(c)}&skin=0`;
+            if (imgEl.dataset.src !== url) {
+              imgEl.dataset.src = url;
+              imgEl.onload = () => { wrapEl.classList.remove('hidden-el'); };
+              imgEl.onerror = () => { wrapEl.classList.add('hidden-el'); };
+              imgEl.src = url;
+            } else if (imgEl.complete && imgEl.naturalWidth > 0) {
+              wrapEl.classList.remove('hidden-el');
+            }
+          };
+
+          // Player 1 & Player 2 Smash Bars (Singles & Doubles 2v2 — inline stock icon aligned 1:1 with teammate!)
+          els.smP1Sponsor.textContent = p1.sponsor || '';
+          els.smP2Sponsor.textContent = p2.sponsor || '';
+          els.smP1Name.textContent = p1.name || 'PLAYER 1';
+          els.smP2Name.textContent = p2.name || 'PLAYER 2';
+          els.smP1Score.textContent = s1;
+          els.smP2Score.textContent = s2;
+          els.smP1Partner.textContent = [p1.partnerSponsor, p1.partnerName].filter(Boolean).join(' ') || 'TEAMMATE 1';
+          els.smP2Partner.textContent = [p2.partnerSponsor, p2.partnerName].filter(Boolean).join(' ') || 'TEAMMATE 2';
+          els.smP1PPronouns.textContent = state.showPronouns !== false ? (p1.partnerPronouns || '') : '';
+          els.smP2PPronouns.textContent = state.showPronouns !== false ? (p2.partnerPronouns || '') : '';
+
+          renderStockIcon(els.smP1Stock, els.smP1StockImg, p1.character);
+          renderStockIcon(els.smP2Stock, els.smP2StockImg, p2.character);
+          renderStockIcon(els.smP1StockInline, els.smP1StockInlineImg, p1.character);
+          renderStockIcon(els.smP2StockInline, els.smP2StockInlineImg, p2.character);
+          renderStockIcon(els.smP1PStock, els.smP1PStockImg, p1.partnerChar);
+          renderStockIcon(els.smP2PStock, els.smP2PStockImg, p2.partnerChar);
+
+          // Flags Placement: Below Bar, Inside Outer, Inside Near Score, or Fade BG — with INDIVIDUAL per-player flags in 2v2 Doubles!
+          const flagsInsideBar = smFlagPos !== 'below';
+          const usePerRowFlags = isSmDoubles && (smFlagPos === 'inside-outer' || smFlagPos === 'inside-score') && !(smFlagPos === 'inside-outer' && smFlagStyle === 'fade-blend');
+
+          // Sub-row hanging flags (P1 + optional individual Teammate pill in 2v2!)
+          renderFlagGroup(els.smP1Flags, els.smP1Flag, els.smP1Region, p1.flag, p1.region, flagsInsideBar ? 'none' : flagMode, flagFit);
+          renderFlagGroup(els.smP2Flags, els.smP2Flag, els.smP2Region, p2.flag, p2.region, flagsInsideBar ? 'none' : flagMode, flagFit);
+          renderFlagGroup(els.smP1PFlags, els.smP1PFlag, els.smP1PRegion, p1.partnerFlag, p1.partnerRegion, (isSmDoubles && !flagsInsideBar) ? flagMode : 'none', flagFit);
+          renderFlagGroup(els.smP2PFlags, els.smP2PFlag, els.smP2PRegion, p2.partnerFlag, p2.partnerRegion, (isSmDoubles && !flagsInsideBar) ? flagMode : 'none', flagFit);
+
+          // Per-row individual flags for Smash 2v2 (Row 1 = Player 1, Row 2 = Teammate!)
+          renderFlagGroup(els.smP1RowFlags, els.smP1RFlag, els.smP1RRegion, p1.flag, p1.region, usePerRowFlags ? flagMode : 'none', flagFit);
+          renderFlagGroup(els.smP1PRowFlags, els.smP1PRFlag, els.smP1PRRegion, p1.partnerFlag, p1.partnerRegion, usePerRowFlags ? flagMode : 'none', flagFit);
+          renderFlagGroup(els.smP2RowFlags, els.smP2RFlag, els.smP2RRegion, p2.flag, p2.region, usePerRowFlags ? flagMode : 'none', flagFit);
+          renderFlagGroup(els.smP2PRowFlags, els.smP2PRFlag, els.smP2PRRegion, p2.partnerFlag, p2.partnerRegion, usePerRowFlags ? flagMode : 'none', flagFit);
+
+          // Shared / Split-Row Inside-Bar Flags (1v1 inside bar OR 2v2 Top/Bottom Fade-BG!)
+          const inMode = (flagsInsideBar && !usePerRowFlags) ? flagMode : 'none';
+          renderFlagGroup(els.smP1InRow1, els.smP1InFlag, els.smP1InRegion, p1.flag, p1.region, inMode, flagFit);
+          renderFlagGroup(els.smP1InRow2, els.smP1InPFlag, els.smP1InPRegion, p1.partnerFlag, p1.partnerRegion, isSmDoubles ? inMode : 'none', flagFit);
+          const p1InVis = !els.smP1InRow1.classList.contains('hidden-el') || !els.smP1InRow2.classList.contains('hidden-el');
+          els.smP1InFlags.classList.toggle('hidden-el', !p1InVis);
+          els.smP1InFlags.classList.toggle('is-dual', els.smP1InRow1.classList.contains('is-dual') || els.smP1InRow2.classList.contains('is-dual'));
+
+          renderFlagGroup(els.smP2InRow1, els.smP2InFlag, els.smP2InRegion, p2.flag, p2.region, inMode, flagFit);
+          renderFlagGroup(els.smP2InRow2, els.smP2InPFlag, els.smP2InPRegion, p2.partnerFlag, p2.partnerRegion, isSmDoubles ? inMode : 'none', flagFit);
+          const p2InVis = !els.smP2InRow1.classList.contains('hidden-el') || !els.smP2InRow2.classList.contains('hidden-el');
+          els.smP2InFlags.classList.toggle('hidden-el', !p2InVis);
+          els.smP2InFlags.classList.toggle('is-dual', els.smP2InRow1.classList.contains('is-dual') || els.smP2InRow2.classList.contains('is-dual'));
+
+          // Hanging Competitive Sub-Row (Seed + Flags + Pronouns + [W/L] + Match Point)
+          els.smP1Seed.textContent = seed1;
+          els.smP1Seed.classList.toggle('hidden-el', !seed1);
+          els.smP2Seed.textContent = seed2;
+          els.smP2Seed.classList.toggle('hidden-el', !seed2);
+
+          els.smP1Pronouns.textContent = pr1;
+          els.smP1Pronouns.classList.toggle('hidden-el', !pr1);
+          els.smP2Pronouns.textContent = pr2;
+          els.smP2Pronouns.classList.toggle('hidden-el', !pr2);
+
+          const renderSmBracket = (el, bVal) => {
+            const b = String(bVal || '').toUpperCase().trim();
+            el.classList.remove('bracket-w', 'bracket-l', 'hidden-el');
+            if (b === 'W') { el.textContent = 'W'; el.classList.add('bracket-w'); }
+            else if (b === 'L') { el.textContent = 'L'; el.classList.add('bracket-l'); }
+            else el.classList.add('hidden-el');
+          };
+          renderSmBracket(els.smP1Bracket, p1.bracket);
+          renderSmBracket(els.smP2Bracket, p2.bracket);
+
+          // Match Point on Smash (All 5 Positions, All 5 Colors, Custom Badge Text!)
+          els.smSideP1.classList.toggle('match-point', p1MP);
+          els.smSideP2.classList.toggle('match-point', p2MP);
+          els.smP1Mp.textContent = mpLabel;
+          els.smP2Mp.textContent = mpLabel;
+          els.smP1MpIn.textContent = mpLabel;
+          els.smP2MpIn.textContent = mpLabel;
+          els.smP1MpFloat.textContent = mpLabel;
+          els.smP2MpFloat.textContent = mpLabel;
+          els.smP1Mp.classList.toggle('hidden-el', !p1MP);
+          els.smP2Mp.classList.toggle('hidden-el', !p2MP);
+          els.smP1MpIn.classList.toggle('hidden-el', !p1MP);
+          els.smP2MpIn.classList.toggle('hidden-el', !p2MP);
+          els.smP1MpFloat.classList.toggle('hidden-el', !p1MP);
+          els.smP2MpFloat.classList.toggle('hidden-el', !p2MP);
+        }
+
+        // 6. PRESET-ADAPTIVE EVENT BAR + COMMENTATORS + ZERO-OVERLAP STACKING ENGINE
+        // Derive active preset visual tokens (bg, p1, p2, accent, text, shape, font) automatically!
+        const rootCs = getComputedStyle(els.root);
+        const activeThemeId = state.theme || 't8-native-hud';
+        const sf6T = SF6_THEME_MAP[activeThemeId] || null;
+        const isLightTheme = smIsLight || Boolean(!useCustom && gameTheme?.pv?.isLight) || ['t8-kazama-sanctuary', 'fgc-clean-major'].includes(activeThemeId);
+        const brandP1 = isSmash ? smP1Col : (useCustom ? (st.p1Color1 || '#ff512f') : (gameTheme?.pv?.p1 || sf6T?.pv?.p1 || rootCs.getPropertyValue('--p1-accent').trim() || '#ff512f'));
+        const brandP2 = isSmash ? smP2Col : (useCustom ? (st.p2Color1 || '#2563eb') : (gameTheme?.pv?.p2 || sf6T?.pv?.p2 || rootCs.getPropertyValue('--p2-accent').trim() || '#2563eb'));
+        const brandAcc = isSmash ? smAcc : (useCustom ? (st.centerAccent || '#ffd24d') : (gameTheme?.pv?.cborder || sf6T?.pv?.cborder || rootCs.getPropertyValue('--center-accent').trim() || brandP1 || '#ffd24d'));
+        const brandBg = useCustom
+          ? `linear-gradient(180deg, ${hexToRgba(st.bgColor1 || '#121520', Math.max(0.4, Number(st.bgAlpha ?? 94) / 100))}, ${hexToRgba(st.bgColor2 || '#07080d', Math.max(0.4, Number(st.bgAlpha ?? 94) / 100))})`
+          : (isSmash
+            ? (gameTheme?.cfg?.smashStyle === 'pill'
+              ? `linear-gradient(90deg, ${smP1Col}, #111522 50%, ${smP2Col})`
+              : (gameTheme?.pv?.bg1 || 'linear-gradient(180deg, rgba(20,24,36,0.95), rgba(10,13,20,0.98))'))
+            : (gameTheme?.pv?.bg1 || sf6T?.pv?.bg1 || sf6T?.pv?.bg || rootCs.getPropertyValue('--bg-main').trim() || 'linear-gradient(180deg, rgba(16,19,28,0.95), rgba(8,10,16,0.98))'));
+        const brandText = useCustom ? (st.textColor || '#ffffff') : (isLightTheme ? '#0f172a' : '#ffffff');
+        const brandSub = isLightTheme ? '#475569' : '#cbd5e1';
+        const brandFont = resolvedNameFont || FONT_STACKS[gameTheme?.cfg?.font || sf6T?.cfg?.font] || rootCs.getPropertyValue('--font-display').trim() || FONT_STACKS['Barlow Condensed'];
+
+        // Derive matching silhouette automatically from active scorebar preset
+        let autoShape = 'trapezoid';
+        if (isSmash) {
+          const sms = gameTheme?.cfg?.smashStyle || 'major';
+          autoShape = sms === 'pill' ? 'pill' : sms === 'slant' ? 'blade' : sms === 'glass' ? 'glass' : 'flat';
+        } else if (st.fillMode === 'glass' || ['t8-glass-minimal', 'mk1-hourglass-glass', '2xko-ionia-spirit'].includes(activeThemeId)) {
+          autoShape = 'glass';
+        } else if (activeThemeId === 'mk1-evo-broadcast') {
+          autoShape = 'flat';
+        } else if (['2xko', 'ffcotw', 'avatar', 'mk1'].includes(activeGameProfile) || activeLayout === 'blade' || activeLayout === 'sf6-drive') {
+          autoShape = 'blade';
+        } else if (['t8-sakura-dojo', 't8-prism-holo', 't8-kazama-sanctuary'].includes(activeThemeId) || st.shape === 'rounded') {
+          autoShape = 'pill';
+        } else if (['fgc-clean-major', 'sf6-sfl-pro'].includes(activeThemeId) || st.shape === 'flat') {
+          autoShape = 'flat';
+        }
+
+        // Resolve Tournament / Custom Logo (Sync with Start.gg / Challonge OR custom upload)
+        const eb = state.eventBar || {};
         const cm = state.commentators || {};
+        const resolvedLogoUrl = eb.syncLogo !== false
+          ? (state.vs?.logoUrl || eb.logoUrl || '')
+          : (eb.logoUrl || '');
+
+        const setImgUrl = (wrap, img, url, show) => {
+          if (!wrap || !img) return;
+          if (show && url) {
+            wrap.classList.remove('hidden-el');
+            if (img.dataset.src !== url) {
+              img.dataset.src = url;
+              img.src = url;
+            }
+          } else {
+            wrap.classList.add('hidden-el');
+          }
+        };
+
+        // 6A. Render Event Bar (works for ALL games including Smash!)
+        const showBottomEv = (Boolean(state.showBottomBar) || Boolean(cfg.forceBottomBar)) && state.visible !== false && !introPending;
+        const ebShape = (eb.style && eb.style !== 'auto') ? eb.style : autoShape;
+        let ebPos = eb.position || 'bottom-center';
+        const ebCustom = Boolean(eb.customColors);
+
+        els.bottomBar.dataset.shape = ebShape;
+        els.bottomBar.dataset.anim = eb.anim || 'slide-up';
+        els.bottomBar.dataset.light = (!ebCustom && isLightTheme) ? 'on' : 'off';
+        els.bottomBar.style.setProperty('--eb-bg', ebCustom
+          ? `linear-gradient(180deg, ${eb.bgColor1 || '#10141f'}, ${eb.bgColor2 || '#07090f'})`
+          : brandBg);
+        els.bottomBar.style.setProperty('--eb-accent', ebCustom ? (eb.accentColor || '#ffd24d') : brandAcc);
+        els.bottomBar.style.setProperty('--eb-p1', ebCustom ? (eb.accentColor || brandP1) : brandP1);
+        els.bottomBar.style.setProperty('--eb-p2', ebCustom ? (eb.accentColor || brandP2) : brandP2);
+        els.bottomBar.style.setProperty('--eb-text', ebCustom ? (eb.textColor || '#ffffff') : brandText);
+        els.bottomBar.style.setProperty('--eb-sub', ebCustom ? (eb.subColor || '#cbd5e1') : brandSub);
+        els.bottomBar.style.setProperty('--eb-border-w', `${Number(eb.borderWidth ?? 2)}px`);
+        els.bottomBar.style.setProperty('--eb-scale', (Number(eb.scale || 100) / 100).toFixed(3));
+        els.bottomBar.style.setProperty('--eb-off-x', `${Number(eb.offsetX || 0)}px`);
+        els.bottomBar.style.setProperty('--eb-off-y', `${Number(eb.offsetY || 0)}px`);
+        els.bottomBar.style.setProperty('--eb-op', (Number(eb.opacity ?? 100) / 100).toFixed(2));
+        els.bottomBar.style.setProperty('--eb-logo-scale', (Number(eb.logoScale || 100) / 100).toFixed(2));
+        els.bottomBar.style.setProperty('--eb-font', brandFont);
+        if (Number(eb.width || 0) >= 160) {
+          els.bottomBar.dataset.customW = '1';
+          els.bottomBar.style.setProperty('--eb-min-w', `${Math.round(Number(eb.width))}px`);
+        } else {
+          els.bottomBar.dataset.customW = '0';
+          els.bottomBar.style.setProperty('--eb-min-w', isSmash ? '300px' : '370px');
+        }
+
+        const ebTitleTxt = (eb.title || '').trim() || (state.tournament || '').trim() || (GAME_PROFILES[activeGameProfile]?.name || 'TOURNAMENT LIVE');
+        els.bebTitle.textContent = ebTitleTxt;
+        const autoSub = [state.round, state.format].filter(Boolean).join(' · ') || 'LIVE MATCH';
+        const subTxt = (eb.subtitle || '').trim() || autoSub;
+        els.bebSub.textContent = subTxt;
+        els.bebSub.classList.toggle('hidden-el', eb.showSubtitle === false || !subTxt);
+        const tickTxt = (eb.tickerText || '').trim();
+        els.bebTicker.textContent = tickTxt;
+        els.bebTicker.classList.toggle('hidden-el', !tickTxt);
+
+        const ebShowLogo = eb.showLogo !== false && Boolean(resolvedLogoUrl);
+        const ebLogoPos = eb.logoPos || 'top-badge';
+        setImgUrl(els.bebLogoWrap, els.bebLogoImg, resolvedLogoUrl, ebShowLogo && ebLogoPos === 'top-badge');
+        setImgUrl(els.bebLogoLeft, els.bebLogoLeftImg, resolvedLogoUrl, ebShowLogo && (ebLogoPos === 'left' || ebLogoPos === 'both'));
+        setImgUrl(els.bebLogoRight, els.bebLogoRightImg, resolvedLogoUrl, ebShowLogo && (ebLogoPos === 'right' || ebLogoPos === 'both'));
+
+        // 6B. Render Commentators Lower-Third (Up to 3 Casters + Preset-Adaptive Styling!)
+        const showCasters = Boolean(state.showCommentators) && state.visible !== false && !introPending;
+        const cmShape = (cm.style && cm.style !== 'auto') ? cm.style : autoShape;
+        let cmPos = cm.position || 'bottom-center';
+        const antiOverlap = cm.antiOverlap || 'auto-stack';
+        const cmCustom = Boolean(cm.customColors);
+
+        // Side-by-side anti-overlap mode when both share bottom-center!
+        if (showBottomEv && showCasters && antiOverlap === 'side-by-side' && ebPos === 'bottom-center' && cmPos === 'bottom-center') {
+          ebPos = 'bottom-left';
+          cmPos = 'bottom-right';
+        }
+        els.bottomBar.dataset.pos = ebPos;
+        els.casterBar.dataset.pos = cmPos;
+        els.casterBar.dataset.shape = cmShape;
+        els.casterBar.dataset.layout = cm.layout || 'single-bar';
+        els.casterBar.dataset.icon = cm.iconStyle || 'mic';
+        els.casterBar.dataset.sep = cm.sepStyle || 'line';
+        els.casterBar.dataset.anim = cm.anim || 'slide-up';
+
+        els.casterBar.style.setProperty('--cm-bg', cmCustom
+          ? `linear-gradient(180deg, ${cm.bgColor1 || '#10141f'}, ${cm.bgColor2 || '#07090f'})`
+          : brandBg);
+        els.casterBar.style.setProperty('--cm-accent', cmCustom ? (cm.accentColor || '#ffd24d') : brandAcc);
+        els.casterBar.style.setProperty('--cm-p1', cmCustom ? (cm.accentColor || brandP1) : brandP1);
+        els.casterBar.style.setProperty('--cm-p2', cmCustom ? (cm.accentColor || brandP2) : brandP2);
+        els.casterBar.style.setProperty('--cm-text', cmCustom ? (cm.textColor || '#ffffff') : brandText);
+        els.casterBar.style.setProperty('--cm-handle', cmCustom ? (cm.handleColor || '#ffd24d') : (isLightTheme ? brandP1 : brandAcc));
+        els.casterBar.style.setProperty('--cm-scale', (Number(cm.scale || 100) / 100).toFixed(3));
+        els.casterBar.style.setProperty('--cm-off-x', `${Number(cm.offsetX || 0)}px`);
+        els.casterBar.style.setProperty('--cm-off-y', `${Number(cm.offsetY || 0)}px`);
+        els.casterBar.style.setProperty('--cm-op', (Number(cm.opacity ?? 100) / 100).toFixed(2));
+        els.casterBar.style.setProperty('--cm-font', brandFont);
+        if (Number(cm.width || 0) >= 180) {
+          els.casterBar.dataset.customW = '1';
+          els.casterBar.style.setProperty('--cm-w', `${Math.round(Number(cm.width))}px`);
+        } else {
+          els.casterBar.dataset.customW = '0';
+          els.casterBar.style.removeProperty('--cm-w');
+        }
+
+        const MIC_SVG = `<svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 1 0-2 0 3 3 0 0 1-6 0 1 1 0 1 0-2 0 5 5 0 0 0 4 4.9V19H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.1A5 5 0 0 0 17 11z"/></svg>`;
+        const HEADSET_SVG = `<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-9 9v5a3 3 0 0 0 3 3h2v-7H5v-1a7 7 0 0 1 14 0v1h-3v7h2a3 3 0 0 0 3-3v-5a9 9 0 0 0-9-9z"/></svg>`;
+        const iconHtml = cm.iconStyle === 'headset' ? HEADSET_SVG : cm.iconStyle === 'live-dot' ? '<span class="caster-live-dot"></span>' : MIC_SVG;
+        if (els.c1Icon) els.c1Icon.innerHTML = iconHtml;
+        if (els.c2Icon) els.c2Icon.innerHTML = iconHtml;
+        if (els.c3Icon) els.c3Icon.innerHTML = iconHtml;
+
+        setImgUrl(els.casterLogoWrap, els.casterLogoImg, resolvedLogoUrl, Boolean(cm.showLogo) && Boolean(resolvedLogoUrl));
+
         els.c1Name.textContent = cm.c1Name || '';
         els.c1Handle.textContent = cm.c1Handle || '';
+        if (els.c1Role) els.c1Role.textContent = cm.c1Role || '';
         els.c2Name.textContent = cm.c2Name || '';
         els.c2Handle.textContent = cm.c2Handle || '';
+        if (els.c2Role) els.c2Role.textContent = cm.c2Role || '';
+        if (els.c3Name) els.c3Name.textContent = cm.c3Name || '';
+        if (els.c3Handle) els.c3Handle.textContent = cm.c3Handle || '';
+        if (els.c3Role) els.c3Role.textContent = cm.c3Role || '';
+
         const hasC2 = Boolean((cm.c2Name || '').trim());
+        const hasC3 = Boolean((cm.c3Name || '').trim());
         els.c2Wrap.style.display = hasC2 ? 'flex' : 'none';
-        els.cSep.style.display = hasC2 ? 'block' : 'none';
-        if (!introPending) {
-          els.casterBar.classList.toggle('visible', Boolean(state.showCommentators) && state.visible !== false);
+        els.cSep.style.display = hasC2 ? 'flex' : 'none';
+        if (els.c3Wrap) els.c3Wrap.style.display = hasC3 ? 'flex' : 'none';
+        if (els.cSep2) els.cSep2.style.display = hasC3 ? 'flex' : 'none';
+
+        els.bottomBar.classList.toggle('visible', showBottomEv);
+        els.casterBar.classList.toggle('visible', showCasters);
+
+        // 6C. REAL-TIME COLLISION-PROOF AUTO-STACK MEASUREMENT
+        // If both Event Bar & Commentators occupy the same anchor zone, lift Commentators cleanly above Event Bar!
+        const sameZone = showBottomEv && showCasters && antiOverlap === 'auto-stack' && ebPos === cmPos;
+        if (sameZone) {
+          requestAnimationFrame(() => {
+            const ebRect = els.bottomBar.getBoundingClientRect();
+            const ebH = Math.max(54, Math.ceil(ebRect.height));
+            const baseGap = ebPos.startsWith('bottom') ? (ebPos === 'bottom-center' ? 14 : 26) : 26;
+            els.casterBar.style.setProperty('--cm-stack-lift', `${ebH + baseGap}px`);
+          });
+        } else {
+          els.casterBar.style.setProperty('--cm-stack-lift', '0px');
         }
+
+        // 6D. Apply Free-Drag Layout Position Offsets (applies identically in Preview & OBS!)
+        const lp = state.layoutPos || {};
+        const setLp = (cssVar, val) => stage.style.setProperty(cssVar, `${Math.round(Number(val || 0))}px`);
+        setLp('--lp-p1-wing-x', lp.p1WingX); setLp('--lp-p1-wing-y', lp.p1WingY);
+        setLp('--lp-p2-wing-x', lp.p2WingX); setLp('--lp-p2-wing-y', lp.p2WingY);
+        setLp('--lp-center-x', lp.centerX); setLp('--lp-center-y', lp.centerY);
+        setLp('--lp-p1-mp-x', lp.p1MpX); setLp('--lp-p1-mp-y', lp.p1MpY);
+        setLp('--lp-p2-mp-x', lp.p2MpX); setLp('--lp-p2-mp-y', lp.p2MpY);
+        setLp('--lp-p1-meta-x', lp.p1MetaX); setLp('--lp-p1-meta-y', lp.p1MetaY);
+        setLp('--lp-p2-meta-x', lp.p2MetaX); setLp('--lp-p2-meta-y', lp.p2MetaY);
+        setLp('--lp-sm-info-x', lp.smInfoX); setLp('--lp-sm-info-y', lp.smInfoY);
+        setLp('--lp-sm-p1-x', lp.smP1X); setLp('--lp-sm-p1-y', lp.smP1Y);
+        setLp('--lp-sm-p2-x', lp.smP2X); setLp('--lp-sm-p2-y', lp.smP2Y);
+        setLp('--lp-sm-logo-x', lp.smLogoX); setLp('--lp-sm-logo-y', lp.smLogoY);
+        setLp('--lp-sm-p1sub-x', lp.smP1SubX); setLp('--lp-sm-p1sub-y', lp.smP1SubY);
+        setLp('--lp-sm-p2sub-x', lp.smP2SubX); setLp('--lp-sm-p2sub-y', lp.smP2SubY);
+        const setOptPx = (attr, cssVar, val, minV) => {
+          const n = Math.round(Number(val || 0));
+          if (n >= minV) { stage.dataset[attr] = '1'; stage.style.setProperty(cssVar, `${n}px`); }
+          else { delete stage.dataset[attr]; stage.style.removeProperty(cssVar); }
+        };
+        const setOptScale = (attr, cssVar, val) => {
+          const n = Number(val ?? 100);
+          if (Number.isFinite(n) && Math.abs(n - 100) >= 1) {
+            stage.dataset[attr] = '1';
+            stage.style.setProperty(cssVar, (n / 100).toFixed(3));
+          } else {
+            delete stage.dataset[attr];
+            stage.style.removeProperty(cssVar);
+          }
+        };
+        setOptPx('lpCenterW', '--lp-center-w', lp.centerW, 96);
+        setOptPx('lpSmInfoW', '--lp-sm-info-w', lp.smInfoW, 130);
+        setOptPx('lpSmLogoSz', '--lp-sm-logo-sz', lp.smLogoSize, 42);
+        setOptScale('lpMpScale', '--lp-mp-scale', lp.mpScale);
+        setOptPx('lpMetaW', '--lp-meta-w', lp.metaW, 120);
+        setOptScale('lpSmSubScale', '--lp-sm-sub-scale', lp.smSubScale);
+        if (typeof refreshSelectOverlay === 'function') requestAnimationFrame(refreshSelectOverlay);
 
         // 7. Initial OBS Scene Intro & Live Replay Trigger (introNonce)
         const incomingNonce = Number(state.introNonce || 0);
@@ -5339,13 +6487,572 @@
           window.FGC_CUSTOM_FONTS?.setFonts(msg.fonts);
           if (latestState) applyState(latestState);
         } else if (msg.type === 'test-score-anim') {
-          triggerScorePop(els.p1ScoreBox);
-          triggerScorePop(els.p2ScoreBox);
+          const testDur = Math.max(200, Math.min(1500, Number(latestState?.style?.scoreAnimDuration || 450)));
+          triggerScorePop(els.p1ScoreBox, 'up', testDur);
+          triggerScorePop(els.p2ScoreBox, 'up', testDur);
+          triggerScorePop(els.smP1ScoreBox, 'up', testDur);
+          triggerScorePop(els.smP2ScoreBox, 'up', testDur);
         } else if (msg.type === 'test-entry-anim') {
           const delay = msg.useSceneDelay ? (latestState?.style?.sceneDelay ?? 250) : 140;
           playSceneIntro(delay);
+        } else if (msg.type === 'sb-interactive-config' && isPreviewMode) {
+          sbInteractiveEdit = Boolean(msg.interactive);
+          sbDragEnabled = Boolean(msg.drag);
+          if (msg.mirror !== undefined) sbMirrorDrag = Boolean(msg.mirror);
+          document.body.classList.toggle('sb-interactive-edit', sbInteractiveEdit);
+          document.body.classList.toggle('sb-drag-on', sbInteractiveEdit && sbDragEnabled);
+          if (!sbInteractiveEdit) {
+            sbSelectedEl = '';
+            if (sbHoverBox) sbHoverBox.style.display = 'none';
+            if (sbSelectBox) sbSelectBox.style.display = 'none';
+            if (sbMirrorBox) sbMirrorBox.style.display = 'none';
+            if (sbResizeHandle) sbResizeHandle.style.display = 'none';
+            if (sbHoverPill) sbHoverPill.style.display = 'none';
+          } else {
+            refreshSelectOverlay();
+          }
+        } else if (msg.type === 'sb-highlight-element' && isPreviewMode) {
+          sbSelectedEl = msg.element || '';
+          refreshSelectOverlay();
         }
       });
+
+      /* =========================================================================
+         INTERACTIVE CLICK-TO-EDIT & DIRECT FREE-DRAG ENGINE (PREVIEW MODE ONLY!)
+         Zero overhead & zero visual artifacts in live OBS Browser Source.
+         ========================================================================= */
+      let sbInteractiveEdit = isPreviewMode;
+      let sbDragEnabled = isPreviewMode;
+      let sbMirrorDrag = isPreviewMode;
+      let sbSelectedEl = '';
+      const sbHoverBox = document.getElementById('sb-hover-box');
+      const sbSelectBox = document.getElementById('sb-select-box');
+      const sbMirrorBox = document.getElementById('sb-mirror-box');
+      const sbResizeHandle = document.getElementById('sb-resize-handle');
+      const sbResizeHandleAlt = document.getElementById('sb-resize-handle-alt');
+      const sbHoverPill = document.getElementById('sb-hover-pill');
+
+      const MIRROR_PAIR = {
+        p1Wing: 'p2Wing', p2Wing: 'p1Wing',
+        p1Mp: 'p2Mp', p2Mp: 'p1Mp',
+        p1Meta: 'p2Meta', p2Meta: 'p1Meta',
+        smP1: 'smP2', smP2: 'smP1',
+        smP1Sub: 'smP2Sub', smP2Sub: 'smP1Sub'
+      };
+      const PAIR_CONTAINER = {
+        p1Wing: '#wing-p1', p2Wing: '#wing-p2',
+        p1Mp: '#p1-mp-tag', p2Mp: '#p2-mp-tag',
+        p1Meta: '#p1-meta-strip', p2Meta: '#p2-meta-strip',
+        smP1: '#sm-side-p1 .sm-bar', smP2: '#sm-side-p2 .sm-bar',
+        smP1Sub: '#sm-p1-subrow', smP2Sub: '#sm-p2-subrow'
+      };
+
+      const DRAG_SPEC = {
+        p1Wing:  { target: 'layoutPos', xKey: 'p1WingX',  yKey: 'p1WingY',  xVar: '--lp-p1-wing-x',  yVar: '--lp-p1-wing-y',  minX: -820, maxX: 820,  minY: -90,  maxY: 940, scaled: true,  name: 'P1 Wing' },
+        p2Wing:  { target: 'layoutPos', xKey: 'p2WingX',  yKey: 'p2WingY',  xVar: '--lp-p2-wing-x',  yVar: '--lp-p2-wing-y',  minX: -820, maxX: 820,  minY: -90,  maxY: 940, scaled: true,  name: 'P2 Wing' },
+        center:  { target: 'layoutPos', xKey: 'centerX',  yKey: 'centerY',  xVar: '--lp-center-x',   yVar: '--lp-center-y',   minX: -860, maxX: 860,  minY: -80,  maxY: 950, scaled: true,  name: 'Center Banner' },
+        p1Mp:    { target: 'layoutPos', xKey: 'p1MpX',    yKey: 'p1MpY',    xVar: '--lp-p1-mp-x',    yVar: '--lp-p1-mp-y',    minX: -450, maxX: 450,  minY: -220, maxY: 480, scaled: true,  name: 'P1 Match Point' },
+        p2Mp:    { target: 'layoutPos', xKey: 'p2MpX',    yKey: 'p2MpY',    xVar: '--lp-p2-mp-x',    yVar: '--lp-p2-mp-y',    minX: -450, maxX: 450,  minY: -220, maxY: 480, scaled: true,  name: 'P2 Match Point' },
+        p1Meta:  { target: 'layoutPos', xKey: 'p1MetaX',  yKey: 'p1MetaY',  xVar: '--lp-p1-meta-x',  yVar: '--lp-p1-meta-y',  minX: -450, maxX: 450,  minY: -120, maxY: 360, scaled: true,  name: 'P1 Meta Strip' },
+        p2Meta:  { target: 'layoutPos', xKey: 'p2MetaX',  yKey: 'p2MetaY',  xVar: '--lp-p2-meta-x',  yVar: '--lp-p2-meta-y',  minX: -450, maxX: 450,  minY: -120, maxY: 360, scaled: true,  name: 'P2 Meta Strip' },
+        smInfo:  { target: 'layoutPos', xKey: 'smInfoX',  yKey: 'smInfoY',  xVar: '--lp-sm-info-x',  yVar: '--lp-sm-info-y',  minX: -120, maxX: 1580, minY: -60,  maxY: 940, scaled: true,  name: 'Round / Stage Box' },
+        smP1:    { target: 'layoutPos', xKey: 'smP1X',    yKey: 'smP1Y',    xVar: '--lp-sm-p1-x',    yVar: '--lp-sm-p1-y',    minX: -720, maxX: 720,  minY: -60,  maxY: 940, scaled: true,  name: 'P1 Smash Bar' },
+        smP2:    { target: 'layoutPos', xKey: 'smP2X',    yKey: 'smP2Y',    xVar: '--lp-sm-p2-x',    yVar: '--lp-sm-p2-y',    minX: -720, maxX: 720,  minY: -60,  maxY: 940, scaled: true,  name: 'P2 Smash Bar' },
+        smLogo:  { target: 'layoutPos', xKey: 'smLogoX',  yKey: 'smLogoY',  xVar: '--lp-sm-logo-x',  yVar: '--lp-sm-logo-y',  minX: -860, maxX: 860,  minY: -60,  maxY: 940, scaled: true,  name: 'Center Logo' },
+        smP1Sub: { target: 'layoutPos', xKey: 'smP1SubX', yKey: 'smP1SubY', xVar: '--lp-sm-p1sub-x', yVar: '--lp-sm-p1sub-y', minX: -520, maxX: 520,  minY: -140, maxY: 420, scaled: true,  name: 'P1 Flags / Badges' },
+        smP2Sub: { target: 'layoutPos', xKey: 'smP2SubX', yKey: 'smP2SubY', xVar: '--lp-sm-p2sub-x', yVar: '--lp-sm-p2sub-y', minX: -520, maxX: 520,  minY: -140, maxY: 420, scaled: true,  name: 'P2 Flags / Badges' },
+        eventBar:     { target: 'eventBar',     xKey: 'offsetX', yKey: 'offsetY', minX: -840, maxX: 840, minY: -200, maxY: 900, scaled: false, name: 'Event Bar' },
+        commentators: { target: 'commentators', xKey: 'offsetX', yKey: 'offsetY', minX: -840, maxX: 840, minY: -200, maxY: 900, scaled: false, name: 'Commentators Bar' }
+      };
+
+      function isVisibleHit(el) {
+        if (!el || !el.isConnected) return false;
+        const r = el.getBoundingClientRect();
+        if (r.width < 2 || r.height < 2) return false;
+        const cs = getComputedStyle(el);
+        return cs.display !== 'none' && cs.visibility !== 'hidden' && Number(cs.opacity) > 0.02;
+      }
+
+      function positionBox(boxEl, targetEl) {
+        if (!boxEl) return;
+        if (!targetEl || !sbInteractiveEdit || !isVisibleHit(targetEl)) {
+          boxEl.style.display = 'none';
+          return;
+        }
+        const r = targetEl.getBoundingClientRect();
+        const pad = 2;
+        boxEl.style.left = `${Math.round(r.left - pad)}px`;
+        boxEl.style.top = `${Math.round(r.top - pad)}px`;
+        boxEl.style.width = `${Math.round(r.width + pad * 2)}px`;
+        boxEl.style.height = `${Math.round(r.height + pad * 2)}px`;
+        boxEl.style.display = 'block';
+      }
+
+      function findSelectedNode(elKey) {
+        if (!elKey) return null;
+        const nodes = document.querySelectorAll(`.sb-hit[data-sb-el="${elKey}"]`);
+        for (const n of nodes) {
+          if (isVisibleHit(n)) return n;
+        }
+        return null;
+      }
+
+      function getResizeConfig(dragKey) {
+        const isSm = els.smashRoot?.classList.contains('is-active');
+        if (dragKey === 'p1Wing' || dragKey === 'p2Wing' || dragKey === 'smP1' || dragKey === 'smP2') {
+          const isP1 = dragKey === 'p1Wing' || dragKey === 'smP1';
+          const el = isSm
+            ? document.querySelector(isP1 ? '#sm-side-p1 .sm-bar' : '#sm-side-p2 .sm-bar')
+            : document.getElementById(isP1 ? 'wing-p1' : 'wing-p2');
+          const mirrorEl = isSm
+            ? document.querySelector(isP1 ? '#sm-side-p2 .sm-bar' : '#sm-side-p1 .sm-bar')
+            : document.getElementById(isP1 ? 'wing-p2' : 'wing-p1');
+          return {
+            dragKey, mode: 'wingSpread', target: 'tweaks', key: 'wingSpread',
+            min: -300, max: 220, step: 2, defaultVal: 0, scaled: true,
+            edges: [isP1 ? -1 : 1], edgeMult: 1, el, mirrorEl,
+            label: '🪞 Plate Width', unit: 'px', signed: true
+          };
+        }
+        if (dragKey === 'center') {
+          return {
+            dragKey, mode: 'width', target: 'layoutPos', key: 'centerW',
+            cssVar: '--lp-center-w', flagAttr: 'lpCenterW', flagHost: stage,
+            min: 96, max: 640, step: 2, defaultVal: 0, scaled: true,
+            edges: [1, -1], edgeMult: 2, el: document.getElementById('sb-center'),
+            label: 'Center Banner Width', unit: 'px'
+          };
+        }
+        if (dragKey === 'smInfo') {
+          const isCentered = els.smashRoot?.dataset.infoPos === 'center-top';
+          return {
+            dragKey, mode: 'width', target: 'layoutPos', key: 'smInfoW',
+            cssVar: '--lp-sm-info-w', flagAttr: 'lpSmInfoW', flagHost: stage,
+            min: 130, max: 640, step: 2, defaultVal: 0, scaled: true,
+            edges: isCentered ? [1, -1] : [1], edgeMult: isCentered ? 2 : 1,
+            el: document.getElementById('sm-info-box'),
+            label: 'Round Box Width', unit: 'px'
+          };
+        }
+        if (dragKey === 'smLogo') {
+          return {
+            dragKey, mode: 'width', target: 'layoutPos', key: 'smLogoSize',
+            cssVar: '--lp-sm-logo-sz', flagAttr: 'lpSmLogoSz', flagHost: stage,
+            min: 42, max: 180, step: 2, defaultVal: 0, scaled: true,
+            edges: [1, -1], edgeMult: 2, el: document.getElementById('sm-center-logo'),
+            label: 'Center Logo Size', unit: 'px'
+          };
+        }
+        if (dragKey === 'p1Mp' || dragKey === 'p2Mp') {
+          const isP1 = dragKey === 'p1Mp';
+          return {
+            dragKey, mode: 'scale', target: 'layoutPos', key: 'mpScale',
+            cssVar: '--lp-mp-scale', flagAttr: 'lpMpScale', flagHost: stage,
+            min: 60, max: 200, step: 2, defaultVal: 100, scaled: true,
+            edges: [isP1 ? -1 : 1], edgeMult: 1,
+            el: document.getElementById(isP1 ? 'p1-mp-tag' : 'p2-mp-tag'),
+            mirrorEl: document.getElementById(isP1 ? 'p2-mp-tag' : 'p1-mp-tag'),
+            label: '🪞 Match Point Size', unit: '%'
+          };
+        }
+        if (dragKey === 'p1Meta' || dragKey === 'p2Meta') {
+          const isP1 = dragKey === 'p1Meta';
+          return {
+            dragKey, mode: 'width', target: 'layoutPos', key: 'metaW',
+            cssVar: '--lp-meta-w', flagAttr: 'lpMetaW', flagHost: stage,
+            min: 120, max: 760, step: 2, defaultVal: 0, scaled: true,
+            edges: [isP1 ? -1 : 1], edgeMult: 1,
+            el: document.getElementById(isP1 ? 'p1-meta-strip' : 'p2-meta-strip'),
+            mirrorEl: document.getElementById(isP1 ? 'p2-meta-strip' : 'p1-meta-strip'),
+            label: '🪞 Meta Strip Width', unit: 'px'
+          };
+        }
+        if (dragKey === 'smP1Sub' || dragKey === 'smP2Sub') {
+          const isP1 = dragKey === 'smP1Sub';
+          return {
+            dragKey, mode: 'scale', target: 'layoutPos', key: 'smSubScale',
+            cssVar: '--lp-sm-sub-scale', flagAttr: 'lpSmSubScale', flagHost: stage,
+            min: 65, max: 170, step: 2, defaultVal: 100, scaled: true,
+            edges: [isP1 ? 1 : -1], edgeMult: 1,
+            el: document.getElementById(isP1 ? 'sm-p1-subrow' : 'sm-p2-subrow'),
+            mirrorEl: document.getElementById(isP1 ? 'sm-p2-subrow' : 'sm-p1-subrow'),
+            label: '🪞 Flags / Badges Size', unit: '%'
+          };
+        }
+        if (dragKey === 'eventBar') {
+          const pos = els.bottomBar?.dataset.pos || 'bottom-center';
+          const isCenter = pos === 'bottom-center';
+          const isRight = pos.endsWith('right');
+          return {
+            dragKey, mode: 'width', target: 'eventBar', key: 'width',
+            cssVar: '--eb-min-w', flagAttr: 'customW', flagHost: els.bottomBar,
+            min: 160, max: 1400, step: 4, defaultVal: 0, scaled: false,
+            elScale: () => Math.max(0.4, Number(latestState?.eventBar?.scale || 100) / 100),
+            edges: isCenter ? [1, -1] : (isRight ? [-1] : [1]), edgeMult: isCenter ? 2 : 1,
+            el: els.bottomBar?.querySelector('.beb-plate') || els.bottomBar,
+            label: 'Event Bar Width', unit: 'px'
+          };
+        }
+        if (dragKey === 'commentators') {
+          const pos = els.casterBar?.dataset.pos || 'bottom-center';
+          const isCenter = pos === 'bottom-center';
+          const isRight = pos.endsWith('right');
+          return {
+            dragKey, mode: 'width', target: 'commentators', key: 'width',
+            cssVar: '--cm-w', flagAttr: 'customW', flagHost: els.casterBar,
+            min: 180, max: 1500, step: 4, defaultVal: 0, scaled: false,
+            elScale: () => Math.max(0.4, Number(latestState?.commentators?.scale || 100) / 100),
+            edges: isCenter ? [1, -1] : (isRight ? [-1] : [1]), edgeMult: isCenter ? 2 : 1,
+            el: els.casterBar,
+            label: 'Commentators Width', unit: 'px'
+          };
+        }
+        return null;
+      }
+
+      function hideResizeHandles() {
+        if (sbResizeHandle) sbResizeHandle.style.display = 'none';
+        if (sbResizeHandleAlt) sbResizeHandleAlt.style.display = 'none';
+      }
+
+      function placeOneHandle(handleEl, targetEl, dragKey, dir) {
+        if (!handleEl || !targetEl || !isVisibleHit(targetEl)) {
+          if (handleEl) handleEl.style.display = 'none';
+          return;
+        }
+        const r = targetEl.getBoundingClientRect();
+        handleEl.dataset.dragKey = dragKey;
+        handleEl.dataset.dir = String(dir);
+        handleEl.style.left = `${Math.round(dir < 0 ? r.left : r.right)}px`;
+        handleEl.style.top = `${Math.round(r.top + r.height / 2)}px`;
+        handleEl.style.height = `${Math.max(22, Math.min(44, Math.round(r.height + 6)))}px`;
+        handleEl.style.display = 'flex';
+      }
+
+      function positionResizeHandle(node) {
+        if (!sbResizeHandle) return;
+        const dk = (sbInteractiveEdit && sbDragEnabled) ? (node?.dataset?.sbDrag || '') : '';
+        const cfg = dk ? getResizeConfig(dk) : null;
+        if (!cfg || !cfg.el || !isVisibleHit(cfg.el)) {
+          hideResizeHandles();
+          return;
+        }
+        placeOneHandle(sbResizeHandle, cfg.el, dk, cfg.edges[0]);
+        if (cfg.edges.length > 1) {
+          placeOneHandle(sbResizeHandleAlt, cfg.el, dk, cfg.edges[1]);
+        } else if (sbResizeHandleAlt) {
+          sbResizeHandleAlt.style.display = 'none';
+        }
+      }
+
+      function refreshSelectOverlay() {
+        if (!isPreviewMode || !sbInteractiveEdit || !sbSelectedEl) {
+          if (sbSelectBox) sbSelectBox.style.display = 'none';
+          hideResizeHandles();
+          return;
+        }
+        const selNode = findSelectedNode(sbSelectedEl);
+        positionBox(sbSelectBox, selNode);
+        positionResizeHandle(selNode);
+      }
+
+      if (isPreviewMode) {
+        document.body.classList.add('sb-interactive-edit', 'sb-drag-on');
+        window.addEventListener('resize', () => requestAnimationFrame(refreshSelectOverlay));
+
+        let dragState = null;
+        let resizeState = null;
+        let lastSentTs = 0;
+
+        const placePill = (text, cx, cy) => {
+          sbHoverPill.textContent = text;
+          sbHoverPill.style.display = 'block';
+          const pillW = Math.min(340, Math.max(120, text.length * 7.2 + 24));
+          const left = Math.max(6, Math.min(window.innerWidth - pillW, cx + 12));
+          // Top scorebars sit near y=0..65px -> place pill BELOW cursor so it never clips at top edge!
+          const top = cy < 64 ? (cy + 18) : Math.max(6, cy - 30);
+          sbHoverPill.style.left = `${Math.round(left)}px`;
+          sbHoverPill.style.top = `${Math.round(top)}px`;
+        };
+
+        // Universal direct-edge mouse resize handles (works on EVERY scorebar element + double-click to reset!)
+        const startHandleResize = (handleEl, e) => {
+          if (!sbInteractiveEdit || !sbDragEnabled || e.button !== 0) return;
+          const dk = handleEl.dataset.dragKey || '';
+          const dir = Number(handleEl.dataset.dir || 1);
+          const cfg = getResizeConfig(dk);
+          if (!cfg || !cfg.el) return;
+          const stageScale = (stage.getBoundingClientRect().width / 1920) || 1;
+          const userScale = cfg.scaled ? Math.max(0.5, Number(latestState?.tweaks?.scale || 100) / 100) : (cfg.elScale ? cfg.elScale() : 1);
+          const effScale = stageScale * userScale;
+          const curRect = cfg.el.getBoundingClientRect();
+          const curUnscaledW = curRect.width / effScale;
+          const srcObj = latestState?.[cfg.target] || {};
+          let baseVal = Number(srcObj[cfg.key] ?? cfg.defaultVal);
+          if (cfg.mode === 'width' && (!baseVal || baseVal < cfg.min)) {
+            baseVal = Math.round(curUnscaledW);
+          } else if (cfg.mode === 'scale' && (!Number.isFinite(baseVal) || baseVal <= 0)) {
+            baseVal = 100;
+          }
+          resizeState = {
+            cfg,
+            dir,
+            startX: e.clientX,
+            effScale,
+            baseVal,
+            baseVisualW: Math.max(48, curUnscaledW),
+            lastVal: baseVal
+          };
+          document.body.classList.add('sb-resizing');
+          e.preventDefault();
+          e.stopPropagation();
+        };
+
+        const resetHandleSize = (handleEl, e) => {
+          if (!sbInteractiveEdit || !sbDragEnabled) return;
+          const dk = handleEl.dataset.dragKey || '';
+          const cfg = getResizeConfig(dk);
+          if (!cfg) return;
+          e.preventDefault();
+          e.stopPropagation();
+          if (cfg.mode === 'wingSpread') {
+            els.root.style.setProperty('--wing-spread', '0px');
+            if (els.smashRoot) els.smashRoot.style.setProperty('--wing-spread', '0px');
+          } else if (cfg.flagHost) {
+            if (cfg.flagAttr === 'customW') cfg.flagHost.dataset.customW = '0';
+            else delete cfg.flagHost.dataset[cfg.flagAttr];
+            if (cfg.cssVar) cfg.flagHost.style.removeProperty(cfg.cssVar);
+          }
+          window.parent?.postMessage({ type: 'sb-drag-patch', target: cfg.target, patch: { [cfg.key]: cfg.defaultVal }, commit: true }, '*');
+          requestAnimationFrame(refreshSelectOverlay);
+        };
+
+        [sbResizeHandle, sbResizeHandleAlt].forEach((h) => {
+          h?.addEventListener('mousedown', (e) => startHandleResize(h, e));
+          h?.addEventListener('dblclick', (e) => resetHandleSize(h, e));
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (resizeState && sbDragEnabled) {
+            const { cfg, dir, startX, effScale, baseVal, baseVisualW } = resizeState;
+            const rawDx = (e.clientX - startX) / effScale;
+            const signedDx = rawDx * dir * (cfg.edgeMult || 1);
+            let nextVal;
+            if (cfg.mode === 'scale') {
+              const deltaPct = (signedDx / baseVisualW) * 100;
+              nextVal = Math.max(cfg.min, Math.min(cfg.max, Math.round((baseVal + deltaPct) / cfg.step) * cfg.step));
+            } else {
+              nextVal = Math.max(cfg.min, Math.min(cfg.max, Math.round((baseVal + signedDx) / cfg.step) * cfg.step));
+            }
+            resizeState.lastVal = nextVal;
+
+            if (cfg.mode === 'wingSpread') {
+              els.root.style.setProperty('--wing-spread', `${nextVal}px`);
+              if (els.smashRoot) els.smashRoot.style.setProperty('--wing-spread', `${nextVal}px`);
+            } else if (cfg.mode === 'width') {
+              cfg.flagHost.dataset[cfg.flagAttr] = '1';
+              cfg.flagHost.style.setProperty(cfg.cssVar, `${nextVal}px`);
+            } else if (cfg.mode === 'scale') {
+              cfg.flagHost.dataset[cfg.flagAttr] = '1';
+              cfg.flagHost.style.setProperty(cfg.cssVar, (nextVal / 100).toFixed(3));
+            }
+
+            const selNode = findSelectedNode(sbSelectedEl) || cfg.el;
+            positionBox(sbSelectBox, selNode);
+            positionResizeHandle(selNode);
+            if (cfg.mirrorEl && isVisibleHit(cfg.mirrorEl)) {
+              positionBox(sbMirrorBox, cfg.mirrorEl);
+            } else if (sbMirrorBox) {
+              sbMirrorBox.style.display = 'none';
+            }
+            const sign = cfg.signed && nextVal >= 0 ? '+' : '';
+            placePill(`↔ ${cfg.label}: ${sign}${nextVal}${cfg.unit}`, e.clientX, e.clientY);
+
+            const now = performance.now();
+            if (now - lastSentTs > 28) {
+              lastSentTs = now;
+              window.parent?.postMessage({ type: 'sb-drag-patch', target: cfg.target, patch: { [cfg.key]: nextVal }, commit: false }, '*');
+            }
+            return;
+          }
+
+          if (dragState && sbDragEnabled) {
+            const spec = DRAG_SPEC[dragState.dragKey];
+            if (!spec) return;
+            const stageScale = (stage.getBoundingClientRect().width / 1920) || 1;
+            const userScale = spec.scaled ? (Math.max(0.5, Number(latestState?.tweaks?.scale || 100) / 100)) : 1;
+            const div = stageScale * userScale;
+            const rawDx = (e.clientX - dragState.startX) / div;
+            const rawDy = (e.clientY - dragState.startY) / div;
+            if (!dragState.moved && Math.hypot(e.clientX - dragState.startX, e.clientY - dragState.startY) > 4) {
+              dragState.moved = true;
+              document.body.classList.add('sb-dragging');
+            }
+            if (dragState.moved) {
+              const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(v)));
+              const nx = clamp(dragState.baseX + rawDx, spec.minX, spec.maxX);
+              const ny = clamp(dragState.baseY + (dragState.invertY ? -rawDy : rawDy), spec.minY, spec.maxY);
+              const patch = { [spec.xKey]: nx, [spec.yKey]: ny };
+
+              // SYMMETRICAL MIRROR DRAGGING (P1 ⇄ P2, Smash Bars, MP, Meta Strips — hold Alt to temporarily un-mirror!)
+              const pairKey = (sbMirrorDrag && !e.altKey) ? MIRROR_PAIR[dragState.dragKey] : null;
+              const pairSpec = pairKey ? DRAG_SPEC[pairKey] : null;
+              let mirrored = false;
+              if (pairSpec && spec.target === 'layoutPos') {
+                const mx = clamp(-nx, pairSpec.minX, pairSpec.maxX);
+                const my = clamp(ny, pairSpec.minY, pairSpec.maxY);
+                patch[pairSpec.xKey] = mx;
+                patch[pairSpec.yKey] = my;
+                stage.style.setProperty(pairSpec.xVar, `${mx}px`);
+                stage.style.setProperty(pairSpec.yVar, `${my}px`);
+                mirrored = true;
+              }
+              dragState.lastPatch = patch;
+
+              // Instant optimistic 60fps local preview update before postMessage round-trip
+              if (spec.target === 'layoutPos') {
+                stage.style.setProperty(spec.xVar, `${nx}px`);
+                stage.style.setProperty(spec.yVar, `${ny}px`);
+              } else if (spec.target === 'eventBar') {
+                els.bottomBar.style.setProperty('--eb-off-x', `${nx}px`);
+                els.bottomBar.style.setProperty('--eb-off-y', `${ny}px`);
+              } else if (spec.target === 'commentators') {
+                els.casterBar.style.setProperty('--cm-off-x', `${nx}px`);
+                els.casterBar.style.setProperty('--cm-off-y', `${ny}px`);
+              }
+
+              positionBox(sbHoverBox, dragState.node);
+              positionBox(sbSelectBox, dragState.node);
+              positionResizeHandle(dragState.node);
+              if (mirrored && PAIR_CONTAINER[pairKey]) {
+                positionBox(sbMirrorBox, document.querySelector(PAIR_CONTAINER[pairKey]));
+              } else if (sbMirrorBox) {
+                sbMirrorBox.style.display = 'none';
+              }
+              placePill(
+                mirrored
+                  ? `🪞 ${spec.name} (Mirror · X: ${nx >= 0 ? '+' : ''}${nx}px, Y: ${ny >= 0 ? '+' : ''}${ny}px)`
+                  : `✋ ${spec.name}  (X: ${nx >= 0 ? '+' : ''}${nx}px, Y: ${ny >= 0 ? '+' : ''}${ny}px)`,
+                e.clientX,
+                e.clientY
+              );
+
+              const now = performance.now();
+              if (now - lastSentTs > 28) {
+                lastSentTs = now;
+                window.parent?.postMessage({ type: 'sb-drag-patch', target: spec.target, patch, commit: false }, '*');
+              }
+            }
+            return;
+          }
+
+          if (!sbInteractiveEdit) {
+            sbHoverBox.style.display = 'none';
+            sbHoverPill.style.display = 'none';
+            return;
+          }
+
+          if (e.target === sbResizeHandle || e.target === sbResizeHandleAlt) {
+            const hCfg = getResizeConfig(e.target.dataset.dragKey || '');
+            placePill(`↔ Drag to resize ${hCfg ? hCfg.label : 'element'} (double-click to reset)`, e.clientX, e.clientY);
+            return;
+          }
+
+          const hit = e.target.closest?.('.sb-hit');
+          if (hit && isVisibleHit(hit)) {
+            positionBox(sbHoverBox, hit);
+            const lbl = hit.dataset.sbLabel || hit.dataset.sbEl;
+            if (lbl) placePill(lbl, e.clientX, e.clientY);
+          } else {
+            sbHoverBox.style.display = 'none';
+            sbHoverPill.style.display = 'none';
+          }
+        });
+
+        document.addEventListener('mouseleave', () => {
+          if (!dragState && !resizeState) {
+            sbHoverBox.style.display = 'none';
+            sbHoverPill.style.display = 'none';
+          }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+          if (!sbInteractiveEdit || e.button !== 0) return;
+          if (e.target === sbResizeHandle || e.target === sbResizeHandleAlt) return;
+          const hit = e.target.closest?.('.sb-hit');
+          if (!hit || !isVisibleHit(hit)) return;
+          const elKey = hit.dataset.sbEl || '';
+          const dragKey = hit.dataset.sbDrag || '';
+          const spec = DRAG_SPEC[dragKey];
+          let baseX = 0, baseY = 0, invertY = false;
+          if (spec) {
+            const srcObj = latestState?.[spec.target] || {};
+            baseX = Number(srcObj[spec.xKey] || 0);
+            baseY = Number(srcObj[spec.yKey] || 0);
+            if (spec.target === 'eventBar') {
+              const pos = els.bottomBar.dataset.pos || 'bottom-center';
+              invertY = pos.startsWith('bottom');
+            } else if (spec.target === 'commentators') {
+              const pos = els.casterBar.dataset.pos || 'bottom-center';
+              invertY = pos.startsWith('bottom');
+            }
+          }
+          dragState = {
+            node: hit,
+            el: elKey,
+            dragKey,
+            label: hit.dataset.sbLabel || elKey,
+            startX: e.clientX,
+            startY: e.clientY,
+            baseX,
+            baseY,
+            invertY,
+            moved: false,
+            lastPatch: null
+          };
+          e.preventDefault();
+        });
+
+        window.addEventListener('mouseup', () => {
+          if (resizeState) {
+            const rs = resizeState;
+            resizeState = null;
+            document.body.classList.remove('sb-resizing');
+            sbHoverPill.style.display = 'none';
+            if (sbHoverBox) sbHoverBox.style.display = 'none';
+            if (sbMirrorBox) sbMirrorBox.style.display = 'none';
+            window.parent?.postMessage({ type: 'sb-drag-patch', target: rs.cfg.target, patch: { [rs.cfg.key]: rs.lastVal }, commit: true }, '*');
+            requestAnimationFrame(refreshSelectOverlay);
+            return;
+          }
+          if (!dragState) return;
+          const ds = dragState;
+          dragState = null;
+          document.body.classList.remove('sb-dragging');
+          if (ds.moved) {
+            sbHoverPill.style.display = 'none';
+            if (sbHoverBox) sbHoverBox.style.display = 'none';
+          }
+          if (sbMirrorBox) sbMirrorBox.style.display = 'none';
+          sbSelectedEl = ds.el;
+          positionBox(sbSelectBox, ds.node);
+          positionResizeHandle(ds.node);
+          const spec = DRAG_SPEC[ds.dragKey];
+          if (ds.moved && ds.lastPatch && spec) {
+            window.parent?.postMessage({ type: 'sb-drag-patch', target: spec.target, patch: ds.lastPatch, commit: true }, '*');
+          }
+          window.parent?.postMessage({
+            type: 'sb-select-element',
+            element: ds.el,
+            label: ds.label,
+            dragKey: ds.dragKey,
+            moved: ds.moved
+          }, '*');
+        });
+      }
+
+      // Initialize OBS-safe Audio & SFX engine (strictly silent inside preview iframes)
+      window.FGC_AUDIO?.init({ role: 'scorebar', isPreview: isPreviewMode });
 
       // Layer 2: BroadcastChannel & localStorage fallback
       let bc = null;
@@ -5356,6 +7063,10 @@
           else if (ev.data && ev.data.type === 'fonts' && Array.isArray(ev.data.payload)) {
             window.FGC_CUSTOM_FONTS?.setFonts(ev.data.payload);
             if (latestState) applyState(latestState);
+          } else if (ev.data && ev.data.type === 'sfx' && Array.isArray(ev.data.payload)) {
+            window.FGC_AUDIO?.setCustomSfx(ev.data.payload);
+          } else if (ev.data && ev.data.type === 'audio' && ev.data.payload) {
+            window.FGC_AUDIO?.handleAudioEvent(ev.data.payload);
           }
         };
       } catch { }
@@ -5393,7 +7104,7 @@
           function connectSSE() {
             if (pageUnloading) return;
             if (activeEs) { try { activeEs.close(); } catch { } }
-            const es = new EventSource('/api/events');
+            const es = new EventSource('/api/events?client=scorebar' + (window.obsstudio ? '&obs=1' : ''));
             activeEs = es;
             es.addEventListener('state', (ev) => {
               try {
@@ -5409,6 +7120,20 @@
                 window.FGC_CUSTOM_FONTS?.setFonts(list);
                 if (latestState) applyState(latestState);
                 if (bc) bc.postMessage({ type: 'fonts', payload: list, fromSse: true });
+              } catch { }
+            });
+            es.addEventListener('sfx', (ev) => {
+              try {
+                const list = JSON.parse(ev.data);
+                window.FGC_AUDIO?.setCustomSfx(list);
+                if (bc) bc.postMessage({ type: 'sfx', payload: list, fromSse: true });
+              } catch { }
+            });
+            es.addEventListener('audio', (ev) => {
+              try {
+                const payload = JSON.parse(ev.data);
+                window.FGC_AUDIO?.handleAudioEvent(payload);
+                if (bc) bc.postMessage({ type: 'audio', payload, fromSse: true });
               } catch { }
             });
             es.onerror = () => {

@@ -1,0 +1,4056 @@
+/* ============================================================================
+   FGC OPEN SCOREBARS — MULTI-GAME HUD ARCHITECTURE (Phase 2)
+   Bespoke broadcast overlays calibrated to 1920x1080 gameplay safe-zones:
+     1. 2XKO (Riot 2v2 Tag Duo HUD)
+     2. Fatal Fury: City of the Wolves (SNK South Town / REV Overdrive HUD)
+     3. Super Smash Bros. Ultimate (100% Independent Native Singles / Pill / Doubles)
+     4. Pro Meta Strip & Bottom Event Bar (Tekken 8 / SF6 / Universal)
+   Zero impact on existing Tekken 8 & SF6 themes.
+   ============================================================================ */
+
+/* --- Preview Backdrops & Game-Aware HUD Guides --- */
+body.bg-2xko,
+body.bg-ffcotw,
+body.bg-ssbu,
+body.bg-avatar,
+body.bg-mk1 {
+  background: #05070d;
+}
+
+body.bg-2xko #stage {
+  background: #000 url('assets/2xko-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+}
+
+body.bg-ffcotw #stage {
+  background: #000 url('assets/ffcotw-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+}
+
+body.bg-ssbu #stage {
+  background: #000 url('assets/ssbu-gameplay-ref.png') 0 0 / 1920px 1080px no-repeat;
+}
+
+body.bg-avatar #stage {
+  background: #000 url('assets/avatar-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+}
+
+body.bg-mk1 #stage {
+  background: #000 url('assets/mk1-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+}
+
+#hud-guides-2xko,
+#hud-guides-ffcotw,
+#hud-guides-ssbu,
+#hud-guides-avatar,
+#hud-guides-mk1 {
+  display: none;
+}
+
+body.bg-2xko #hud-guides-t8,
+body.bg-ffcotw #hud-guides-t8,
+body.bg-ssbu #hud-guides-t8,
+body.bg-avatar #hud-guides-t8,
+body.bg-mk1 #hud-guides-t8 {
+  display: none;
+}
+
+body.bg-2xko #hud-guides-2xko {
+  display: block;
+}
+
+body.bg-ffcotw #hud-guides-ffcotw {
+  display: block;
+}
+
+body.bg-ssbu #hud-guides-ssbu {
+  display: block;
+}
+
+body.bg-avatar #hud-guides-avatar {
+  display: block;
+}
+
+body.bg-mk1 #hud-guides-mk1 {
+  display: block;
+}
+
+/* Hide conventional fighting-game top-wing scorebar whenever SSBU native overlay is active */
+#scorebar-root[data-game="ssbu"] {
+  display: none !important;
+}
+
+/* ============================================================================
+   1. SHARED INLINE COMPETITIVE CHIPS (SEED, PARTNER, VARIANT / FUSE / CONTROL)
+   ============================================================================ */
+.seed-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 7px;
+  border-radius: 3px;
+  font: 800 13px/1.15 'Chakra Petch', 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #f8fafc;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.seed-chip.hidden-el {
+  display: none !important;
+}
+
+.variant-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font: 800 12px/1.1 'Chakra Petch', 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.variant-chip img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
+}
+
+.variant-chip.hidden-el {
+  display: none !important;
+}
+
+.partner-sep {
+  opacity: 0.55;
+  margin: 0 5px;
+  font-weight: 700;
+}
+
+.partner-tag {
+  font-size: 0.86em;
+  opacity: 0.92;
+  color: inherit;
+}
+
+.partner-wrap.hidden-el {
+  display: none !important;
+}
+
+/* ============================================================================
+   2. PRO TOP META STRIP & BOTTOM TOURNAMENT BAR (TEKKEN 8 / SF6 / UNIVERSAL)
+   ============================================================================ */
+.pro-meta-strip {
+  position: absolute;
+  top: -21px;
+  height: 20px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: linear-gradient(180deg, rgba(10, 12, 18, 0.92), rgba(16, 20, 30, 0.88));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  font: 700 12px/1 'Chakra Petch', 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.05em;
+  color: #e2e8f0;
+  z-index: 6;
+  white-space: nowrap;
+}
+
+.sb-wing.p1 .pro-meta-strip {
+  left: 0;
+  right: 60px;
+  justify-content: flex-start;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+
+.sb-wing.p2 .pro-meta-strip {
+  right: 0;
+  left: 60px;
+  justify-content: flex-end;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%);
+}
+
+#scorebar-root[data-meta-strip="on"] .pro-meta-strip {
+  display: flex;
+}
+
+#scorebar-root[data-meta-strip="on"] .sb-wing {
+  top: 22px !important;
+}
+
+#scorebar-root[data-meta-strip="on"] .sb-center {
+  top: 22px !important;
+}
+
+.pro-meta-strip .meta-handle {
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.pro-meta-strip .meta-seed {
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: rgba(250, 204, 21, 0.18);
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  color: #fde047;
+  font-weight: 800;
+}
+
+.pro-meta-strip .meta-pronouns {
+  color: #cbd5e1;
+  opacity: 0.85;
+  font-size: 11px;
+}
+
+.pro-meta-strip .hidden-el {
+  display: none !important;
+}
+
+/* ============================================================================
+   2B. PRESET-ADAPTIVE EVENT BAR & COMMENTATORS SYSTEM (ZERO-OVERLAP ENGINE)
+   Automatically inherits active scorebar colors, shapes, borders & fonts,
+   OR lets the operator customize every visual detail independently.
+   ============================================================================ */
+#bottom-event-bar {
+  --eb-bg: linear-gradient(180deg, rgba(16, 19, 28, 0.95), rgba(8, 10, 16, 0.98));
+  --eb-accent: #ffd24d;
+  --eb-p1: #ff512f;
+  --eb-p2: #2563eb;
+  --eb-text: #ffffff;
+  --eb-sub: #cbd5e1;
+  --eb-border-w: 2px;
+  --eb-scale: 1;
+  --eb-off-x: 0px;
+  --eb-off-y: 0px;
+  --eb-op: 1;
+  --eb-logo-scale: 1;
+  --eb-font: var(--font-display, 'Barlow Condensed', sans-serif);
+
+  position: absolute;
+  left: 50%;
+  bottom: calc(0px + var(--eb-off-y));
+  z-index: 28;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: bottom center;
+  transform: translateX(calc(-50% + var(--eb-off-x))) translateY(36px) scale(var(--eb-scale));
+  transition: opacity 0.34s ease, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), bottom 0.32s ease, top 0.32s ease, left 0.32s ease, right 0.32s ease;
+}
+
+#bottom-event-bar.visible {
+  opacity: var(--eb-op);
+  transform: translateX(calc(-50% + var(--eb-off-x))) translateY(0) scale(var(--eb-scale));
+}
+
+#bottom-event-bar[data-anim="fade"]:not(.visible) {
+  transform: translateX(calc(-50% + var(--eb-off-x))) translateY(0) scale(var(--eb-scale));
+}
+
+#bottom-event-bar[data-anim="pop"]:not(.visible) {
+  transform: translateX(calc(-50% + var(--eb-off-x))) translateY(0) scale(calc(var(--eb-scale) * 0.84));
+}
+
+/* Position Variants for Event Bar */
+#bottom-event-bar[data-pos="bottom-left"] {
+  left: calc(28px + var(--eb-off-x));
+  right: auto;
+  bottom: calc(16px + var(--eb-off-y));
+  transform-origin: bottom left;
+  transform: translateY(32px) scale(var(--eb-scale));
+}
+
+#bottom-event-bar[data-pos="bottom-left"].visible {
+  transform: translateY(0) scale(var(--eb-scale));
+}
+
+#bottom-event-bar[data-pos="bottom-right"] {
+  left: auto;
+  right: calc(28px - var(--eb-off-x));
+  bottom: calc(16px + var(--eb-off-y));
+  transform-origin: bottom right;
+  transform: translateY(32px) scale(var(--eb-scale));
+}
+
+#bottom-event-bar[data-pos="bottom-right"].visible {
+  transform: translateY(0) scale(var(--eb-scale));
+}
+
+#bottom-event-bar[data-pos="top-left"] {
+  left: calc(28px + var(--eb-off-x));
+  right: auto;
+  bottom: auto;
+  top: calc(16px + var(--eb-off-y));
+  transform-origin: top left;
+  transform: translateY(-28px) scale(var(--eb-scale));
+}
+
+#bottom-event-bar[data-pos="top-left"].visible {
+  transform: translateY(0) scale(var(--eb-scale));
+}
+
+#bottom-event-bar[data-pos="top-right"] {
+  left: auto;
+  right: calc(28px - var(--eb-off-x));
+  bottom: auto;
+  top: calc(16px + var(--eb-off-y));
+  transform-origin: top right;
+  transform: translateY(-28px) scale(var(--eb-scale));
+}
+
+#bottom-event-bar[data-pos="top-right"].visible {
+  transform: translateY(0) scale(var(--eb-scale));
+}
+
+/* Floating Top Crest Logo */
+.beb-logo-badge {
+  width: calc(46px * var(--eb-logo-scale));
+  height: calc(46px * var(--eb-logo-scale));
+  margin-bottom: -10px;
+  z-index: 3;
+  border-radius: 10px;
+  background: rgba(11, 14, 22, 0.96);
+  border: 1.5px solid var(--eb-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+}
+
+.beb-logo-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.beb-logo-badge.hidden-el {
+  display: none !important;
+}
+
+.beb-plate {
+  position: relative;
+  min-width: var(--eb-min-w, 360px);
+  max-width: 780px;
+  padding: 10px 38px 8px;
+  background: var(--eb-bg);
+  border-top: var(--eb-border-w) solid var(--eb-accent);
+  clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 100%, 0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  box-shadow: 0 -3px 16px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+}
+
+.beb-inline-logo {
+  width: calc(32px * var(--eb-logo-scale));
+  height: calc(32px * var(--eb-logo-scale));
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.beb-inline-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.beb-inline-logo.hidden-el {
+  display: none !important;
+}
+
+.beb-text-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.beb-title {
+  font: 800 19px/1.12 var(--eb-font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--eb-text);
+  white-space: nowrap;
+}
+
+.beb-sub {
+  font: 700 12px/1.15 'Chakra Petch', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--eb-sub);
+  opacity: 0.92;
+  white-space: nowrap;
+}
+
+.beb-sub.hidden-el {
+  display: none !important;
+}
+
+.beb-ticker {
+  margin-top: 2px;
+  padding: 1px 9px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--eb-accent) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--eb-accent) 55%, transparent);
+  font: 700 10.5px/1.25 'Chakra Petch', sans-serif;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--eb-accent);
+  white-space: nowrap;
+}
+
+.beb-ticker.hidden-el {
+  display: none !important;
+}
+
+/* Event Bar Shape Architectures */
+#bottom-event-bar[data-shape="pill"] {
+  bottom: calc(14px + var(--eb-off-y));
+}
+
+#bottom-event-bar[data-shape="pill"] .beb-plate {
+  clip-path: none;
+  border-radius: 999px;
+  border: var(--eb-border-w) solid var(--eb-accent);
+  padding: 8px 30px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.42);
+}
+
+#bottom-event-bar[data-shape="pill"] .beb-logo-badge {
+  border-radius: 50%;
+  margin-bottom: -12px;
+}
+
+#bottom-event-bar[data-shape="blade"] {
+  bottom: calc(10px + var(--eb-off-y));
+}
+
+#bottom-event-bar[data-shape="blade"] .beb-plate {
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+  border-top: var(--eb-border-w) solid var(--eb-p1);
+  border-bottom: var(--eb-border-w) solid var(--eb-p2);
+  padding: 8px 34px;
+}
+
+#bottom-event-bar[data-shape="blade"] .beb-title {
+  font-style: italic;
+}
+
+#bottom-event-bar[data-shape="glass"] {
+  bottom: calc(14px + var(--eb-off-y));
+}
+
+#bottom-event-bar[data-shape="glass"] .beb-plate {
+  clip-path: none;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--eb-bg) 72%, rgba(15, 23, 42, 0.62));
+  border: 1.5px solid rgba(255, 255, 255, 0.24);
+  border-top: calc(var(--eb-border-w) + 1px) solid var(--eb-accent);
+  backdrop-filter: blur(18px);
+  padding: 9px 28px;
+}
+
+#bottom-event-bar[data-shape="flat"] {
+  bottom: calc(10px + var(--eb-off-y));
+}
+
+#bottom-event-bar[data-shape="flat"] .beb-plate {
+  clip-path: none;
+  border-radius: 5px;
+  border: 1px solid color-mix(in srgb, var(--eb-accent) 40%, rgba(255, 255, 255, 0.16));
+  border-top: var(--eb-border-w) solid var(--eb-accent);
+  border-left: 4px solid var(--eb-p1);
+  border-right: 4px solid var(--eb-p2);
+  padding: 8px 28px;
+}
+
+#bottom-event-bar[data-shape="split-accent"] {
+  bottom: calc(8px + var(--eb-off-y));
+}
+
+#bottom-event-bar[data-shape="split-accent"] .beb-plate {
+  clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 100%, 0 100%);
+  border-top: none;
+  padding: 11px 36px 8px;
+}
+
+#bottom-event-bar[data-shape="split-accent"] .beb-plate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--eb-border-w) + 1px);
+  background: linear-gradient(90deg, var(--eb-p1), var(--eb-accent), var(--eb-p2));
+}
+
+#bottom-event-bar[data-shape="minimal"] {
+  bottom: calc(12px + var(--eb-off-y));
+}
+
+#bottom-event-bar[data-shape="minimal"] .beb-plate {
+  clip-path: none;
+  border-radius: 6px;
+  background: rgba(9, 12, 18, 0.72);
+  border: none;
+  border-bottom: var(--eb-border-w) solid var(--eb-accent);
+  padding: 6px 22px;
+  box-shadow: none;
+}
+
+#bottom-event-bar[data-light="on"] .beb-logo-badge {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.22);
+}
+
+/* ============================================================================
+   2C. PRESET-ADAPTIVE COMMENTATORS BAR (#commentator-bar — Zero-Overlap!)
+   ============================================================================ */
+#commentator-bar {
+  --cm-bg: linear-gradient(180deg, rgba(16, 19, 28, 0.95), rgba(8, 10, 16, 0.98));
+  --cm-accent: #ffd24d;
+  --cm-p1: #ff512f;
+  --cm-p2: #2563eb;
+  --cm-text: #ffffff;
+  --cm-handle: #ffd24d;
+  --cm-scale: 1;
+  --cm-off-x: 0px;
+  --cm-off-y: 0px;
+  --cm-stack-lift: 0px;
+  --cm-op: 1;
+  --cm-font: var(--font-display, 'Barlow Condensed', sans-serif);
+
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: calc(18px + var(--cm-stack-lift) + var(--cm-off-y)) !important;
+  z-index: 27 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 20px !important;
+  padding: 9px 26px !important;
+  background: var(--cm-bg) !important;
+  border: 1px solid color-mix(in srgb, var(--cm-accent) 32%, rgba(255, 255, 255, 0.16)) !important;
+  border-top: 2.5px solid var(--cm-accent) !important;
+  color: var(--cm-text) !important;
+  backdrop-filter: blur(12px) !important;
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5) !important;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: bottom center;
+  transform: translateX(calc(-50% + var(--cm-off-x))) translateY(48px) scale(var(--cm-scale)) !important;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.34s ease, bottom 0.34s cubic-bezier(0.22, 1, 0.36, 1), top 0.34s ease !important;
+}
+
+#commentator-bar.visible {
+  opacity: var(--cm-op) !important;
+  transform: translateX(calc(-50% + var(--cm-off-x))) translateY(0) scale(var(--cm-scale)) !important;
+}
+
+#commentator-bar[data-anim="fade"]:not(.visible) {
+  transform: translateX(calc(-50% + var(--cm-off-x))) translateY(0) scale(var(--cm-scale)) !important;
+}
+
+#commentator-bar[data-anim="pop"]:not(.visible) {
+  transform: translateX(calc(-50% + var(--cm-off-x))) translateY(0) scale(calc(var(--cm-scale) * 0.84)) !important;
+}
+
+/* Position Variants for Commentators */
+#commentator-bar[data-pos="bottom-left"] {
+  left: calc(28px + var(--cm-off-x)) !important;
+  right: auto !important;
+  transform-origin: bottom left;
+  transform: translateY(40px) scale(var(--cm-scale)) !important;
+}
+
+#commentator-bar[data-pos="bottom-left"].visible {
+  transform: translateY(0) scale(var(--cm-scale)) !important;
+}
+
+#commentator-bar[data-pos="bottom-right"] {
+  left: auto !important;
+  right: calc(28px - var(--cm-off-x)) !important;
+  transform-origin: bottom right;
+  transform: translateY(40px) scale(var(--cm-scale)) !important;
+}
+
+#commentator-bar[data-pos="bottom-right"].visible {
+  transform: translateY(0) scale(var(--cm-scale)) !important;
+}
+
+#commentator-bar[data-pos="top-left"] {
+  left: calc(28px + var(--cm-off-x)) !important;
+  right: auto !important;
+  bottom: auto !important;
+  top: calc(18px + var(--cm-stack-lift) + var(--cm-off-y)) !important;
+  transform-origin: top left;
+  transform: translateY(-32px) scale(var(--cm-scale)) !important;
+}
+
+#commentator-bar[data-pos="top-left"].visible {
+  transform: translateY(0) scale(var(--cm-scale)) !important;
+}
+
+#commentator-bar[data-pos="top-right"] {
+  left: auto !important;
+  right: calc(28px - var(--cm-off-x)) !important;
+  bottom: auto !important;
+  top: calc(18px + var(--cm-stack-lift) + var(--cm-off-y)) !important;
+  transform-origin: top right;
+  transform: translateY(-32px) scale(var(--cm-scale)) !important;
+}
+
+#commentator-bar[data-pos="top-right"].visible {
+  transform: translateY(0) scale(var(--cm-scale)) !important;
+}
+
+/* Commentator Shape Variants (Adapts to Active Preset!) */
+#commentator-bar[data-shape="trapezoid"] {
+  clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 100%, 0 100%) !important;
+  padding: 9px 32px !important;
+}
+
+#commentator-bar[data-shape="pill"] {
+  clip-path: none !important;
+  border-radius: 999px !important;
+  border: 2px solid var(--cm-accent) !important;
+  padding: 8px 26px !important;
+}
+
+#commentator-bar[data-shape="blade"] {
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%) !important;
+  border-top: 2.5px solid var(--cm-p1) !important;
+  border-bottom: 2.5px solid var(--cm-p2) !important;
+}
+
+#commentator-bar[data-shape="blade"] .caster-name {
+  font-style: italic;
+}
+
+#commentator-bar[data-shape="glass"] {
+  clip-path: none !important;
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--cm-bg) 72%, rgba(15, 23, 42, 0.62)) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.24) !important;
+  border-top: 2.5px solid var(--cm-accent) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+#commentator-bar[data-shape="flat"] {
+  clip-path: none !important;
+  border-radius: 6px !important;
+  border-left: 4px solid var(--cm-p1) !important;
+  border-right: 4px solid var(--cm-p2) !important;
+  padding: 8px 24px !important;
+}
+
+#commentator-bar[data-shape="minimal"] {
+  clip-path: none !important;
+  border-radius: 6px !important;
+  background: rgba(9, 12, 18, 0.72) !important;
+  border: none !important;
+  border-bottom: 2px solid var(--cm-accent) !important;
+  box-shadow: none !important;
+}
+
+/* Split Twin Cards Layout */
+#commentator-bar[data-layout="split-cards"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  clip-path: none !important;
+  backdrop-filter: none !important;
+  padding: 0 !important;
+  gap: 14px !important;
+}
+
+#commentator-bar[data-layout="split-cards"] .caster-sep {
+  display: none !important;
+}
+
+#commentator-bar[data-layout="split-cards"] .caster-item {
+  background: var(--cm-bg);
+  border: 1px solid color-mix(in srgb, var(--cm-accent) 35%, rgba(255, 255, 255, 0.16));
+  border-left: 3.5px solid var(--cm-p1);
+  border-radius: 8px;
+  padding: 8px 18px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.44);
+}
+
+#commentator-bar[data-layout="split-cards"] .caster-item:nth-of-type(2n) {
+  border-left-color: var(--cm-p2);
+}
+
+#commentator-bar[data-layout="split-cards"][data-shape="pill"] .caster-item {
+  border-radius: 999px;
+  border: 1.5px solid var(--cm-accent);
+}
+
+#commentator-bar[data-layout="split-cards"][data-shape="blade"] .caster-item {
+  border-radius: 0;
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  padding: 8px 22px;
+}
+
+/* Compact Stacked Layout (Name over Handle) */
+#commentator-bar[data-layout="compact-stack"] .caster-text-wrap {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.caster-logo-mini {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.caster-logo-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.caster-logo-mini.hidden-el {
+  display: none !important;
+}
+
+.caster-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.caster-text-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.caster-icon-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--cm-accent);
+}
+
+.caster-icon-slot svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+}
+
+.caster-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  display: inline-block;
+}
+
+#commentator-bar[data-icon="none"] .caster-icon-slot {
+  display: none !important;
+}
+
+.caster-name {
+  font: 800 19px/1.05 var(--cm-font) !important;
+  color: var(--cm-text) !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.caster-handle {
+  font: 700 13.5px/1 'Chakra Petch', sans-serif !important;
+  color: var(--cm-handle) !important;
+  opacity: 0.94 !important;
+  white-space: nowrap;
+}
+
+.caster-role {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--cm-accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cm-accent) 45%, transparent);
+  font: 700 10px/1.2 'Chakra Petch', sans-serif;
+  color: var(--cm-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.caster-role:empty {
+  display: none;
+}
+
+.caster-sep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cm-accent);
+  opacity: 0.72;
+  flex-shrink: 0;
+}
+
+#commentator-bar[data-sep="line"] .caster-sep {
+  width: 2px;
+  height: 20px;
+  background: linear-gradient(180deg, transparent, var(--cm-accent), transparent);
+}
+
+#commentator-bar[data-sep="slash"] .caster-sep::after {
+  content: '/';
+  font: 900 18px/1 'Chakra Petch', sans-serif;
+}
+
+#commentator-bar[data-sep="dot"] .caster-sep::after {
+  content: '•';
+  font: 900 16px/1 sans-serif;
+}
+
+#commentator-bar[data-sep="none"] .caster-sep {
+  display: none !important;
+}
+
+/* ============================================================================
+   3. 2XKO TAG DUO HUD (Calibrated to 1920x1080: y=0..35 Wings + Open Center Gap)
+   Parallel blade geometry (\ on P1, / on P2) so outer .blade-edge, BOTH flags
+   (blade-twt & fade-blend), player name, and score box interlock with 0px overlap!
+   ============================================================================ */
+#scorebar-root[data-game="2xko"] {
+  --bar-h: 35px;
+  --blade-slant: 14px;
+  --safe-outer-pad: 26px;
+}
+
+#scorebar-root[data-game="2xko"] .sb-wing {
+  top: 0 !important;
+  height: var(--bar-h, 35px) !important;
+  width: calc(630px + var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="2xko"] .sb-wing.p1 {
+  left: calc(224px - var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="2xko"] .sb-wing.p2 {
+  right: calc(224px - var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="2xko"] .wing-plate {
+  height: var(--bar-h, 35px) !important;
+  padding: 0 !important;
+  background: var(--gp-bg-p1, linear-gradient(90deg, #0b0e14 0%, #111927 100%));
+  border-bottom: 2.5px solid var(--gp-p1, #ccff00);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.72), 0 0 14px var(--gp-glow1, rgba(204, 255, 0, 0.25));
+}
+
+#scorebar-root[data-game="2xko"] .sb-wing.p1 .wing-plate {
+  clip-path: polygon(0 0, calc(100% - var(--blade-slant, 14px)) 0, 100% 100%, var(--blade-slant, 14px) 100%);
+}
+
+#scorebar-root[data-game="2xko"] .sb-wing.p2 .wing-plate {
+  background: var(--gp-bg-p2, linear-gradient(270deg, #0b0e14 0%, #111927 100%));
+  border-bottom: 2.5px solid var(--gp-p2, #00e5ff);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.72), 0 0 14px var(--gp-glow2, rgba(0, 229, 255, 0.25));
+  clip-path: polygon(var(--blade-slant, 14px) 0, 100% 0, calc(100% - var(--blade-slant, 14px)) 100%, 0 100%);
+}
+
+/* Compact, non-overlapping dual-flag widths calibrated to 35px height (NEVER clips 2nd flag!) */
+#scorebar-root[data-game="2xko"][data-flag-style="blade-twt"] .flag-wrap,
+#scorebar-root[data-game="2xko"][data-flag-style="twt-code"] .flag-wrap {
+  width: calc(44px + var(--blade-slant, 14px)) !important;
+}
+
+#scorebar-root[data-game="2xko"][data-flag-style="blade-twt"] .flags-group.is-dual .flag-wrap,
+#scorebar-root[data-game="2xko"][data-flag-style="twt-code"] .flags-group.is-dual .flag-wrap {
+  width: calc(40px + var(--blade-slant, 14px)) !important;
+}
+
+#scorebar-root[data-game="2xko"][data-flag-style="fade-blend"] .flag-wrap {
+  width: 68px !important;
+}
+
+#scorebar-root[data-game="2xko"][data-flag-style="fade-blend"] .flags-group.is-dual .flag-wrap {
+  width: 58px !important;
+}
+
+/* Ensure BOTH country + region flags stay clearly visible in fade-blend before soft melt! */
+#scorebar-root[data-game="2xko"][data-flag-style="fade-blend"] .sb-wing.p1 .flags-group.is-dual {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 66%, transparent 99%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 66%, transparent 99%);
+}
+
+#scorebar-root[data-game="2xko"][data-flag-style="fade-blend"] .sb-wing.p2 .flags-group.is-dual {
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 66%, transparent 99%);
+  mask-image: linear-gradient(270deg, #000 0%, #000 66%, transparent 99%);
+}
+
+#scorebar-root[data-game="2xko"] .player-info {
+  gap: 7px !important;
+  padding: 0 10px !important;
+}
+
+#scorebar-root[data-game="2xko"] .name-block {
+  min-width: 48px;
+  flex: 1 1 auto;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+#scorebar-root[data-game="2xko"] .seed-chip {
+  font-size: 10px;
+  padding: 1px 5px;
+}
+
+#scorebar-root[data-game="2xko"] .player-name {
+  font-family: var(--gp-font, 'Chakra Petch', sans-serif);
+  font-size: calc(19px * var(--font-scale, 1));
+  font-weight: 800;
+  font-style: italic;
+  color: var(--gp-tx, #ffffff);
+  letter-spacing: 0.03em;
+}
+
+#scorebar-root[data-game="2xko"] .sponsor-tag {
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 800;
+  color: var(--gp-sp1, #ccff00);
+}
+
+#scorebar-root[data-game="2xko"] .sb-wing.p2 .sponsor-tag {
+  color: var(--gp-sp2, #38bdf8);
+}
+
+#scorebar-root[data-game="2xko"] .score-box {
+  width: calc(48px + var(--blade-slant, 14px)) !important;
+  min-width: calc(48px + var(--blade-slant, 14px)) !important;
+  height: 100% !important;
+  background: var(--gp-sc1, linear-gradient(135deg, #ccff00, #84cc16));
+  color: var(--gp-sct1, #090c10);
+  font-size: 23px !important;
+}
+
+#scorebar-root[data-game="2xko"] .sb-wing.p1 .score-box {
+  clip-path: polygon(0 0, calc(100% - var(--blade-slant, 14px)) 0, 100% 100%, var(--blade-slant, 14px) 100%);
+}
+
+#scorebar-root[data-game="2xko"] .sb-wing.p2 .score-box {
+  background: var(--gp-sc2, linear-gradient(135deg, #00e5ff, #0284c7));
+  color: var(--gp-sct2, #061018);
+  clip-path: polygon(var(--blade-slant, 14px) 0, 100% 0, calc(100% - var(--blade-slant, 14px)) 100%, 0 100%);
+}
+
+#scorebar-root[data-game="2xko"] .char-pill {
+  font-size: 10px !important;
+  padding: 1px 5px !important;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #e2e8f0;
+  letter-spacing: 0.03em;
+  flex-shrink: 1;
+  max-width: 118px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#scorebar-root[data-game="2xko"] .variant-chip {
+  background: rgba(204, 255, 0, 0.14);
+  border-color: rgba(204, 255, 0, 0.5);
+  color: #d9f99d;
+  font-size: 10px;
+  padding: 1px 5px;
+  gap: 3px;
+}
+
+#scorebar-root[data-game="2xko"] .variant-chip img {
+  width: 15px;
+  height: 15px;
+}
+
+#scorebar-root[data-game="2xko"] .sb-wing.p2 .variant-chip {
+  background: rgba(0, 229, 255, 0.14);
+  border-color: rgba(0, 229, 255, 0.5);
+  color: #bae6fd;
+}
+
+/* 2XKO Open Center Crest (sits neatly inside x=864..1056 between the two BREAK gauges!) */
+#scorebar-root[data-game="2xko"] .sb-center {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  top: 0 !important;
+  min-width: 184px !important;
+  max-width: 198px !important;
+  height: auto !important;
+  min-height: 46px !important;
+  padding: 5px 18px 8px !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  background: var(--gp-cbg, linear-gradient(180deg, #121822, #090c11)) !important;
+  border-bottom: 2.5px solid var(--gp-cborder, #ccff00) !important;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 14px 100%) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.72) !important;
+}
+
+#scorebar-root[data-game="2xko"] .round-text {
+  font-family: var(--gp-font, 'Chakra Petch', sans-serif);
+  font-size: 14px !important;
+  font-weight: 800;
+  color: var(--gp-ct, #ccff00) !important;
+  letter-spacing: 0.08em;
+}
+
+#scorebar-root[data-game="2xko"] .format-pill {
+  font-size: 11px !important;
+  padding: 1px 8px !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+  border-radius: 3px;
+}
+
+#scorebar-root[data-game="2xko"] .mp-tag {
+  top: 37px !important;
+}
+
+/* Custom Colors compatibility for 2XKO */
+#scorebar-root[data-game="2xko"].custom-colors .wing-plate {
+  background: var(--c-bg-fill) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .sb-wing.p1 .wing-plate {
+  border-bottom-color: var(--c-p1-1) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .sb-wing.p2 .wing-plate {
+  border-bottom-color: var(--c-p2-1) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .sb-wing.p1 .blade-edge,
+#scorebar-root[data-game="2xko"].custom-colors .sb-wing.p1 .flag-slash {
+  background: var(--c-p1-1) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .sb-wing.p2 .blade-edge,
+#scorebar-root[data-game="2xko"].custom-colors .sb-wing.p2 .flag-slash {
+  background: var(--c-p2-1) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .sb-wing.p1 .score-box {
+  background: var(--c-p1-score-bg) !important;
+  color: var(--c-p1-score-text) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .sb-wing.p2 .score-box {
+  background: var(--c-p2-score-bg) !important;
+  color: var(--c-p2-score-text) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .sb-center {
+  background: var(--c-center-fill) !important;
+  border-bottom-color: var(--c-center-acc) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .round-text {
+  color: var(--c-center-acc) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .player-name {
+  color: var(--c-text) !important;
+}
+
+#scorebar-root[data-game="2xko"].custom-colors .sponsor-tag {
+  color: var(--c-sponsor) !important;
+}
+
+/* ============================================================================
+   4. FATAL FURY: CITY OF THE WOLVES HUD (Calibrated to 1920x1080)
+   Parallel blade geometry (\ on P1, / on P2) — zero flag clipping, zero overlap!
+   ============================================================================ */
+#scorebar-root[data-game="ffcotw"] {
+  --bar-h: 44px;
+  --blade-slant: 16px;
+  --safe-outer-pad: 30px;
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing {
+  top: 8px !important;
+  height: var(--bar-h, 44px) !important;
+  width: calc(624px + var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing.p1 {
+  left: calc(180px - var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing.p2 {
+  right: calc(180px - var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="ffcotw"] .wing-plate {
+  height: var(--bar-h, 44px) !important;
+  padding: 0 !important;
+  background: var(--gp-bg-p1, linear-gradient(180deg, #181610 0%, #0a0907 100%));
+  border-top: 2px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 3px solid var(--gp-p1, #facc15);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.78), 0 0 14px var(--gp-glow1, rgba(250, 204, 21, 0.25));
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing.p1 .wing-plate {
+  clip-path: polygon(0 0, calc(100% - var(--blade-slant, 16px)) 0, 100% 100%, var(--blade-slant, 16px) 100%);
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing.p2 .wing-plate {
+  background: var(--gp-bg-p2, linear-gradient(180deg, #181610 0%, #0a0907 100%));
+  border-bottom: 3px solid var(--gp-p2, #facc15);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.78), 0 0 14px var(--gp-glow2, rgba(250, 204, 21, 0.25));
+  clip-path: polygon(var(--blade-slant, 16px) 0, 100% 0, calc(100% - var(--blade-slant, 16px)) 100%, 0 100%);
+}
+
+#scorebar-root[data-game="ffcotw"][data-flag-style="blade-twt"] .flag-wrap,
+#scorebar-root[data-game="ffcotw"][data-flag-style="twt-code"] .flag-wrap {
+  width: calc(50px + var(--blade-slant, 16px)) !important;
+}
+
+#scorebar-root[data-game="ffcotw"][data-flag-style="blade-twt"] .flags-group.is-dual .flag-wrap,
+#scorebar-root[data-game="ffcotw"][data-flag-style="twt-code"] .flags-group.is-dual .flag-wrap {
+  width: calc(44px + var(--blade-slant, 16px)) !important;
+}
+
+#scorebar-root[data-game="ffcotw"][data-flag-style="fade-blend"] .flags-group.is-dual .flag-wrap {
+  width: 64px !important;
+}
+
+#scorebar-root[data-game="ffcotw"][data-flag-style="fade-blend"] .sb-wing.p1 .flags-group.is-dual {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 66%, transparent 99%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 66%, transparent 99%);
+}
+
+#scorebar-root[data-game="ffcotw"][data-flag-style="fade-blend"] .sb-wing.p2 .flags-group.is-dual {
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 66%, transparent 99%);
+  mask-image: linear-gradient(270deg, #000 0%, #000 66%, transparent 99%);
+}
+
+#scorebar-root[data-game="ffcotw"] .player-info {
+  gap: 7px !important;
+  padding: 0 11px !important;
+}
+
+#scorebar-root[data-game="ffcotw"] .name-block {
+  min-width: 56px;
+  flex: 1 1 auto;
+}
+
+#scorebar-root[data-game="ffcotw"] .seed-chip {
+  font-size: 11px;
+  padding: 1px 5px;
+}
+
+#scorebar-root[data-game="ffcotw"] .player-name {
+  font-family: var(--gp-font, 'Russo One', sans-serif);
+  font-size: calc(21px * var(--font-scale, 1));
+  font-weight: 800;
+  font-style: italic;
+  color: var(--gp-tx, #ffffff);
+  letter-spacing: 0.03em;
+}
+
+#scorebar-root[data-game="ffcotw"] .sponsor-tag {
+  color: var(--gp-sp1, #facc15);
+  font-weight: 800;
+  font-size: calc(16px * var(--font-scale, 1));
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing.p2 .sponsor-tag {
+  color: var(--gp-sp2, #facc15);
+}
+
+#scorebar-root[data-game="ffcotw"] .score-box {
+  width: calc(52px + var(--blade-slant, 16px)) !important;
+  min-width: calc(52px + var(--blade-slant, 16px)) !important;
+  background: var(--gp-sc1, linear-gradient(135deg, #fde047, #eab308));
+  color: var(--gp-sct1, #0a0907);
+  font-size: 27px !important;
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing.p1 .score-box {
+  clip-path: polygon(0 0, calc(100% - var(--blade-slant, 16px)) 0, 100% 100%, var(--blade-slant, 16px) 100%);
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing.p2 .score-box {
+  background: var(--gp-sc2, linear-gradient(135deg, #fde047, #eab308));
+  color: var(--gp-sct2, #0a0907);
+  clip-path: polygon(var(--blade-slant, 16px) 0, 100% 0, calc(100% - var(--blade-slant, 16px)) 100%, 0 100%);
+}
+
+#scorebar-root[data-game="ffcotw"] .variant-chip {
+  background: linear-gradient(135deg, #facc15, #ca8a04);
+  border: 1px solid #fef08a;
+  color: #09090b;
+  font-weight: 900;
+  padding: 1px 6px;
+}
+
+/* Ultra-Slim Top Center Ribbon sitting strictly ABOVE the circular golden timer (y=0..24px!) */
+#scorebar-root[data-game="ffcotw"] .sb-center {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  top: 0 !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  min-width: 240px !important;
+  max-width: 360px !important;
+  padding: 0 28px !important;
+  background: var(--gp-cbg, #0d0c09) !important;
+  border-bottom: 2px solid var(--gp-cborder, #facc15) !important;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 12px 100%) !important;
+}
+
+/* Tuck Match Point neatly under the inner flank of CotW wings (zero overlap with center trapezoid or round diamonds!) */
+#scorebar-root[data-game="ffcotw"] .mp-tag {
+  top: calc(100% + 2px) !important;
+  height: 18px !important;
+  font-size: 8.5px !important;
+  padding: 0 12px !important;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 7px 100%) !important;
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing.p1 .mp-tag {
+  left: auto !important;
+  right: 76px !important;
+}
+
+#scorebar-root[data-game="ffcotw"] .sb-wing.p2 .mp-tag {
+  right: auto !important;
+  left: 76px !important;
+}
+
+#scorebar-root[data-game="ffcotw"] .round-text {
+  font-family: var(--gp-font, 'Russo One', sans-serif);
+  font-size: 13px !important;
+  color: var(--gp-ct, #fde047) !important;
+  letter-spacing: 0.08em;
+}
+
+#scorebar-root[data-game="ffcotw"] .format-pill {
+  font-size: 11px !important;
+  padding: 1px 7px !important;
+  background: var(--gp-cborder, #facc15) !important;
+  color: #09090b !important;
+  font-weight: 900;
+}
+
+/* Custom Colors compatibility for Fatal Fury: CotW */
+#scorebar-root[data-game="ffcotw"].custom-colors .wing-plate {
+  background: var(--c-bg-fill) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .sb-wing.p1 .wing-plate {
+  border-bottom-color: var(--c-p1-1) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .sb-wing.p2 .wing-plate {
+  border-bottom-color: var(--c-p2-1) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .sb-wing.p1 .blade-edge,
+#scorebar-root[data-game="ffcotw"].custom-colors .sb-wing.p1 .flag-slash {
+  background: var(--c-p1-1) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .sb-wing.p2 .blade-edge,
+#scorebar-root[data-game="ffcotw"].custom-colors .sb-wing.p2 .flag-slash {
+  background: var(--c-p2-1) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .sb-wing.p1 .score-box {
+  background: var(--c-p1-score-bg) !important;
+  color: var(--c-p1-score-text) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .sb-wing.p2 .score-box {
+  background: var(--c-p2-score-bg) !important;
+  color: var(--c-p2-score-text) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .sb-center {
+  background: var(--c-center-fill) !important;
+  border-bottom-color: var(--c-center-acc) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .round-text {
+  color: var(--c-center-acc) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .player-name {
+  color: var(--c-text) !important;
+}
+
+#scorebar-root[data-game="ffcotw"].custom-colors .sponsor-tag {
+  color: var(--c-sponsor) !important;
+}
+
+/* 2XKO Bespoke Preset Surface Finishes (Spirit Blossom Glass & Riot LAN Light) */
+#scorebar-root[data-theme="2xko-ionia-spirit"] .wing-plate,
+#scorebar-root[data-theme="2xko-ionia-spirit"] .sb-center {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#scorebar-root[data-theme="2xko-riot-clean-white"]:not(.custom-colors) .player-name {
+  text-shadow: none !important;
+}
+
+#scorebar-root[data-theme="2xko-riot-clean-white"]:not(.custom-colors) .seed-chip,
+#scorebar-root[data-theme="2xko-riot-clean-white"]:not(.custom-colors) .char-pill {
+  background: rgba(15, 23, 42, 0.1) !important;
+  border-color: rgba(15, 23, 42, 0.22) !important;
+  color: #0f172a !important;
+}
+
+#scorebar-root[data-theme="2xko-riot-clean-white"]:not(.custom-colors) .variant-chip {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-color: rgba(132, 204, 22, 0.65) !important;
+  color: #bef264 !important;
+}
+
+#scorebar-root[data-theme="2xko-riot-clean-white"]:not(.custom-colors) .sb-wing.p2 .variant-chip {
+  border-color: rgba(59, 130, 246, 0.7) !important;
+  color: #93c5fd !important;
+}
+
+/* ============================================================================
+   4A. BESPOKE SVG ARCHITECTURAL ART LAYERS (Game-Integrated Cutouts & Frames)
+   ============================================================================ */
+.sb-stage-art {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 140px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.sb-stage-art:empty {
+  display: none;
+}
+
+.sb-stage-art svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.sb-art-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+
+.sb-art-layer:empty {
+  display: none;
+}
+
+.sb-art-layer svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+@keyframes subtleEmberPulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.35)); }
+  50% { filter: drop-shadow(0 0 15px rgba(251, 146, 60, 0.65)); }
+}
+
+@keyframes subtleSpiritFloat {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)); }
+  50% { filter: drop-shadow(0 0 18px rgba(125, 211, 252, 0.72)); }
+}
+
+/* ============================================================================
+   4B. AVATAR LEGENDS: THE FIGHTING GAME — 5 ARCHITECTURALLY UNIQUE PRESETS!
+   Exact 1920x1080 Safe Zones (verified with 1px ruler):
+     • Portraits: x=0..216 & 1704..1920 | HP Bars: y=54..96 | Spirit/Chi: y=100..160
+     • In-game WINS text: x=784..876 & 1044..1136, y=28..48 -> 100% CLEAR!
+     • Center Diamond Timer (41): x=884..1036, y=26..178 -> 100% CLEAR!
+   ============================================================================ */
+#scorebar-root[data-game="avatar"] {
+  --bar-h: 40px;
+  --blade-slant: 0px;
+  --safe-outer-pad: 18px;
+}
+
+#scorebar-root[data-game="avatar"] .sb-wing {
+  top: 6px !important;
+  height: var(--bar-h, 40px) !important;
+  width: calc(544px + var(--wing-spread, 0px)) !important;
+  overflow: visible !important;
+}
+
+#scorebar-root[data-game="avatar"] .sb-wing.p1 {
+  left: calc(220px - var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="avatar"] .sb-wing.p2 {
+  right: calc(220px - var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="avatar"] .wing-plate {
+  height: var(--bar-h, 40px) !important;
+  padding: 0 !important;
+  background: var(--gp-bg-p1, linear-gradient(180deg, #1d1813 0%, #0d0b08 100%));
+  border-bottom: 2.5px solid var(--gp-p1, #dc2626);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.75);
+}
+
+#scorebar-root[data-game="avatar"] .sb-wing.p2 .wing-plate {
+  background: var(--gp-bg-p2, linear-gradient(180deg, #1d1813 0%, #0d0b08 100%));
+  border-bottom: 2.5px solid var(--gp-p2, #2563eb);
+}
+
+#scorebar-root[data-game="avatar"] .player-info {
+  gap: 6px !important;
+  padding: 0 10px !important;
+}
+
+#scorebar-root[data-game="avatar"] .name-block {
+  min-width: 48px;
+  flex: 1 1 auto;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+#scorebar-root[data-game="avatar"] .player-name {
+  font-family: var(--gp-font, 'Cinzel', 'Barlow Condensed', serif);
+  font-size: calc(18.5px * var(--font-scale, 1));
+  font-weight: 800;
+  color: var(--gp-tx, #faf5eb);
+  letter-spacing: 0.04em;
+}
+
+#scorebar-root[data-game="avatar"] .sponsor-tag {
+  font-size: calc(13.5px * var(--font-scale, 1));
+  font-weight: 800;
+  color: var(--gp-sp1, #fbbf24);
+}
+
+#scorebar-root[data-game="avatar"] .sb-wing.p2 .sponsor-tag {
+  color: var(--gp-sp2, #93c5fd);
+}
+
+#scorebar-root[data-game="avatar"] .score-box {
+  width: 46px !important;
+  min-width: 46px !important;
+  height: 100% !important;
+  background: var(--gp-sc1, linear-gradient(180deg, #dc2626, #991b1b));
+  color: var(--gp-sct1, #ffffff);
+  font-size: 23px !important;
+  font-weight: 900;
+}
+
+#scorebar-root[data-game="avatar"] .sb-wing.p2 .score-box {
+  background: var(--gp-sc2, linear-gradient(180deg, #3b82f6, #1e40af));
+  color: var(--gp-sct2, #ffffff);
+}
+
+#scorebar-root[data-game="avatar"] .variant-chip {
+  background: rgba(234, 179, 8, 0.16);
+  border-color: rgba(250, 204, 21, 0.55);
+  color: #fde68a;
+  font-size: 10px;
+  padding: 1.5px 6px;
+}
+
+#scorebar-root[data-game="avatar"] .sb-wing.p2 .variant-chip {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(125, 211, 252, 0.55);
+  color: #bae6fd;
+}
+
+#scorebar-root[data-game="avatar"] .char-pill {
+  font-size: 10px !important;
+  padding: 1px 6px !important;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  color: #f8fafc;
+}
+
+/* Slim Center Crown Banner sitting strictly ABOVE the 41 Diamond Peak (y=0..24px!) */
+#scorebar-root[data-game="avatar"] .sb-center {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  min-width: 176px !important;
+  max-width: 312px !important;
+  padding: 0 20px !important;
+  background: var(--gp-cbg, linear-gradient(180deg, #1a1510, #0b0907)) !important;
+  border-bottom: 2px solid var(--gp-cborder, #eab308) !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.78) !important;
+}
+
+#scorebar-root[data-game="avatar"][data-center-style="floating"] .sb-stage-art {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 40.5%, transparent 43%, transparent 57%, #000 59.5%, #000 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 40.5%, transparent 43%, transparent 57%, #000 59.5%, #000 100%);
+}
+
+#scorebar-root[data-meta-strip="on"][data-game="avatar"] .sb-stage-art {
+  top: 18px;
+}
+
+#scorebar-root[data-game="avatar"] .round-text {
+  font-family: var(--gp-font, 'Cinzel', 'Barlow Condensed', serif);
+  font-size: 11.5px !important;
+  font-weight: 900;
+  color: var(--gp-ct, #fde047) !important;
+  letter-spacing: 0.08em;
+}
+
+#scorebar-root[data-game="avatar"] .format-pill {
+  font-size: 9.5px !important;
+  padding: 1px 5px !important;
+  background: rgba(250, 204, 21, 0.22) !important;
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  color: #fef08a !important;
+  font-weight: 800;
+}
+
+#scorebar-root[data-game="avatar"] .mp-tag {
+  top: 45px !important;
+  height: 15px !important;
+  font-size: 8.5px !important;
+  padding: 0 10px !important;
+}
+
+/* --- AVATAR VARIANT 1: Native Filigree Scroll (Exact Cel-Shaded Black+Gold Game Engine Match!) --- */
+#scorebar-root[data-theme="avatar-four-nations"] .sb-wing.p1 .wing-plate {
+  clip-path: polygon(14px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px), 0 14px);
+  border: 2px solid #0b0907;
+  box-shadow: 0 0 0 2px #0b0907, inset 0 0 0 1.5px rgba(234, 179, 8, 0.72), 0 5px 16px rgba(0, 0, 0, 0.8);
+}
+
+#scorebar-root[data-theme="avatar-four-nations"] .sb-wing.p2 .wing-plate {
+  clip-path: polygon(10px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  border: 2px solid #0b0907;
+  box-shadow: 0 0 0 2px #0b0907, inset 0 0 0 1.5px rgba(234, 179, 8, 0.72), 0 5px 16px rgba(0, 0, 0, 0.8);
+}
+
+#scorebar-root[data-theme="avatar-four-nations"] .score-box {
+  clip-path: polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%);
+  width: 52px !important;
+  min-width: 52px !important;
+  border-left: 2px solid #fde047;
+}
+
+#scorebar-root[data-theme="avatar-four-nations"] .sb-wing.p2 .score-box {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+  border-left: none;
+  border-right: 2px solid #fde047;
+}
+
+#scorebar-root[data-theme="avatar-four-nations"] .sb-center {
+  padding: 0 22px !important;
+  border-left: 2px solid var(--gp-cborder, #eab308);
+  border-right: 2px solid var(--gp-cborder, #eab308);
+  border-top: 2px solid #0b0907;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 0 0 2px #0b0907, inset 0 1px 0 rgba(254, 240, 138, 0.34), 0 4px 14px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* --- AVATAR VARIANT 2: Agni Kai (ASYMMETRIC Jagged Fire Nation Blade vs. Curved Water Tribe Wave!) --- */
+#scorebar-root[data-theme="avatar-fire-vs-water"] .sb-wing.p1 .wing-plate {
+  clip-path: polygon(18px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  border-top: 2px solid #fb923c;
+  border-bottom: 2.5px solid #dc2626;
+  animation: subtleEmberPulse 3.2s ease-in-out infinite;
+}
+
+#scorebar-root[data-theme="avatar-fire-vs-water"] .sb-wing.p1 .score-box {
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  width: 56px !important;
+  min-width: 56px !important;
+}
+
+#scorebar-root[data-theme="avatar-fire-vs-water"] .sb-wing.p2 .wing-plate {
+  clip-path: none !important;
+  border-radius: 6px 22px 22px 6px !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.72);
+  border-bottom: 2.5px solid #0284c7;
+  box-shadow: 0 4px 18px rgba(2, 132, 199, 0.42);
+}
+
+#scorebar-root[data-theme="avatar-fire-vs-water"] .sb-wing.p2 .score-box {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  align-self: center;
+  margin-left: 5px;
+  border-radius: 50% !important;
+  clip-path: none !important;
+  border: 2px solid #bae6fd;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.65);
+  font-size: 20px !important;
+}
+
+#scorebar-root[data-theme="avatar-fire-vs-water"] .sb-center {
+  border-radius: 0 0 14px 14px !important;
+  clip-path: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-top: none;
+}
+
+/* --- AVATAR VARIANT 3: Raava Spirit Portal (Floating Glass Petals + Glowing Spirit Orb Scores!) --- */
+#scorebar-root[data-theme="avatar-avatar-state"] .wing-plate {
+  border-radius: 22px !important;
+  clip-path: none !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(125, 211, 252, 0.58) !important;
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  animation: subtleSpiritFloat 3.6s ease-in-out infinite;
+}
+
+#scorebar-root[data-theme="avatar-avatar-state"] .sb-wing.p2 .wing-plate {
+  border-color: rgba(253, 224, 71, 0.58) !important;
+  box-shadow: 0 0 22px rgba(251, 191, 36, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+#scorebar-root[data-theme="avatar-avatar-state"] .score-box {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  align-self: center;
+  margin: 0 4px;
+  border-radius: 50% !important;
+  border: 2px solid #e0f2fe;
+  box-shadow: 0 0 14px rgba(125, 211, 252, 0.85);
+  font-size: 20px !important;
+}
+
+#scorebar-root[data-theme="avatar-avatar-state"] .sb-wing.p2 .score-box {
+  border-color: #fef9c3;
+  box-shadow: 0 0 14px rgba(253, 224, 71, 0.85);
+}
+
+#scorebar-root[data-theme="avatar-avatar-state"] .sb-center {
+  border-radius: 0 0 16px 16px !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(125, 211, 252, 0.65);
+  border-top: none;
+}
+
+/* --- AVATAR VARIANT 4: Ba Sing Se Carved Jade Monolith + Iconic Earth Kingdom Circular Jade Coin Score! --- */
+#scorebar-root[data-theme="avatar-earth-kingdom"] .wing-plate {
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  border: 2px solid #064e3b;
+  box-shadow: inset 0 2px 0 rgba(52, 211, 153, 0.35), 0 5px 16px rgba(0, 0, 0, 0.82);
+}
+
+#scorebar-root[data-theme="avatar-earth-kingdom"] .sb-wing.p2 .wing-plate {
+  border-color: #78350f;
+  box-shadow: inset 0 2px 0 rgba(251, 191, 36, 0.35), 0 5px 16px rgba(0, 0, 0, 0.82);
+}
+
+/* Iconic Earth Kingdom Circular Jade Coin with Inner Carved Square Frame! */
+#scorebar-root[data-theme="avatar-earth-kingdom"] .score-box {
+  width: 36px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  align-self: center;
+  margin: 0 5px;
+  border-radius: 50% !important;
+  border: 2.5px solid #a7f3d0;
+  box-shadow: inset 0 0 0 2px rgba(4, 26, 16, 0.65), 0 0 10px rgba(16, 185, 129, 0.55);
+  font-size: 20px !important;
+}
+
+#scorebar-root[data-theme="avatar-earth-kingdom"] .score-box::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1.5px solid rgba(255, 255, 255, 0.42);
+  pointer-events: none;
+}
+
+#scorebar-root[data-theme="avatar-earth-kingdom"] .sb-wing.p2 .score-box {
+  border-color: #fde68a;
+  box-shadow: inset 0 0 0 2px rgba(26, 16, 4, 0.65), 0 0 10px rgba(245, 158, 11, 0.55);
+}
+
+#scorebar-root[data-theme="avatar-earth-kingdom"] .sb-center {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 8px 100%) !important;
+}
+
+/* --- AVATAR VARIANT 5: Air Nomad Unrolled Parchment Scroll + 3D Wood Rollers + Wax-Seal Stamps! --- */
+#scorebar-root[data-theme="avatar-air-temple-light"] .wing-plate {
+  border-radius: 3px !important;
+  clip-path: none !important;
+  border-top: 2px solid #78350f;
+  border-bottom: 2.5px solid #b45309;
+  box-shadow: inset 0 0 14px rgba(180, 83, 9, 0.22), 0 4px 14px rgba(0, 0, 0, 0.65);
+}
+
+#scorebar-root[data-theme="avatar-air-temple-light"] .sb-wing.p2 .wing-plate {
+  border-bottom-color: #0369a1;
+}
+
+#scorebar-root[data-theme="avatar-air-temple-light"] .score-box {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  align-self: center;
+  margin: 0 6px;
+  border-radius: 50% !important;
+  border: 2px solid #fef3c7;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45), inset 0 0 0 2px rgba(0, 0, 0, 0.2);
+  font-size: 20px !important;
+}
+
+#scorebar-root[data-theme="avatar-air-temple-light"]:not(.custom-colors) .player-name { text-shadow: none !important; }
+#scorebar-root[data-theme="avatar-air-temple-light"]:not(.custom-colors) .seed-chip,
+#scorebar-root[data-theme="avatar-air-temple-light"]:not(.custom-colors) .char-pill {
+  background: rgba(28, 20, 14, 0.1) !important;
+  border-color: rgba(180, 83, 9, 0.38) !important;
+  color: #1c140e !important;
+}
+#scorebar-root[data-theme="avatar-air-temple-light"]:not(.custom-colors) .variant-chip {
+  background: rgba(45, 24, 12, 0.9) !important;
+  border-color: rgba(234, 88, 12, 0.68) !important;
+  color: #fed7aa !important;
+}
+#scorebar-root[data-theme="avatar-air-temple-light"]:not(.custom-colors) .sb-wing.p2 .variant-chip {
+  border-color: rgba(2, 132, 199, 0.72) !important;
+  color: #bae6fd !important;
+}
+
+/* Custom Colors compatibility for Avatar Legends */
+#scorebar-root[data-game="avatar"].custom-colors .wing-plate { background: var(--c-bg-fill) !important; }
+#scorebar-root[data-game="avatar"].custom-colors .sb-wing.p1 .wing-plate { border-bottom-color: var(--c-p1-1) !important; }
+#scorebar-root[data-game="avatar"].custom-colors .sb-wing.p2 .wing-plate { border-bottom-color: var(--c-p2-1) !important; }
+#scorebar-root[data-game="avatar"].custom-colors .sb-wing.p1 .blade-edge,
+#scorebar-root[data-game="avatar"].custom-colors .sb-wing.p1 .flag-slash { background: var(--c-p1-1) !important; }
+#scorebar-root[data-game="avatar"].custom-colors .sb-wing.p2 .blade-edge,
+#scorebar-root[data-game="avatar"].custom-colors .sb-wing.p2 .flag-slash { background: var(--c-p2-1) !important; }
+#scorebar-root[data-game="avatar"].custom-colors .sb-wing.p1 .score-box { background: var(--c-p1-score-bg) !important; color: var(--c-p1-score-text) !important; }
+#scorebar-root[data-game="avatar"].custom-colors .sb-wing.p2 .score-box { background: var(--c-p2-score-bg) !important; color: var(--c-p2-score-text) !important; }
+#scorebar-root[data-game="avatar"].custom-colors .sb-center { background: var(--c-center-fill) !important; border-color: var(--c-center-acc) !important; border-top-color: #0b0907 !important; }
+#scorebar-root[data-game="avatar"].custom-colors .round-text { color: var(--c-center-acc) !important; }
+#scorebar-root[data-game="avatar"].custom-colors .player-name { color: var(--c-text) !important; }
+#scorebar-root[data-game="avatar"].custom-colors .sponsor-tag { color: var(--c-sponsor) !important; }
+
+/* ============================================================================
+   4C. MORTAL KOMBAT 1 — 5 ARCHITECTURALLY UNIQUE PRESETS (ZERO ORB OVERLAP!)
+   Exact 1920x1080 Safe Zones (verified with 1px ruler):
+     • P1 Round Orbs: (858, 22) & (884, 22) [x=850..892, y=14..30] -> 100% CLEAR / SOCKET-MOUNTED!
+     • P2 Round Orbs: (1036, 22) & (1062, 22) [x=1028..1070, y=14..30] -> 100% CLEAR / SOCKET-MOUNTED!
+     • Enso Timer (89): center (960, 54), x=916..1004, y=10..98 -> 100% CLEAR!
+     • Health Bars: y=37..65 -> 100% CLEAR!
+     • Center Banner hangs cleanly BELOW the Enso Timer at y=101..124px!
+   ============================================================================ */
+#scorebar-root[data-game="mk1"] {
+  --bar-h: 32px;
+  --blade-slant: 0px;
+  --safe-outer-pad: 18px;
+}
+
+#scorebar-root[data-game="mk1"] .sb-wing {
+  top: 3px !important;
+  height: var(--bar-h, 32px) !important;
+  width: calc(600px + var(--wing-spread, 0px)) !important;
+  overflow: visible !important;
+}
+
+#scorebar-root[data-game="mk1"] .sb-wing.p1 {
+  left: calc(236px - var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="mk1"] .sb-wing.p2 {
+  right: calc(236px - var(--wing-spread, 0px)) !important;
+}
+
+#scorebar-root[data-game="mk1"] .wing-plate {
+  height: var(--bar-h, 32px) !important;
+  padding: 0 !important;
+  background: var(--gp-bg-p1, linear-gradient(180deg, #10141f 0%, #07090f 100%));
+  border-bottom: 2px solid var(--gp-p1, #2563eb);
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.78);
+}
+
+#scorebar-root[data-game="mk1"] .sb-wing.p2 .wing-plate {
+  background: var(--gp-bg-p2, linear-gradient(180deg, #10141f 0%, #07090f 100%));
+  border-bottom: 2px solid var(--gp-p2, #2563eb);
+}
+
+#scorebar-root[data-game="mk1"][data-flag-style="fade-blend"] .flag-wrap {
+  width: 60px !important;
+}
+#scorebar-root[data-game="mk1"][data-flag-style="fade-blend"] .flags-group.is-dual .flag-wrap {
+  width: 52px !important;
+}
+#scorebar-root[data-game="mk1"][data-flag-style="fade-blend"] .sb-wing.p1 .flags-group.is-dual {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 66%, transparent 99%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 66%, transparent 99%);
+}
+#scorebar-root[data-game="mk1"][data-flag-style="fade-blend"] .sb-wing.p2 .flags-group.is-dual {
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 66%, transparent 99%);
+  mask-image: linear-gradient(270deg, #000 0%, #000 66%, transparent 99%);
+}
+
+#scorebar-root[data-game="mk1"] .player-info {
+  gap: 6px !important;
+  padding: 0 10px !important;
+}
+
+#scorebar-root[data-game="mk1"] .name-block {
+  min-width: 48px;
+  flex: 1 1 auto;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+#scorebar-root[data-game="mk1"] .player-name {
+  font-family: var(--gp-font, 'Barlow Condensed', sans-serif);
+  font-size: calc(18.5px * var(--font-scale, 1));
+  font-weight: 800;
+  color: var(--gp-tx, #ffffff);
+  letter-spacing: 0.04em;
+}
+
+#scorebar-root[data-game="mk1"] .sponsor-tag {
+  font-size: calc(13.5px * var(--font-scale, 1));
+  font-weight: 800;
+  color: var(--gp-sp1, #93c5fd);
+}
+
+#scorebar-root[data-game="mk1"] .sb-wing.p2 .sponsor-tag {
+  color: var(--gp-sp2, #93c5fd);
+}
+
+#scorebar-root[data-game="mk1"] .score-box {
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 100% !important;
+  background: var(--gp-sc1, #ffffff);
+  color: var(--gp-sct1, #090b12);
+  font-size: 22px !important;
+  font-weight: 900;
+  text-shadow: none;
+}
+
+#scorebar-root[data-game="mk1"] .sb-wing.p2 .score-box {
+  background: var(--gp-sc2, #ffffff);
+  color: var(--gp-sct2, #090b12);
+}
+
+/* Official MK1 Kameo Portrait Icon + Name Chip */
+#scorebar-root[data-game="mk1"] .variant-chip {
+  background: rgba(234, 179, 8, 0.16);
+  border-color: rgba(234, 179, 8, 0.55);
+  color: #fef08a;
+  font-size: 10px;
+  padding: 1px 6px 1px 3px;
+  gap: 4px;
+}
+
+#scorebar-root[data-game="mk1"] .variant-chip img {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(250, 204, 21, 0.72);
+  background: #0b0d14;
+}
+
+#scorebar-root[data-game="mk1"] .char-pill {
+  font-size: 10px !important;
+  padding: 1px 6px !important;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #e2e8f0;
+}
+
+/* MK1 Center Banner sits cleanly BELOW the 89 Enso Timer Ring (top: 105px — ZERO touch on timer or cradle!) */
+#scorebar-root[data-game="mk1"] .sb-center {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  top: 105px !important;
+  z-index: 8 !important;
+  height: 23px !important;
+  min-height: 23px !important;
+  min-width: 168px !important;
+  max-width: 248px !important;
+  padding: 0 18px !important;
+  background: var(--gp-cbg, linear-gradient(90deg, #1d4ed8, #2563eb, #1d4ed8)) !important;
+  border-bottom: 2px solid var(--gp-cborder, #60a5fa) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.82) !important;
+}
+
+#scorebar-root[data-game="mk1"] .round-text {
+  font-family: var(--gp-font, 'Barlow Condensed', sans-serif);
+  font-size: 11.5px !important;
+  font-weight: 900;
+  color: var(--gp-ct, #ffffff) !important;
+  letter-spacing: 0.1em;
+}
+
+#scorebar-root[data-game="mk1"] .format-pill {
+  font-size: 9.5px !important;
+  padding: 0.5px 5px !important;
+  background: rgba(0, 0, 0, 0.36) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  border-radius: 2px;
+}
+
+/* Tuck MK1 Match Point cleanly on outer edge so HP bar & round orbs remain 100% clear! */
+#scorebar-root[data-game="mk1"] .mp-tag {
+  top: 6px !important;
+  height: 20px !important;
+  font-size: 9px !important;
+  padding: 0 10px !important;
+}
+
+/* --- MK1 VARIANT 1: Dragon Orb Sockets (Kazuya-Fists Cutout Centerpiece!) --- */
+#scorebar-root[data-theme="mk1-dragon-socket"] .sb-wing.p1 .wing-plate {
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 6px) 100%, 4px 100%, 14px 50%);
+  border-top: 1.5px solid rgba(253, 224, 71, 0.65);
+  border-bottom: 2px solid #d97706;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(254, 240, 138, 0.35);
+}
+
+#scorebar-root[data-theme="mk1-dragon-socket"] .sb-wing.p2 .wing-plate {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, calc(100% - 14px) 50%, calc(100% - 4px) 100%, 6px 100%);
+  border-top: 1.5px solid rgba(253, 224, 71, 0.65);
+  border-bottom: 2px solid #38bdf8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(254, 240, 138, 0.35);
+}
+
+#scorebar-root[data-theme="mk1-dragon-socket"] .score-box {
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  width: 46px !important;
+  min-width: 46px !important;
+}
+
+#scorebar-root[data-theme="mk1-dragon-socket"] .sb-wing.p2 .score-box {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 100%, 6px 100%);
+}
+
+#scorebar-root[data-theme="mk1-dragon-socket"] .sb-center {
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%) !important;
+  border: 1.5px solid #eab308 !important;
+}
+
+/* --- MK1 VARIANT 2: Enso Ink Scroll (Game-Native Aged Parchment + Circular Hanko Wax-Seal Scores!) --- */
+#scorebar-root[data-theme="mk1-enso-ink"] .sb-wing.p1 .wing-plate {
+  clip-path: polygon(16px 2px, 100% 0, calc(100% - 4px) 100%, 14px 96%, 0 52%);
+  border-bottom: 2.5px solid #991b1b;
+  box-shadow: inset 0 0 12px rgba(120, 53, 15, 0.25), 0 4px 14px rgba(0, 0, 0, 0.72);
+}
+
+#scorebar-root[data-theme="mk1-enso-ink"] .sb-wing.p2 .wing-plate {
+  clip-path: polygon(0 0, calc(100% - 16px) 2px, 100% 52%, calc(100% - 14px) 96%, 4px 100%);
+  border-bottom: 2.5px solid #1e3a8a;
+  box-shadow: inset 0 0 12px rgba(120, 53, 15, 0.25), 0 4px 14px rgba(0, 0, 0, 0.72);
+}
+
+#scorebar-root[data-theme="mk1-enso-ink"] .score-box {
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  align-self: center;
+  margin: 0 5px;
+  border-radius: 50% !important;
+  border: 1.8px solid #fef3c7;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.48);
+  font-size: 18px !important;
+}
+
+#scorebar-root[data-theme="mk1-enso-ink"]:not(.custom-colors) .player-name { text-shadow: none !important; }
+#scorebar-root[data-theme="mk1-enso-ink"]:not(.custom-colors) .variant-chip {
+  background: rgba(28, 17, 10, 0.88) !important;
+  border-color: rgba(217, 119, 6, 0.72) !important;
+  color: #fde68a !important;
+}
+#scorebar-root[data-theme="mk1-enso-ink"]:not(.custom-colors) .seed-chip,
+#scorebar-root[data-theme="mk1-enso-ink"]:not(.custom-colors) .char-pill {
+  background: rgba(28, 17, 10, 0.12) !important;
+  border-color: rgba(120, 53, 15, 0.4) !important;
+  color: #1c110a !important;
+}
+
+#scorebar-root[data-theme="mk1-enso-ink"] .sb-center {
+  border-radius: 3px !important;
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%) !important;
+}
+
+/* --- MK1 VARIANT 3: Shirai Ryu Kunai vs. Lin Kuei Ice Spear (Asymmetric Clan Weapons!) --- */
+#scorebar-root[data-theme="mk1-shirai-lin-kuei"] .sb-wing.p1 .wing-plate {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 100%, 14px 100%);
+  border-bottom: 2.5px solid #f59e0b;
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.34);
+}
+
+#scorebar-root[data-theme="mk1-shirai-lin-kuei"] .sb-wing.p1 .score-box {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%);
+  width: 50px !important;
+  min-width: 50px !important;
+}
+
+#scorebar-root[data-theme="mk1-shirai-lin-kuei"] .sb-wing.p2 .wing-plate {
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 8px) 50%, calc(100% - 16px) 100%, 0 100%);
+  border-bottom: 2.5px solid #38bdf8;
+  border-top: 1px solid rgba(186, 230, 253, 0.55);
+  box-shadow: 0 4px 18px rgba(56, 189, 248, 0.38);
+}
+
+#scorebar-root[data-theme="mk1-shirai-lin-kuei"] .sb-wing.p2 .score-box {
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  width: 50px !important;
+  min-width: 50px !important;
+}
+
+#scorebar-root[data-theme="mk1-shirai-lin-kuei"] .sb-center {
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%) !important;
+  border-bottom: 2px solid #38bdf8 !important;
+  border-top: 2px solid #f59e0b !important;
+}
+
+/* --- MK1 VARIANT 4: Liu Kang Hourglass Astrolabe (Frosted Cosmic Glass + Brass Orb Sockets!) --- */
+#scorebar-root[data-theme="mk1-hourglass-glass"] .wing-plate {
+  border-radius: 16px !important;
+  clip-path: none !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(253, 224, 71, 0.48) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(254, 249, 195, 0.25);
+}
+
+#scorebar-root[data-theme="mk1-hourglass-glass"] .score-box {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 26px !important;
+  align-self: center;
+  margin: 0 4px;
+  border-radius: 13px !important;
+  border: 1.2px solid #fef9c3;
+  font-size: 19px !important;
+}
+
+#scorebar-root[data-theme="mk1-hourglass-glass"] .sb-center {
+  border-radius: 12px !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(253, 224, 71, 0.58) !important;
+}
+
+/* --- MK1 VARIANT 5: EVO Pro Broadcast (Crisp Flat Rectangular TV Standard) --- */
+#scorebar-root[data-theme="mk1-evo-broadcast"] .wing-plate,
+#scorebar-root[data-theme="mk1-evo-broadcast"] .score-box {
+  clip-path: none !important;
+  border-radius: 2px;
+}
+
+#scorebar-root[data-theme="mk1-evo-broadcast"] .sb-center {
+  clip-path: none !important;
+  border-radius: 3px !important;
+}
+
+/* Custom Colors compatibility for Mortal Kombat 1 */
+#scorebar-root[data-game="mk1"].custom-colors .wing-plate { background: var(--c-bg-fill) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .sb-wing.p1 .wing-plate { border-bottom-color: var(--c-p1-1) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .sb-wing.p2 .wing-plate { border-bottom-color: var(--c-p2-1) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .sb-wing.p1 .blade-edge,
+#scorebar-root[data-game="mk1"].custom-colors .sb-wing.p1 .flag-slash { background: var(--c-p1-1) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .sb-wing.p2 .blade-edge,
+#scorebar-root[data-game="mk1"].custom-colors .sb-wing.p2 .flag-slash { background: var(--c-p2-1) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .sb-wing.p1 .score-box { background: var(--c-p1-score-bg) !important; color: var(--c-p1-score-text) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .sb-wing.p2 .score-box { background: var(--c-p2-score-bg) !important; color: var(--c-p2-score-text) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .sb-center { background: var(--c-center-fill) !important; border-bottom-color: var(--c-center-acc) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .round-text { color: var(--c-center-acc) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .player-name { color: var(--c-text) !important; }
+#scorebar-root[data-game="mk1"].custom-colors .sponsor-tag { color: var(--c-sponsor) !important; }
+
+/* ============================================================================
+   5. SUPER SMASH BROS. ULTIMATE — 100% INDEPENDENT NATIVE ARCHITECTURE (#smash-root)
+   - NEVER overlaps Switch Top-Right Timer (x=1630..1900, y=24..108)
+   - NEVER overlaps Switch Bottom % & Stock HUD (y=835..1080)
+   - Supports: major-singles, pill-compact (webcam-ready), doubles-2v2
+   ============================================================================ */
+#smash-root {
+  --sm-p1: #ef4444;
+  --sm-p2: #2563eb;
+  --sm-bg: linear-gradient(180deg, rgba(24, 28, 40, 0.94), rgba(12, 15, 22, 0.97));
+  --sm-border: rgba(255, 255, 255, 0.16);
+  --sm-text: #ffffff;
+  --sm-sponsor: #fde047;
+  --sm-accent: #facc15;
+  --sm-font: 'Barlow Condensed', 'Bahnschrift', sans-serif;
+  --sm-score-font: 'Chakra Petch', 'Barlow Condensed', sans-serif;
+
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 25;
+  opacity: var(--user-opacity, 1);
+  transition: opacity 0.36s ease, transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  display: none;
+}
+
+#smash-root.is-active {
+  display: block;
+}
+
+#smash-root.hidden {
+  opacity: 0 !important;
+  transform: translateY(-28px);
+}
+
+#smash-root.no-trans,
+#smash-root.no-trans * {
+  transition: none !important;
+}
+
+.sm-top-cluster {
+  position: absolute;
+  top: calc(18px + var(--offset-y, 0px));
+  left: 0;
+  width: 1920px;
+  height: 150px;
+  transform-origin: top center;
+  transform: scale(var(--user-scale, 1));
+}
+
+/* --- TOP-LEFT ROUND / FORMAT / STAGE INFO CARD --- */
+.sm-info-box {
+  position: absolute;
+  left: 26px;
+  top: 0;
+  width: auto;
+  min-width: 268px;
+  max-width: 348px;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--sm-bg);
+  border: 1.5px solid var(--sm-border);
+  border-left: 4px solid var(--sm-accent);
+  border-radius: 8px;
+  padding: 9px 14px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.38);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  backdrop-filter: blur(8px);
+}
+
+.sm-info-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sm-format-badge {
+  font: 800 12px/1 'Chakra Petch', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sm-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.sm-round-label {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-family: var(--sm-font);
+  font-size: calc(21px * var(--font-scale, 1));
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sm-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sm-stage-pill {
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font: 700 12px/1.1 'Chakra Petch', sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #e2e8f0;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sm-stage-pill img {
+  width: 22px;
+  height: 16px;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+.sm-stage-pill.hidden-el {
+  display: none !important;
+}
+
+/* --- MAIN MATCH BAR GROUP (PIXEL-EXACT DEAD CENTER x=960px, Symmetrical P1 | Logo | P2, Clears Top-Right Switch Timer!) --- */
+.sm-match-group {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 1120px;
+  /* Spans x=400..1520px -> 400px clear left for Round box, 400px clear right for Switch Timer! */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 14px;
+}
+
+.sm-side {
+  flex: 1 1 0;
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* Clean separation so bar border never crowds flags/pills underneath! */
+  min-width: 0;
+}
+
+.sm-bar {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  height: 62px;
+  background: var(--sm-bg);
+  border: 1.5px solid var(--sm-border);
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.38);
+  /* Tight non-muddy shadow so hanging flags stay 100% crisp! */
+  backdrop-filter: blur(8px);
+}
+
+.sm-side.p1 .sm-bar {
+  flex-direction: row;
+  border-bottom: 3.5px solid var(--sm-p1);
+}
+
+.sm-side.p2 .sm-bar {
+  flex-direction: row-reverse;
+  border-bottom: 3.5px solid var(--sm-p2);
+}
+
+.sm-port-stripe {
+  width: 7px;
+  flex-shrink: 0;
+  background: var(--sm-p1);
+}
+
+.sm-side.p2 .sm-port-stripe {
+  background: var(--sm-p2);
+}
+
+.sm-player-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  min-width: 0;
+}
+
+.sm-side.p2 .sm-player-body {
+  flex-direction: row-reverse;
+}
+
+.sm-name-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.sm-side.p1 .sm-name-col {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.sm-side.p2 .sm-name-col {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.sm-name-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.sm-side.p2 .sm-name-line {
+  flex-direction: row-reverse;
+}
+
+/* Inline Stock Icon for Player 1 in Doubles 2v2 — vertically aligned 1:1 above Player 2's stock icon! */
+.sm-stock-inline {
+  display: none;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.sm-stock-inline img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.sm-stock-inline.hidden-el {
+  display: none !important;
+}
+
+.sm-sponsor {
+  font-family: var(--sm-font);
+  font-size: calc(20px * var(--font-scale, 1));
+  font-weight: 800;
+  color: var(--sm-sponsor);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.sm-sponsor:empty {
+  display: none;
+}
+
+.sm-name {
+  font-family: var(--sm-font);
+  font-size: calc(30px * var(--font-scale, 1));
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--sm-text);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Official SSBU Character Stock Head Icon inside 1v1 player bar */
+.sm-stock-wrap {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+}
+
+.sm-stock-wrap img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55));
+}
+
+.sm-stock-wrap.hidden-el {
+  display: none !important;
+}
+
+/* Set Score Box */
+.sm-score-box {
+  position: relative;
+  overflow: hidden;
+  width: 68px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--sm-p1), color-mix(in srgb, var(--sm-p1) 72%, #000));
+  color: #ffffff;
+  font-family: var(--sm-score-font);
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+}
+
+.sm-score-num {
+  display: inline-block;
+  position: relative;
+  z-index: 2;
+  will-change: transform, opacity;
+}
+
+.sm-side.p2 .sm-score-box {
+  background: linear-gradient(180deg, var(--sm-p2), color-mix(in srgb, var(--sm-p2) 72%, #000));
+}
+
+/* Score Increment (+1) & Decrement (-1) FX — All 5 Modes for Super Smash Bros. Ultimate */
+.sm-score-box.pop .sm-score-num {
+  animation: scorePop var(--score-dur, 0.45s) cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+.sm-score-box.pop[data-score-dir="down"] .sm-score-num {
+  animation: scorePopDown var(--score-dur, 0.45s) cubic-bezier(0.22, 1.3, 0.36, 1);
+}
+
+.sm-score-box.pop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 15%, rgba(255, 255, 255, 0.82) 50%, transparent 85%);
+  animation: scoreFlash var(--score-dur, 0.45s) ease-out forwards;
+}
+
+#smash-root[data-score-anim="flip"] .sm-score-box.pop .sm-score-num {
+  animation: scoreFlip var(--score-dur, 0.45s) cubic-bezier(0.22, 1.2, 0.36, 1) !important;
+}
+
+#smash-root[data-score-anim="roll"] .sm-score-box.pop .sm-score-num {
+  animation: scoreRoll var(--score-dur, 0.45s) cubic-bezier(0.22, 1.3, 0.36, 1) !important;
+}
+
+#smash-root[data-score-anim="roll"] .sm-score-box.pop[data-score-dir="down"] .sm-score-num {
+  animation: scoreRollDown var(--score-dur, 0.45s) cubic-bezier(0.22, 1.3, 0.36, 1) !important;
+}
+
+#smash-root[data-score-anim="shockwave"] .sm-score-box.pop::after {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, transparent 70%) !important;
+  animation: scoreShock var(--score-dur, 0.45s) ease-out forwards !important;
+}
+
+#smash-root[data-score-anim="none"] .sm-score-box.pop .sm-score-num,
+#smash-root[data-score-anim="none"] .sm-score-box.pop::after {
+  animation: none !important;
+  content: none !important;
+}
+
+/* Hanging Competitive Meta Sub-Row (Seed + Flags + Pronouns + [W/L] + Match Point — Crisp High-Contrast, ZERO Muddy Shadow!) */
+.sm-subrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px;
+  min-height: 24px;
+}
+
+.sm-side.p1 .sm-subrow {
+  justify-content: flex-start;
+}
+
+.sm-side.p2 .sm-subrow {
+  justify-content: flex-start; /* With row-reverse, flex-start anchors flush to the RIGHT outer edge — exact mirror of P1! */
+  flex-direction: row-reverse;
+}
+
+.sm-side.p2 .sm-flags-pill {
+  flex-direction: row-reverse; /* Mirror Country (outer right) + Region (inner) to match P1! */
+}
+
+.sm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  background: rgba(10, 13, 21, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  font: 800 13px/1.1 'Chakra Petch', 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.04em;
+  color: #f8fafc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.32);
+  white-space: nowrap;
+}
+
+.sm-pill.seed {
+  border-color: rgba(250, 204, 21, 0.72);
+  color: #fde047;
+}
+
+.sm-pill.pronouns {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+.sm-pill.bracket-w {
+  background: #f59e0b;
+  border-color: #fde047;
+  color: #090b10;
+  font-weight: 900;
+}
+
+.sm-pill.bracket-l {
+  background: #e11d48;
+  border-color: #fda4af;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.sm-pill.mp {
+  background: linear-gradient(90deg, #dc2626, #ea580c);
+  border-color: #fde047;
+  color: #ffffff;
+  animation: mpPulse 1.4s ease-in-out infinite;
+}
+
+.sm-pill.hidden-el {
+  display: none !important;
+}
+
+.sm-flags-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: rgba(10, 13, 21, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.32);
+}
+
+.sm-flags-pill .sm-flag-svg {
+  width: 24px;
+  height: 16px;
+  border-radius: 2px;
+  overflow: hidden;
+  display: inline-flex;
+  box-shadow: 0 0 0 0.6px rgba(255, 255, 255, 0.22);
+}
+
+.sm-flags-pill .sm-flag-svg svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.sm-flags-pill .hidden-el,
+.sm-flags-pill.hidden-el {
+  display: none !important;
+}
+
+/* Center Square Tournament Logo Medallion */
+.sm-center-logo {
+  width: 92px;
+  height: 92px;
+  margin-top: -4px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(20, 24, 36, 0.96), rgba(9, 12, 18, 0.98));
+  border: 2px solid var(--sm-accent);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  overflow: hidden;
+}
+
+.sm-center-logo.hidden-el {
+  display: none !important;
+}
+
+.sm-center-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sm-center-logo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--sm-accent);
+}
+
+.smash-ball-svg {
+  width: 78%;
+  height: 78%;
+  display: block;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35));
+}
+
+/* ============================================================================
+   DOUBLES 2v2 UNIVERSAL LAYOUT (Works across ALL 5 Smash Styles!)
+   Top player's stock icon sits inline beside their name — aligned 1:1 above partner!
+   ============================================================================ */
+.sm-doubles-row {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  width: 100%;
+}
+
+.sm-side.p2 .sm-doubles-row {
+  flex-direction: row-reverse;
+}
+
+.sm-partner-name {
+  font-family: var(--sm-font);
+  font-size: calc(22px * var(--font-scale, 1));
+  font-weight: 800;
+  color: var(--sm-partner-text, #e2e8f0);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sm-partner-pronouns {
+  font: 700 11px/1 'Chakra Petch', sans-serif;
+  color: var(--sm-partner-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.sm-partner-stock {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.sm-partner-stock img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.sm-partner-stock.hidden-el {
+  display: none !important;
+}
+
+#smash-root[data-doubles="on"] .sm-match-group {
+  width: 1140px;
+}
+
+#smash-root[data-doubles="on"] .sm-bar {
+  height: 90px;
+}
+
+#smash-root[data-doubles="on"] .sm-name {
+  font-size: calc(25px * var(--font-scale, 1));
+}
+
+#smash-root[data-doubles="on"] .sm-sponsor {
+  font-size: calc(18px * var(--font-scale, 1));
+}
+
+#smash-root[data-doubles="on"] .sm-doubles-row {
+  display: flex;
+}
+
+#smash-root[data-doubles="on"] .sm-stock-wrap {
+  display: none !important;
+  /* Replaced by inline stock icon right beside Player 1! */
+}
+
+#smash-root[data-doubles="on"] .sm-stock-inline:not(.hidden-el) {
+  display: inline-flex;
+}
+
+#smash-root[data-doubles="on"] .sm-score-box {
+  width: 74px;
+  font-size: 44px;
+}
+
+#smash-root[data-doubles="on"] .sm-center-logo {
+  width: 102px;
+  height: 102px;
+}
+
+/* ============================================================================
+   SMASH STYLE 2: PILL (Webcam Ready — 1v1 & 2v2!)
+   ============================================================================ */
+#smash-root[data-style="pill"] .sm-match-group {
+  width: 1080px;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-match-group {
+  width: 1120px;
+}
+
+#smash-root[data-style="pill"] .sm-info-box {
+  border-radius: 32px;
+  border-left: 1.5px solid var(--sm-border);
+  padding: 8px 28px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#smash-root[data-style="pill"]:not([data-info-pos="center-top"]) .sm-info-box {
+  width: auto;
+  min-width: 224px;
+  max-width: 364px;
+  min-height: 58px;
+  top: 8px;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"]:not([data-info-pos="center-top"]) .sm-info-box {
+  top: 14px;
+  min-height: 66px;
+  max-width: 356px;
+  padding: 10px 30px;
+}
+
+#smash-root[data-style="pill"] .sm-info-top {
+  justify-content: center;
+}
+
+#smash-root[data-style="pill"] .sm-format-badge {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+#smash-root[data-style="pill"] .sm-round-label {
+  font-size: calc(18px * var(--font-scale, 1));
+  line-height: 1.12;
+  text-align: center;
+}
+
+#smash-root[data-style="pill"] .sm-stage-pill {
+  border-radius: 999px;
+}
+
+#smash-root[data-style="pill"] .sm-bar {
+  height: 58px;
+  margin-top: 8px;
+  border-radius: 999px;
+  border-bottom-width: 1.5px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--sm-p1) 76%, #000), var(--sm-p1));
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-bar {
+  height: 86px;
+  margin-top: 4px;
+  border-radius: 44px;
+}
+
+#smash-root[data-style="pill"] .sm-side.p2 .sm-bar {
+  background: linear-gradient(270deg, color-mix(in srgb, var(--sm-p2) 76%, #000), var(--sm-p2));
+}
+
+#smash-root[data-style="pill"] .sm-port-stripe {
+  display: none;
+}
+
+#smash-root[data-style="pill"] .sm-side.p1 .sm-player-body {
+  padding: 0 14px 0 28px;
+}
+
+#smash-root[data-style="pill"] .sm-side.p2 .sm-player-body {
+  padding: 0 28px 0 14px;
+}
+
+#smash-root[data-style="pill"][data-score-pos="outer"] .sm-side.p1 .sm-player-body {
+  padding: 0 28px 0 14px;
+}
+
+#smash-root[data-style="pill"][data-score-pos="outer"] .sm-side.p2 .sm-player-body {
+  padding: 0 14px 0 28px;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-side.p1 .sm-player-body {
+  padding: 4px 14px 4px 36px;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-side.p2 .sm-player-body {
+  padding: 4px 36px 4px 14px;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"][data-score-pos="outer"] .sm-side.p1 .sm-player-body {
+  padding: 4px 36px 4px 14px;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"][data-score-pos="outer"] .sm-side.p2 .sm-player-body {
+  padding: 4px 14px 4px 36px;
+}
+
+#smash-root[data-style="pill"] .sm-name {
+  font-size: calc(27px * var(--font-scale, 1));
+  line-height: 1.08;
+}
+
+#smash-root[data-style="pill"] .sm-sponsor {
+  font-size: calc(19px * var(--font-scale, 1));
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-name {
+  font-size: calc(22px * var(--font-scale, 1));
+  line-height: 1.08;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-sponsor {
+  font-size: calc(16px * var(--font-scale, 1));
+}
+
+#smash-root[data-style="pill"] .sm-stock-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-stock-inline,
+#smash-root[data-style="pill"][data-doubles="on"] .sm-partner-stock {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-stock-inline img,
+#smash-root[data-style="pill"][data-doubles="on"] .sm-partner-stock img {
+  width: 21px;
+  height: 21px;
+}
+
+#smash-root[data-style="pill"] .sm-score-box {
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+  align-self: center;
+  background: rgba(9, 12, 18, 0.92);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  margin: 0 6px;
+  font-size: 28px;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-score-box {
+  width: 62px;
+  min-width: 62px;
+  height: 62px;
+  flex: 0 0 62px;
+  margin: 0 11px;
+  font-size: 36px;
+}
+
+#smash-root[data-style="pill"] .sm-center-logo {
+  width: 78px;
+  height: 78px;
+  margin-top: -2px;
+  border-radius: 50%;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-center-logo {
+  width: 96px;
+  height: 96px;
+  margin-top: -1px;
+}
+
+#smash-root[data-style="pill"] .sm-subrow {
+  padding: 0 24px;
+}
+
+#smash-root[data-style="pill"][data-doubles="on"] .sm-subrow {
+  padding: 0 32px;
+}
+
+#smash-root[data-style="pill"] .sm-side.p1 .sm-in-flags {
+  padding-left: 24px;
+}
+
+#smash-root[data-style="pill"] .sm-side.p2 .sm-in-flags {
+  padding-right: 24px;
+}
+
+#smash-root[data-style="pill"][data-flag-pos="inside-outer"]:not([data-flag-style="fade-blend"]) .sm-side.p1 .sm-in-flags:not(.hidden-el) + .sm-player-body {
+  padding-left: 10px;
+}
+
+#smash-root[data-style="pill"][data-flag-pos="inside-outer"]:not([data-flag-style="fade-blend"]) .sm-side.p2 .sm-in-flags:not(.hidden-el) + .sm-player-body {
+  padding-right: 10px;
+}
+
+#smash-root[data-style="pill"][data-mp-style="side-peek"] .sm-side.p1 .sm-mp-float {
+  right: 26px;
+}
+
+#smash-root[data-style="pill"][data-mp-style="side-peek"] .sm-side.p2 .sm-mp-float {
+  left: 26px;
+}
+
+#smash-root[data-style="pill"][data-mp-style="outer-peek"] .sm-side.p1 .sm-mp-float {
+  left: 32px;
+}
+
+#smash-root[data-style="pill"][data-mp-style="outer-peek"] .sm-side.p2 .sm-mp-float {
+  right: 32px;
+}
+
+#smash-root[data-style="pill"] .sm-pill,
+#smash-root[data-style="pill"] .sm-flags-pill {
+  border-radius: 999px;
+}
+
+#smash-root[data-style="pill"] .sm-doubles-row {
+  border-top-color: rgba(255, 255, 255, 0.28);
+  padding-top: 3px;
+  margin-top: 3px;
+  gap: 7px;
+}
+
+#smash-root[data-style="pill"] .sm-partner-name {
+  font-size: calc(19px * var(--font-scale, 1));
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+#smash-root[data-style="pill"] .sm-partner-pronouns {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+/* ============================================================================
+   SMASH STYLE 3: APEX SLANT (Esports Angled Blades — 1v1 & 2v2!)
+   ============================================================================ */
+#smash-root[data-style="slant"] .sm-info-box {
+  border-radius: 0;
+  border-left: 5px solid var(--sm-accent);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  padding: 9px 22px 9px 14px;
+}
+
+#smash-root[data-style="slant"] .sm-bar {
+  border-radius: 0;
+  border: none;
+  border-top: 2px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 3.5px solid var(--sm-p1);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sm-p1) 20%, #0d111c), #0b0e18 65%);
+}
+
+#smash-root[data-style="slant"] .sm-side.p1 .sm-bar {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 100%, 16px 100%);
+}
+
+#smash-root[data-style="slant"] .sm-side.p2 .sm-bar {
+  border-bottom-color: var(--sm-p2);
+  background: linear-gradient(225deg, color-mix(in srgb, var(--sm-p2) 20%, #0d111c), #0b0e18 65%);
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+}
+
+#smash-root[data-style="slant"] .sm-port-stripe {
+  width: 10px;
+}
+
+#smash-root[data-style="slant"] .sm-player-body {
+  padding: 0 22px;
+}
+
+#smash-root[data-style="slant"] .sm-name,
+#smash-root[data-style="slant"] .sm-partner-name {
+  font-style: italic;
+}
+
+#smash-root[data-style="slant"] .sm-score-box {
+  width: 78px;
+  font-style: italic;
+}
+
+#smash-root[data-style="slant"] .sm-side.p1 .sm-score-box {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 100%, 14px 100%);
+  padding-right: 6px;
+}
+
+#smash-root[data-style="slant"] .sm-side.p2 .sm-score-box {
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  padding-left: 6px;
+}
+
+#smash-root[data-style="slant"] .sm-center-logo {
+  border-radius: 6px;
+  clip-path: polygon(14% 0, 86% 0, 100% 14%, 100% 86%, 86% 100%, 14% 100%, 0 86%, 0 14%);
+  border: 2px solid var(--sm-accent);
+}
+
+#smash-root[data-style="slant"] .sm-pill,
+#smash-root[data-style="slant"] .sm-flags-pill {
+  border-radius: 2px;
+  transform: skewX(-10deg);
+}
+
+#smash-root[data-style="slant"] .sm-side.p2 .sm-pill,
+#smash-root[data-style="slant"] .sm-side.p2 .sm-flags-pill {
+  transform: skewX(10deg);
+}
+
+/* ============================================================================
+   SMASH STYLE 4: KAGARIBI LIGHT (Japanese Clean Daylight TV — 1v1 & 2v2!)
+   ============================================================================ */
+#smash-root[data-style="kagaribi"] {
+  --sm-bg: linear-gradient(180deg, #ffffff, #edf2f8);
+  --sm-border: rgba(15, 23, 42, 0.16);
+  --sm-text: #0f172a;
+  --sm-partner-text: #1e293b;
+  --sm-partner-muted: #475569;
+}
+
+#smash-root[data-style="kagaribi"] .sm-info-box {
+  background: linear-gradient(180deg, #ffffff, #edf2f8);
+  border-color: rgba(15, 23, 42, 0.18);
+  border-left: 5px solid var(--sm-p1);
+  border-radius: 4px;
+}
+
+#smash-root[data-style="kagaribi"] .sm-format-badge {
+  color: var(--sm-p1);
+}
+
+#smash-root[data-style="kagaribi"] .sm-stage-pill {
+  background: rgba(15, 23, 42, 0.08);
+  border-color: rgba(15, 23, 42, 0.18);
+  color: #0f172a;
+}
+
+#smash-root[data-style="kagaribi"] .sm-bar {
+  border-radius: 4px;
+  border-bottom-width: 4px;
+}
+
+#smash-root[data-style="kagaribi"] .sm-name {
+  text-shadow: none;
+}
+
+#smash-root[data-style="kagaribi"] .sm-stock-wrap,
+#smash-root[data-style="kagaribi"] .sm-stock-inline,
+#smash-root[data-style="kagaribi"] .sm-partner-stock {
+  background: rgba(15, 23, 42, 0.07);
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+#smash-root[data-style="kagaribi"] .sm-doubles-row {
+  border-top-color: rgba(15, 23, 42, 0.14);
+}
+
+#smash-root[data-style="kagaribi"] .sm-center-logo {
+  background: #ffffff;
+  border: 2px solid rgba(15, 23, 42, 0.22);
+  border-radius: 8px;
+}
+
+#smash-root[data-style="kagaribi"] .sm-center-logo-fallback {
+  color: #0f172a;
+}
+
+#smash-root[data-style="kagaribi"] .sm-center-logo-fallback small {
+  color: #dc2626;
+}
+
+#smash-root[data-style="kagaribi"] .sm-pill,
+#smash-root[data-style="kagaribi"] .sm-flags-pill {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(15, 23, 42, 0.2);
+  color: #0f172a;
+}
+
+#smash-root[data-style="kagaribi"] .sm-pill.seed {
+  background: #0f172a;
+  color: #fde047;
+  border-color: #0f172a;
+}
+
+#smash-root[data-style="kagaribi"] .sm-pill.pronouns {
+  color: #334155;
+}
+
+#smash-root[data-style="kagaribi"] .sm-pill.bracket-w {
+  background: #f59e0b;
+  color: #090b10;
+  border-color: #d97706;
+}
+
+#smash-root[data-style="kagaribi"] .sm-pill.bracket-l {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #b91c1c;
+}
+
+#smash-root[data-style="kagaribi"] .sm-pill.mp {
+  background: linear-gradient(90deg, #dc2626, #ea580c);
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
+/* ============================================================================
+   SMASH STYLE 5: AURORA GLASS (Liquid Glassmorphism — 1v1 & 2v2!)
+   ============================================================================ */
+#smash-root[data-style="glass"] .sm-info-box {
+  background: rgba(15, 23, 42, 0.62);
+  border: 1.5px solid rgba(255, 255, 255, 0.24);
+  border-left: 3.5px solid var(--sm-accent);
+  border-radius: 14px;
+  backdrop-filter: blur(16px);
+}
+
+#smash-root[data-style="glass"] .sm-bar {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sm-p1) 24%, rgba(15, 23, 42, 0.68)), rgba(15, 23, 42, 0.62));
+  border: 1.5px solid rgba(255, 255, 255, 0.24);
+  border-top: 3px solid var(--sm-p1);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  backdrop-filter: blur(16px);
+}
+
+#smash-root[data-style="glass"] .sm-side.p2 .sm-bar {
+  background: linear-gradient(225deg, color-mix(in srgb, var(--sm-p2) 24%, rgba(15, 23, 42, 0.68)), rgba(15, 23, 42, 0.62));
+  border-top: 3px solid var(--sm-p2);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+#smash-root[data-style="glass"] .sm-port-stripe {
+  display: none;
+}
+
+#smash-root[data-style="glass"] .sm-score-box {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sm-p1) 86%, #fff 14%), color-mix(in srgb, var(--sm-p1) 70%, #000));
+  border-radius: 10px;
+  margin: 6px;
+  width: 56px;
+}
+
+#smash-root[data-style="glass"] .sm-side.p2 .sm-score-box {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sm-p2) 86%, #fff 14%), color-mix(in srgb, var(--sm-p2) 70%, #000));
+}
+
+#smash-root[data-style="glass"][data-doubles="on"] .sm-score-box {
+  width: 64px;
+  margin: 8px;
+}
+
+#smash-root[data-style="glass"] .sm-center-logo {
+  background: rgba(15, 23, 42, 0.68);
+  border: 1.5px solid rgba(255, 255, 255, 0.34);
+  border-radius: 18px;
+  backdrop-filter: blur(16px);
+}
+
+#smash-root[data-style="glass"] .sm-pill,
+#smash-root[data-style="glass"] .sm-flags-pill {
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+}
+#smash-root[data-style="glass"] .sm-pill:not(.bracket-w):not(.bracket-l):not(.mp),
+#smash-root[data-style="glass"] .sm-flags-pill {
+  background: rgba(15, 23, 42, 0.84);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* Legacy Smash bottom ticker replaced by unified preset-adaptive #bottom-event-bar */
+#smash-bottom-ticker {
+  display: none !important;
+}
+
+/* ============================================================================
+   5B. FULL STYLE STUDIO SUPPORT ON SUPER SMASH (#smash-root)
+   - Custom Colors & Surface (Gradient / Solid / Glass / Metallic)
+   - Info Box (Round / Format / Stage) Architecture, Position & Colors
+   - Plate Shapes, Borders, Wing Spread, Bar Height, Score Position
+   - Typography (Font, Scale, Letter Spacing, Italic, Uppercase, Text Shadow)
+   - Inside-Bar Flags (Outer Left/Right, Near Score, Full Fade-Blend BG)
+   - All 5 Match Point Styles & All 5 Match Point Colors
+   - Visual FX (Glow & Surface Textures)
+   ============================================================================ */
+
+/* Global Smash Tweaks: Wing Spread & Optional Custom Bar Height */
+#smash-root .sm-match-group {
+  width: clamp(560px, calc(1120px + var(--wing-spread, 0px) * 2), 1580px);
+  max-width: 1460px;
+}
+#smash-root[data-bar-h="1"] .sm-bar {
+  height: var(--bar-h, 62px);
+}
+#smash-root[data-bar-h="1"][data-doubles="on"] .sm-bar {
+  height: calc(var(--bar-h, 62px) + 26px);
+}
+
+/* Smash Score Position Override (Outer swaps score box to outer edge) */
+#smash-root[data-score-pos="outer"] .sm-side.p1 .sm-bar { flex-direction: row-reverse; }
+#smash-root[data-score-pos="outer"] .sm-side.p2 .sm-bar { flex-direction: row; }
+
+/* Smash Round / Format / Stage Info Box Positions */
+#smash-root[data-info-pos="hidden"] .sm-info-box {
+  display: none !important;
+}
+#smash-root[data-info-pos="center-top"] .sm-info-box {
+  left: 50%;
+  top: -6px;
+  transform: translateX(-50%);
+  width: auto;
+  min-width: 260px;
+  max-width: 720px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 5px 18px;
+  border-left: 1.5px solid var(--sm-border);
+  border-bottom: 2.5px solid var(--sm-accent);
+  z-index: 8;
+}
+#smash-root[data-info-pos="center-top"] .sm-match-group {
+  top: 62px;
+}
+#smash-root[data-info-pos="center-top"] .sm-round-label {
+  font-size: 18px;
+}
+#smash-root[data-info-pos="center-top"] .sm-stage-pill {
+  margin-top: 0;
+}
+
+/* Smash Center Block / Info Box Styles (Style Studio -> Center Block) */
+#smash-root[data-center-style="floating"] .sm-info-box {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  padding: 4px 6px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.85));
+}
+#smash-root[data-center-style="trapezoid"] .sm-info-box {
+  border-radius: 0 !important;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%) !important;
+  padding-right: 24px !important;
+}
+#smash-root[data-center-style="hex"] .sm-info-box {
+  border-radius: 0 !important;
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px) !important;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+#smash-root[data-center-style="pill"] .sm-info-box {
+  border-radius: 999px !important;
+  padding: 9px 22px !important;
+  border-left-width: 1.5px !important;
+  border-bottom: 3px solid var(--sm-accent) !important;
+  clip-path: none !important;
+}
+
+/* Smash Plate Shape Overrides (Style Studio -> Plate Shape) */
+#smash-root[data-shape="flat"] .sm-bar,
+#smash-root[data-shape="flat"] .sm-info-box { border-radius: 0 !important; clip-path: none !important; }
+#smash-root[data-shape="rounded"] .sm-bar { border-radius: 999px !important; clip-path: none !important; }
+#smash-root[data-shape="rounded"] .sm-info-box { border-radius: 18px !important; clip-path: none !important; }
+#smash-root[data-shape="blade-slant"] .sm-side.p1 .sm-bar { border-radius: 0 !important; clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 100%, 18px 100%) !important; }
+#smash-root[data-shape="blade-slant"] .sm-side.p2 .sm-bar { border-radius: 0 !important; clip-path: polygon(18px 0, 100% 0, calc(100% - 18px) 100%, 0 100%) !important; }
+#smash-root[data-shape="diagonal"] .sm-side.p1 .sm-bar { border-radius: 0 !important; clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%) !important; }
+#smash-root[data-shape="diagonal"] .sm-side.p2 .sm-bar { border-radius: 0 !important; clip-path: polygon(0 0, 100% 0, 100% 100%, 14px 100%) !important; }
+#smash-root[data-shape="bevel"] .sm-bar,
+#smash-root[data-shape="bevel"] .sm-info-box { border-radius: 0 !important; clip-path: polygon(11px 0, calc(100% - 11px) 0, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 11px) !important; }
+#smash-root[data-shape="hex"] .sm-bar { border-radius: 0 !important; clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 16px 100%, 0 50%) !important; }
+#smash-root[data-shape="skew"] .sm-side.p1 .sm-bar { border-radius: 4px !important; clip-path: none !important; transform: skewX(-10deg); }
+#smash-root[data-shape="skew"] .sm-side.p2 .sm-bar { border-radius: 4px !important; clip-path: none !important; transform: skewX(10deg); }
+
+/* Smash Border Style Overrides */
+#smash-root[data-border-style="none"] .sm-bar,
+#smash-root[data-border-style="none"] .sm-info-box,
+#smash-root[data-border-style="none"] .sm-center-logo { border: none !important; }
+#smash-root[data-border-style="thin"] .sm-bar,
+#smash-root[data-border-style="thin"] .sm-info-box { border-width: 1px !important; }
+#smash-root[data-border-style="bold"] .sm-bar,
+#smash-root[data-border-style="bold"] .sm-info-box,
+#smash-root[data-border-style="bold"] .sm-center-logo { border-width: 3px !important; }
+#smash-root[data-border-style="neon"] .sm-side.p1 .sm-bar { border: 2px solid var(--sm-p1) !important; box-shadow: 0 0 14px color-mix(in srgb, var(--sm-p1) 65%, transparent) !important; }
+#smash-root[data-border-style="neon"] .sm-side.p2 .sm-bar { border: 2px solid var(--sm-p2) !important; box-shadow: 0 0 14px color-mix(in srgb, var(--sm-p2) 65%, transparent) !important; }
+#smash-root[data-border-style="neon"] .sm-info-box { border: 2px solid var(--sm-accent) !important; box-shadow: 0 0 14px color-mix(in srgb, var(--sm-accent) 60%, transparent) !important; }
+
+/* Smash Typography Controls */
+#smash-root .sm-name,
+#smash-root .sm-partner-name,
+#smash-root .sm-round-label {
+  letter-spacing: var(--letter-spacing, 0.04em);
+}
+#smash-root[data-italic="on"] .sm-name,
+#smash-root[data-italic="on"] .sm-partner-name,
+#smash-root[data-italic="on"] .sm-round-label { font-style: italic !important; }
+#smash-root[data-italic="off"] .sm-name,
+#smash-root[data-italic="off"] .sm-partner-name,
+#smash-root[data-italic="off"] .sm-round-label,
+#smash-root[data-italic="off"] .sm-score-box { font-style: normal !important; }
+#smash-root[data-uppercase="false"] .sm-name,
+#smash-root[data-uppercase="false"] .sm-partner-name,
+#smash-root[data-uppercase="false"] .sm-sponsor,
+#smash-root[data-uppercase="false"] .sm-round-label { text-transform: none !important; }
+#smash-root[data-text-shadow="hard"] .sm-name,
+#smash-root[data-text-shadow="hard"] .sm-round-label { text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.92) !important; }
+#smash-root[data-text-shadow="neon"] .sm-side.p1 .sm-name { text-shadow: 0 0 10px var(--sm-p1), 0 1px 4px rgba(0,0,0,0.8) !important; }
+#smash-root[data-text-shadow="neon"] .sm-side.p2 .sm-name { text-shadow: 0 0 10px var(--sm-p2), 0 1px 4px rgba(0,0,0,0.8) !important; }
+#smash-root[data-text-shadow="neon"] .sm-round-label { text-shadow: 0 0 10px var(--sm-accent), 0 1px 4px rgba(0,0,0,0.8) !important; }
+#smash-root[data-text-shadow="none"] .sm-name,
+#smash-root[data-text-shadow="none"] .sm-round-label,
+#smash-root[data-text-shadow="none"] .sm-score-box { text-shadow: none !important; }
+
+/* Smash Custom Colors & Surface Studio Overrides (Works over ALL 5 Smash Styles incl. Kagaribi & Pill!) */
+#smash-root.custom-colors .sm-bar {
+  background: var(--sm-c-bg-fill, var(--sm-bg)) !important;
+  border-color: var(--sm-c-border, rgba(255, 255, 255, 0.22)) !important;
+}
+#smash-root.custom-colors .sm-side.p1 .sm-bar { border-bottom-color: var(--sm-p1) !important; }
+#smash-root.custom-colors .sm-side.p2 .sm-bar { border-bottom-color: var(--sm-p2) !important; }
+#smash-root.custom-colors .sm-info-box {
+  background: var(--sm-c-info-fill, var(--sm-bg)) !important;
+  border-color: var(--sm-c-border, rgba(255, 255, 255, 0.22)) !important;
+  border-left-color: var(--sm-accent) !important;
+}
+#smash-root.custom-colors .sm-format-badge { color: var(--sm-accent) !important; }
+#smash-root.custom-colors .sm-round-label { color: var(--sm-text) !important; }
+#smash-root.custom-colors .sm-stage-pill {
+  background: color-mix(in srgb, var(--sm-accent) 16%, rgba(10, 14, 24, 0.65)) !important;
+  border-color: color-mix(in srgb, var(--sm-accent) 45%, transparent) !important;
+  color: var(--sm-text) !important;
+}
+#smash-root.custom-colors .sm-name,
+#smash-root.custom-colors .sm-partner-name { color: var(--sm-text) !important; }
+#smash-root.custom-colors .sm-sponsor { color: var(--sm-sponsor) !important; }
+#smash-root.custom-colors .sm-side.p1 .sm-score-box {
+  background: var(--sm-c-p1-score, var(--sm-p1)) !important;
+  color: var(--sm-c-p1-score-tx, #ffffff) !important;
+}
+#smash-root.custom-colors .sm-side.p2 .sm-score-box {
+  background: var(--sm-c-p2-score, var(--sm-p2)) !important;
+  color: var(--sm-c-p2-score-tx, #ffffff) !important;
+}
+#smash-root.custom-colors .sm-center-logo {
+  background: var(--sm-c-info-fill, var(--sm-bg)) !important;
+  border-color: var(--sm-accent) !important;
+}
+#smash-root.custom-colors .sm-center-logo-fallback {
+  color: var(--sm-accent) !important;
+}
+#smash-root.custom-colors[data-fill-mode="glass"] .sm-bar,
+#smash-root.custom-colors[data-fill-mode="glass"] .sm-info-box,
+#smash-root.custom-colors[data-fill-mode="glass"] .sm-center-logo {
+  background: var(--sm-c-glass-bg) !important;
+  backdrop-filter: blur(var(--sm-glass-blur, 14px)) !important;
+  border-color: rgba(255, 255, 255, var(--sm-glass-border, 0.24)) !important;
+}
+#smash-root.custom-colors[data-fill-mode="theme"] .sm-bar,
+#smash-root.custom-colors[data-fill-mode="theme"] .sm-info-box,
+#smash-root.custom-colors[data-fill-mode="theme"] .sm-center-logo {
+  background: unset;
+}
+
+/* Smash Visual FX: Outer Glow & Surface Textures */
+#smash-root[data-glow="none"] .sm-bar,
+#smash-root[data-glow="none"] .sm-info-box,
+#smash-root[data-glow="none"] .sm-center-logo { box-shadow: none !important; }
+#smash-root[data-glow="intense"] .sm-side.p1 .sm-bar { box-shadow: 0 4px 20px color-mix(in srgb, var(--sm-p1) 55%, transparent), 0 3px 10px rgba(0,0,0,0.45) !important; }
+#smash-root[data-glow="intense"] .sm-side.p2 .sm-bar { box-shadow: 0 4px 20px color-mix(in srgb, var(--sm-p2) 55%, transparent), 0 3px 10px rgba(0,0,0,0.45) !important; }
+#smash-root[data-glow="intense"] .sm-info-box { box-shadow: 0 4px 18px color-mix(in srgb, var(--sm-accent) 45%, transparent), 0 3px 10px rgba(0,0,0,0.45) !important; }
+#smash-root[data-glow="pulse"] .sm-bar,
+#smash-root[data-glow="pulse"] .sm-info-box { animation: smGlowPulse 2.4s ease-in-out infinite; }
+@keyframes smGlowPulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.14)); }
+  50% { filter: drop-shadow(0 0 12px color-mix(in srgb, var(--sm-accent) 65%, transparent)); }
+}
+
+#smash-root[data-texture="carbon"] .sm-bar::after,
+#smash-root[data-texture="carbon"] .sm-info-box::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.22;
+  background: repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 0 3px, transparent 3px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.18) 0 3px, transparent 3px 6px);
+}
+#smash-root[data-texture="scanlines"] .sm-bar::after,
+#smash-root[data-texture="scanlines"] .sm-info-box::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.24;
+  background: repeating-linear-gradient(180deg, rgba(0,0,0,0.28) 0 2px, transparent 2px 4px);
+}
+#smash-root[data-texture="stripes"] .sm-bar::after,
+#smash-root[data-texture="stripes"] .sm-info-box::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.16;
+  background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.16) 0 6px, transparent 6px 14px);
+}
+#smash-root[data-texture="hex"] .sm-bar::after,
+#smash-root[data-texture="hex"] .sm-info-box::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.2;
+  background-image: radial-gradient(rgba(255,255,255,0.22) 1px, transparent 1px);
+  background-size: 9px 9px;
+}
+
+/* ============================================================================
+   5C. SMASH INSIDE-BAR FLAGS (Mirrored Outer Left/Right, Near Score & Fade BG!)
+   ============================================================================ */
+.sm-in-flags {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 4px 0 10px;
+  flex-shrink: 0;
+  z-index: 2;
+  position: relative;
+}
+.sm-side.p2 .sm-in-flags {
+  flex-direction: row-reverse;
+  padding: 0 10px 0 4px;
+}
+.sm-in-flags.hidden-el,
+.sm-in-flag-wrap.hidden-el {
+  display: none !important;
+}
+.sm-in-flag-wrap {
+  display: inline-flex;
+  width: 30px;
+  height: 20px;
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.26);
+  opacity: var(--flag-opacity, 1);
+}
+.sm-in-flag-wrap svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: scale(var(--flag-zoom, 1)) translate(var(--flag-shift-x, 0%), var(--flag-shift-y, 0%));
+  transform-origin: center center;
+  filter: saturate(var(--flag-sat, 1)) brightness(var(--flag-bright, 0.98));
+}
+.sm-side.p2 .sm-in-flag-wrap svg {
+  transform: scale(var(--flag-zoom, 1)) translate(calc(var(--flag-shift-x, 0%) * -1), var(--flag-shift-y, 0%));
+}
+
+/* Doubles 2v2: stack Country + Region cleanly vertically when inside bar so names keep max width! */
+#smash-root[data-doubles="on"][data-flag-pos="inside-outer"] .sm-in-flags,
+#smash-root[data-doubles="on"][data-flag-pos="inside-score"] .sm-in-flags {
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 4px 6px 10px;
+}
+#smash-root[data-doubles="on"][data-flag-pos="inside-outer"] .sm-side.p2 .sm-in-flags,
+#smash-root[data-doubles="on"][data-flag-pos="inside-score"] .sm-side.p2 .sm-in-flags {
+  padding: 6px 10px 6px 4px;
+}
+#smash-root[data-doubles="on"] .sm-in-flag-wrap {
+  width: 30px;
+  height: 20px;
+}
+
+/* Mode: Inside Near Score (sits right beside Score box) */
+#smash-root[data-flag-pos="inside-score"] .sm-port-stripe { order: 0; }
+#smash-root[data-flag-pos="inside-score"] .sm-player-body { order: 1; }
+#smash-root[data-flag-pos="inside-score"] .sm-in-flags { order: 2; padding: 0 8px; }
+#smash-root[data-flag-pos="inside-score"] .sm-score-box { order: 3; }
+
+/* Integrated TWT Blade Flag Style when flags are Inside Outer Edge! */
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="blade-twt"] .sm-in-flags,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="split-dual"] .sm-in-flags {
+  flex-direction: row !important;
+  height: 100%;
+  padding: 0 !important;
+  gap: 0;
+}
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="blade-twt"] .sm-side.p2 .sm-in-flags,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="split-dual"] .sm-side.p2 .sm-in-flags {
+  flex-direction: row-reverse !important;
+}
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="blade-twt"] .sm-in-flag-wrap,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="split-dual"] .sm-in-flag-wrap {
+  width: calc(var(--flag-w, 62px) * 1.18);
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="blade-twt"] .sm-in-flags.is-dual .sm-in-flag-wrap,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="split-dual"] .sm-in-flags.is-dual .sm-in-flag-wrap {
+  width: calc(var(--flag-w, 62px) * 0.96);
+}
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="blade-twt"] .sm-side.p1 .sm-in-flag-wrap {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+}
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="blade-twt"] .sm-side.p2 .sm-in-flag-wrap {
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* Mode: Full-Height Faded Flag Background Inside Bar (Natural 3:2 Proportions, Crisp Vivid Colors, Zero Cropping!) */
+#smash-root[data-flag-pos="fade-bg"] .sm-in-flags,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-in-flags {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: clamp(128px, calc(var(--flag-w, 62px) * 2.55), 340px);
+  height: 100%;
+  padding: 0 !important;
+  gap: 0;
+  flex-direction: row !important;
+  z-index: 1;
+  pointer-events: none;
+  -webkit-mask-image: var(--flag-mask-p1, linear-gradient(90deg, #000 0%, #000 44%, transparent 100%));
+  mask-image: var(--flag-mask-p1, linear-gradient(90deg, #000 0%, #000 44%, transparent 100%));
+  opacity: calc(var(--flag-opacity, 1) * 0.94);
+}
+#smash-root[data-flag-pos="fade-bg"] .sm-in-flags.is-dual,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-in-flags.is-dual {
+  width: clamp(190px, calc(var(--flag-w, 62px) * 3.85), 390px);
+}
+#smash-root[data-flag-pos="fade-bg"] .sm-side.p2 .sm-in-flags,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-side.p2 .sm-in-flags {
+  left: auto;
+  right: 0;
+  flex-direction: row-reverse !important;
+  -webkit-mask-image: var(--flag-mask-p2, linear-gradient(270deg, #000 0%, #000 44%, transparent 100%));
+  mask-image: var(--flag-mask-p2, linear-gradient(270deg, #000 0%, #000 44%, transparent 100%));
+}
+#smash-root[data-flag-pos="fade-bg"] .sm-in-flag-wrap,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-in-flag-wrap {
+  flex: 1 1 0;
+  width: auto;
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+#smash-root[data-flag-pos="fade-bg"] .sm-player-body,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-player-body,
+#smash-root[data-flag-pos="fade-bg"] .sm-score-box,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-score-box {
+  position: relative;
+  z-index: 2;
+}
+/* Crisp text legibility scrim when vivid flags melt directly behind player names! */
+#smash-root[data-flag-pos="fade-bg"] .sm-name,
+#smash-root[data-flag-pos="fade-bg"] .sm-partner-name,
+#smash-root[data-flag-pos="fade-bg"] .sm-sponsor,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-name,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-partner-name,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-sponsor {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.92), 0 0 3px rgba(0, 0, 0, 0.95);
+}
+/* Ensure flag-bg stays clickable in interactive preview mode */
+body.sb-interactive-edit #smash-root[data-flag-pos="fade-bg"] .sm-in-flags {
+  pointer-events: auto;
+}
+
+/* ============================================================================
+   5C-2. INDIVIDUAL PER-PLAYER FLAGS IN SMASH DOUBLES 2v2!
+   - Each teammate has their own Country + Region flags on THEIR OWN ROW:
+     Row 1 (Player 1) -> #sm-p1-row-flags | Row 2 (Teammate) -> #sm-p1-prow-flags
+   - Works in Inside Outer Edge, Inside Near Score, Split Fade-BG (Top/Bottom) & Below Bar!
+   ============================================================================ */
+.sm-row-flags {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.sm-side.p2 .sm-row-flags {
+  flex-direction: row-reverse;
+}
+.sm-row-flags.hidden-el,
+.sm-row-flag-wrap.hidden-el {
+  display: none !important;
+}
+.sm-row-flag-wrap {
+  display: inline-flex;
+  width: 28px;
+  height: 19px;
+  border-radius: 2.5px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(255, 255, 255, 0.28);
+  opacity: var(--flag-opacity, 1);
+}
+.sm-row-flag-wrap svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform: scale(var(--flag-zoom, 1)) translate(var(--flag-shift-x, 0%), var(--flag-shift-y, 0%));
+  transform-origin: center center;
+  filter: saturate(var(--flag-sat, 1)) brightness(var(--flag-bright, 0.98));
+}
+.sm-side.p2 .sm-row-flag-wrap svg {
+  transform: scale(var(--flag-zoom, 1)) translate(calc(var(--flag-shift-x, 0%) * -1), var(--flag-shift-y, 0%));
+}
+
+/* Doubles 2v2 Inside-Outer: individual flags sit at outer edge of EACH player's row! */
+#smash-root[data-doubles="on"][data-flag-pos="inside-outer"] .sm-in-flags {
+  display: none !important;
+}
+#smash-root[data-doubles="on"][data-flag-pos="inside-outer"] .sm-row-flags:not(.hidden-el) {
+  display: inline-flex;
+  order: -1;
+}
+/* Doubles 2v2 Inside-Score: individual flags align cleanly right beside the Score box on EACH player's row! */
+#smash-root[data-doubles="on"][data-flag-pos="inside-score"] .sm-in-flags {
+  display: none !important;
+}
+#smash-root[data-doubles="on"][data-flag-pos="inside-score"] .sm-row-flags:not(.hidden-el) {
+  display: inline-flex;
+  order: 9;
+}
+#smash-root[data-doubles="on"][data-flag-pos="inside-score"] .sm-side.p1 .sm-row-flags:not(.hidden-el) {
+  margin-left: auto;
+}
+#smash-root[data-doubles="on"][data-flag-pos="inside-score"] .sm-side.p2 .sm-row-flags:not(.hidden-el) {
+  margin-right: auto;
+}
+/* Ensure bottom doubles row spans 100% width so inside-score flags align 1:1 directly beneath top row flags! */
+#smash-root[data-doubles="on"] .sm-doubles-row {
+  width: 100%;
+}
+
+/* Doubles 2v2 Fade-BG: Top 50% fades Player 1's flag(s), Bottom 50% fades Teammate's flag(s)! */
+.sm-in-flags-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  flex: 1 1 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+#smash-root[data-flag-pos="fade-bg"] .sm-in-flags-row,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-in-flags-row,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="blade-twt"] .sm-in-flags-row,
+#smash-root[data-flag-pos="inside-outer"][data-flag-style="split-dual"] .sm-in-flags-row {
+  gap: 0;
+}
+.sm-side.p2 .sm-in-flags-row {
+  flex-direction: row-reverse;
+}
+.sm-in-flags-row.hidden-el {
+  display: none !important;
+}
+#smash-root[data-doubles="on"][data-flag-pos="fade-bg"] .sm-in-flags,
+#smash-root[data-doubles="on"][data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-in-flags {
+  display: flex !important;
+  flex-direction: column !important;
+  width: clamp(106px, calc(var(--flag-w, 62px) * 1.85), 240px);
+}
+#smash-root[data-doubles="on"][data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-row-flags {
+  display: none !important;
+}
+#smash-root[data-doubles="on"][data-flag-pos="fade-bg"] .sm-in-flags-row + .sm-in-flags-row:not(.hidden-el),
+#smash-root[data-doubles="on"][data-flag-pos="inside-outer"][data-flag-style="fade-blend"] .sm-in-flags-row + .sm-in-flags-row:not(.hidden-el) {
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+/* ============================================================================
+   5D. SMASH MATCH POINT ENGINE (All 5 Positions + All 5 Colors + Custom Text!)
+   ============================================================================ */
+#smash-root {
+  --sm-mp-bg: linear-gradient(90deg, #dc2626, #ea580c);
+  --sm-mp-border: #fde047;
+  --sm-mp-text: #ffffff;
+  --sm-mp-glow: rgba(249, 115, 22, 0.72);
+}
+#smash-root[data-mp-color="gold"] {
+  --sm-mp-bg: linear-gradient(90deg, #f59e0b, #eab308);
+  --sm-mp-border: #fef08a;
+  --sm-mp-text: #090b10;
+  --sm-mp-glow: rgba(250, 204, 21, 0.78);
+}
+#smash-root[data-mp-color="crimson"] {
+  --sm-mp-bg: linear-gradient(90deg, #be123c, #e11d48);
+  --sm-mp-border: #fda4af;
+  --sm-mp-text: #ffffff;
+  --sm-mp-glow: rgba(225, 29, 72, 0.78);
+}
+#smash-root[data-mp-color="cyan"] {
+  --sm-mp-bg: linear-gradient(90deg, #0284c7, #06b6d4);
+  --sm-mp-border: #a5f3fc;
+  --sm-mp-text: #ffffff;
+  --sm-mp-glow: rgba(6, 182, 212, 0.78);
+}
+#smash-root[data-mp-color="theme"] .sm-side.p1 {
+  --sm-mp-bg: var(--sm-p1);
+  --sm-mp-border: #ffffff;
+  --sm-mp-text: #ffffff;
+  --sm-mp-glow: color-mix(in srgb, var(--sm-p1) 75%, transparent);
+}
+#smash-root[data-mp-color="theme"] .sm-side.p2 {
+  --sm-mp-bg: var(--sm-p2);
+  --sm-mp-border: #ffffff;
+  --sm-mp-text: #ffffff;
+  --sm-mp-glow: color-mix(in srgb, var(--sm-p2) 75%, transparent);
+}
+
+#smash-root .sm-pill.mp,
+#smash-root .sm-mp-inline,
+#smash-root .sm-mp-float {
+  background: var(--sm-mp-bg) !important;
+  border: 1.5px solid var(--sm-mp-border) !important;
+  color: var(--sm-mp-text) !important;
+  box-shadow: 0 2px 10px var(--sm-mp-glow);
+  font: 900 11.5px/1 'Chakra Petch', 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sm-side {
+  position: relative;
+}
+
+/* Inline MP Badge (inside-ribbon) */
+.sm-mp-inline {
+  display: none;
+  padding: 4px 8px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  animation: mpPulse 1.4s ease-in-out infinite;
+}
+#smash-root[data-mp-style="inside-ribbon"] .sm-side.match-point .sm-mp-inline {
+  display: inline-flex;
+  align-items: center;
+}
+#smash-root[data-mp-style="inside-ribbon"] .sm-pill.mp {
+  display: none !important;
+}
+
+/* Floating Side / Top MP Badge (side-peek & outer-peek) */
+.sm-mp-float {
+  display: none;
+  position: absolute;
+  z-index: 9;
+  padding: 4px 10px;
+  border-radius: 5px;
+  animation: mpPulse 1.4s ease-in-out infinite;
+}
+
+/* side-peek: crisp fin perched right above/beside the inner Score Box (zero overlap with Round Box or top canvas edge!) */
+#smash-root[data-mp-style="side-peek"] .sm-side.match-point .sm-mp-float {
+  display: inline-flex;
+  align-items: center;
+  top: -13px;
+  padding: 2px 9px;
+  font-size: 10px;
+  border-radius: 5px 5px 2px 2px;
+}
+#smash-root[data-mp-style="side-peek"] .sm-side.p1 .sm-mp-float {
+  right: 8px;
+  left: auto;
+}
+#smash-root[data-mp-style="side-peek"] .sm-side.p2 .sm-mp-float {
+  left: 8px;
+  right: auto;
+}
+#smash-root[data-mp-style="side-peek"] .sm-pill.mp {
+  display: none !important;
+}
+
+/* outer-peek: sleek tab perched on the outer corner of the player bar! */
+#smash-root[data-mp-style="outer-peek"] .sm-side.match-point .sm-mp-float {
+  display: inline-flex;
+  align-items: center;
+  top: -13px;
+  padding: 2px 9px;
+  font-size: 10px;
+  border-radius: 5px 5px 2px 2px;
+}
+#smash-root[data-mp-style="outer-peek"] .sm-side.p1 .sm-mp-float { left: 14px; right: auto; }
+#smash-root[data-mp-style="outer-peek"] .sm-side.p2 .sm-mp-float { right: 14px; left: auto; }
+#smash-root[data-mp-style="outer-peek"] .sm-pill.mp {
+  display: none !important;
+}
+
+/* score-glow: hides text badges and wraps the score box + bar edge in a glowing Match Point aura! */
+#smash-root[data-mp-style="score-glow"] .sm-pill.mp,
+#smash-root[data-mp-style="score-glow"] .sm-mp-inline,
+#smash-root[data-mp-style="score-glow"] .sm-mp-float {
+  display: none !important;
+}
+#smash-root[data-mp-style="score-glow"] .sm-side.match-point .sm-score-box {
+  box-shadow: inset 0 0 0 2.5px var(--sm-mp-border), 0 0 18px var(--sm-mp-glow) !important;
+  animation: smMpScoreGlow 1.3s ease-in-out infinite;
+}
+#smash-root[data-mp-style="score-glow"] .sm-side.match-point .sm-bar {
+  box-shadow: 0 0 0 2px var(--sm-mp-border), 0 0 20px var(--sm-mp-glow) !important;
+}
+@keyframes smMpScoreGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.28); }
+}
+
+/* under-wing: classic Smash hanging pill inside .sm-subrow */
+#smash-root[data-mp-style="under-wing"] .sm-mp-inline,
+#smash-root[data-mp-style="under-wing"] .sm-mp-float {
+  display: none !important;
+}
+
+/* ============================================================================
+   6. FREE-DRAG LAYOUT OFFSETS (Applies identically in Live Preview AND OBS!)
+   Uses CSS standalone `translate` property so it composes cleanly alongside
+   existing `transform` entry animations, centering, and scaling!
+   ============================================================================ */
+#wing-p1 { translate: var(--lp-p1-wing-x, 0px) var(--lp-p1-wing-y, 0px); }
+#wing-p2 { translate: var(--lp-p2-wing-x, 0px) var(--lp-p2-wing-y, 0px); }
+#sb-center { translate: var(--lp-center-x, 0px) var(--lp-center-y, 0px); }
+#p1-mp-tag { translate: var(--lp-p1-mp-x, 0px) var(--lp-p1-mp-y, 0px); }
+#p2-mp-tag { translate: var(--lp-p2-mp-x, 0px) var(--lp-p2-mp-y, 0px); }
+#p1-meta-strip { translate: var(--lp-p1-meta-x, 0px) var(--lp-p1-meta-y, 0px); }
+#p2-meta-strip { translate: var(--lp-p2-meta-x, 0px) var(--lp-p2-meta-y, 0px); }
+
+#sm-info-box { translate: var(--lp-sm-info-x, 0px) var(--lp-sm-info-y, 0px); }
+#sm-side-p1 { translate: var(--lp-sm-p1-x, 0px) var(--lp-sm-p1-y, 0px); }
+#sm-side-p2 { translate: var(--lp-sm-p2-x, 0px) var(--lp-sm-p2-y, 0px); }
+#sm-center-logo { translate: var(--lp-sm-logo-x, 0px) var(--lp-sm-logo-y, 0px); }
+#sm-p1-subrow { translate: var(--lp-sm-p1sub-x, 0px) var(--lp-sm-p1sub-y, 0px); }
+#sm-p2-subrow { translate: var(--lp-sm-p2sub-x, 0px) var(--lp-sm-p2sub-y, 0px); }
+
+/* Universal Direct-Resize Overrides (active ONLY when custom width/scale is set — 0/100 preserves preset defaults) */
+#stage[data-lp-center-w="1"] #sb-center {
+  width: var(--lp-center-w) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+#stage[data-lp-sm-info-w="1"] #sm-info-box {
+  width: var(--lp-sm-info-w) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+#stage[data-lp-sm-logo-sz="1"] #sm-center-logo {
+  width: var(--lp-sm-logo-sz) !important;
+  height: var(--lp-sm-logo-sz) !important;
+}
+#stage[data-lp-mp-scale="1"] #p1-mp-tag,
+#stage[data-lp-mp-scale="1"] #p2-mp-tag {
+  scale: var(--lp-mp-scale, 1);
+}
+#stage[data-lp-mp-scale="1"] #p1-mp-tag { transform-origin: right center; }
+#stage[data-lp-mp-scale="1"] #p2-mp-tag { transform-origin: left center; }
+#stage[data-lp-meta-w="1"] .sb-wing.p1 .pro-meta-strip {
+  left: auto !important;
+  right: 60px !important;
+  width: var(--lp-meta-w) !important;
+}
+#stage[data-lp-meta-w="1"] .sb-wing.p2 .pro-meta-strip {
+  right: auto !important;
+  left: 60px !important;
+  width: var(--lp-meta-w) !important;
+}
+#stage[data-lp-sm-sub-scale="1"] #sm-p1-subrow,
+#stage[data-lp-sm-sub-scale="1"] #sm-p2-subrow {
+  scale: var(--lp-sm-sub-scale, 1);
+}
+#stage[data-lp-sm-sub-scale="1"] #sm-p1-subrow { transform-origin: left top; }
+#stage[data-lp-sm-sub-scale="1"] #sm-p2-subrow { transform-origin: right top; }
+#bottom-event-bar[data-custom-w="1"] .beb-plate {
+  width: var(--eb-min-w) !important;
+  min-width: var(--eb-min-w) !important;
+  max-width: none !important;
+}
+#commentator-bar[data-custom-w="1"] {
+  width: var(--cm-w) !important;
+  min-width: var(--cm-w) !important;
+  max-width: none !important;
+  justify-content: center !important;
+}
+
+/* ============================================================================
+   7. INTERACTIVE CLICK-TO-EDIT & DIRECT DRAG STUDIO (PREVIEW MODE ONLY!)
+   ============================================================================ */
+body.sb-interactive-edit .sb-hit {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+body.sb-interactive-edit.sb-drag-on .sb-hit[data-sb-drag] {
+  cursor: grab;
+}
+body.sb-interactive-edit #bottom-event-bar:not(.visible),
+body.sb-interactive-edit #bottom-event-bar:not(.visible) *,
+body.sb-interactive-edit #commentator-bar:not(.visible),
+body.sb-interactive-edit #commentator-bar:not(.visible) *,
+body.sb-interactive-edit #scorebar-root.hidden,
+body.sb-interactive-edit #scorebar-root.hidden *,
+body.sb-interactive-edit #smash-root:not(.is-active),
+body.sb-interactive-edit #smash-root:not(.is-active) *,
+body.sb-interactive-edit #smash-root.hidden,
+body.sb-interactive-edit #smash-root.hidden * {
+  pointer-events: none !important;
+}
+body.sb-dragging,
+body.sb-dragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  transition: none !important;
+}
+#sb-hover-box,
+#sb-select-box {
+  display: none;
+  position: fixed;
+  z-index: 9998;
+  pointer-events: none;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+#sb-hover-box {
+  border: 2px dashed rgba(56, 189, 248, 0.96);
+  background: rgba(56, 189, 248, 0.08);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+}
+#sb-select-box {
+  border: 2.5px solid #00e5ff;
+  background: rgba(0, 229, 255, 0.06);
+  box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.22), 0 0 14px rgba(0, 229, 255, 0.48);
+}
+#sb-mirror-box {
+  display: none;
+  position: fixed;
+  z-index: 9997;
+  pointer-events: none;
+  border-radius: 4px;
+  box-sizing: border-box;
+  border: 2px dashed rgba(250, 204, 21, 0.92);
+  background: rgba(250, 204, 21, 0.08);
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.28);
+}
+#sb-resize-handle,
+#sb-resize-handle-alt {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  width: 16px;
+  min-height: 24px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, #38bdf8, #2563eb);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font: 900 10px/1 sans-serif;
+  align-items: center;
+  justify-content: center;
+  cursor: ew-resize;
+  pointer-events: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.78), 0 0 10px rgba(56, 189, 248, 0.65);
+  transform: translate(-50%, -50%);
+  user-select: none;
+  transition: transform 0.1s ease, background 0.12s ease;
+}
+#sb-resize-handle:hover,
+#sb-resize-handle-alt:hover,
+body.sb-resizing #sb-resize-handle,
+body.sb-resizing #sb-resize-handle-alt {
+  background: linear-gradient(180deg, #fde047, #f59e0b);
+  color: #090d16;
+  transform: translate(-50%, -50%) scale(1.18);
+}
+body.sb-resizing,
+body.sb-resizing * {
+  cursor: ew-resize !important;
+  user-select: none !important;
+  transition: none !important;
+}
+#sb-hover-pill {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: rgba(8, 12, 24, 0.95);
+  border: 1.5px solid #38bdf8;
+  color: #e0f2fe;
+  font: 800 12px/1.2 'Barlow Condensed', 'Segoe UI', sans-serif;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.72);
+  white-space: nowrap;
+}
