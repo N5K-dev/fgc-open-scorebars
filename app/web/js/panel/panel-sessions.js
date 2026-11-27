@@ -88,7 +88,7 @@
       if (meterText) meterText.textContent = tr('No connection to local server');
       if (offlineBox) offlineBox.style.display = 'block';
       if (warnBox) warnBox.style.display = 'none';
-      listHost.innerHTML = `<div class="sess-empty">${esc(tr('Could not reach the local server. Make sure Start_Scorebar.bat (or node server.mjs) is running.'))}</div>`;
+      listHost.innerHTML = `<div class="sess-empty">${esc(tr('Could not reach the local server. Make sure Start_Scorebar.bat (or node app/server/server.mjs) is running.'))}</div>`;
       return;
     }
 
@@ -104,7 +104,7 @@
     if ($('sess-kpi-active')) $('sess-kpi-active').textContent = `${active} / ${max}`;
     if ($('sess-kpi-obs')) $('sess-kpi-obs').textContent = String(brk.obs || 0);
     if ($('sess-kpi-web')) $('sess-kpi-web').textContent = String(webCount);
-    if ($('sess-kpi-health')) $('sess-kpi-health').textContent = `v${snap.version || '2.8.0'} · ${fmtUptime(snap.uptimeSec)} · ${snap.memoryMb || 0} MB`;
+    if ($('sess-kpi-health')) $('sess-kpi-health').textContent = `v${snap.version || '2.8.1'} · ${fmtUptime(snap.uptimeSec)} · ${snap.memoryMb || 0} MB`;
 
     if (meterFill) {
       meterFill.style.width = `${Math.max(active > 0 ? 4 : 0, pct)}%`;

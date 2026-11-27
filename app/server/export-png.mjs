@@ -268,6 +268,23 @@ async function runCapture({ url, width, height, transparent, stageSelector }) {
         if (imgs.every(im => im.complete)) break;
         await sleep(75);
       }
+      // Also await any CSS background-image URLs (e.g., 1080p game preview backdrops)
+      const bgUrls = new Set();
+      for (const node of [document.body, document.querySelector(${JSON.stringify(stageSelector)})]) {
+        if (!node) continue;
+        const bg = getComputedStyle(node).backgroundImage || '';
+        for (const m of bg.matchAll(/url\\(["']?([^"')]+)["']?\\)/g)) {
+          if (m[1] && !m[1].startsWith('data:')) bgUrls.add(m[1]);
+        }
+      }
+      if (bgUrls.size > 0) {
+        await Promise.all(Array.from(bgUrls).map(u => new Promise(resolve => {
+          const im = new Image();
+          const t = setTimeout(resolve, 4500);
+          im.onload = im.onerror = () => { clearTimeout(t); resolve(); };
+          im.src = u;
+        })));
+      }
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
       await sleep(160);
       return true;

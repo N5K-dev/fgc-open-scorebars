@@ -191,7 +191,11 @@
   const DEFAULT_STYLE = {
     fontName: 'theme', fontScore: 'theme', fontScale: 100, letterSpacing: 4, italic: 'theme', scoreSlant: 'mirror', uppercase: true,
     layoutOverride: 'theme', scorePosOverride: 'theme', shape: 'theme', flagStyle: 'theme', borderStyle: 'theme',
-    centerStyle: 'theme', outerBlade: 'theme', bladeSlant: 22, barHeight: 0, flagWidth: 62, flagOpacity: 100,
+    centerStyle: 'theme', centerScale: 100, centerFontSize: 100, centerWidth: 0, centerHeight: 0, centerPadX: -1,
+    centerOffsetX: 0, centerOffsetY: 0, centerLayout: 'theme', centerRadius: -1, centerBorderW: -1, centerOpacity: 100,
+    centerGlow: 'theme', centerCustomColors: false, centerBgAlpha: 94, centerTextColor: '#ffffff',
+    centerBorderColor: '#ffd24d', centerFormatBg: '#ffd24d', centerFormatText: '#0b0d14',
+    outerBlade: 'theme', bladeSlant: 22, barHeight: 0, flagWidth: 62, flagOpacity: 100,
     flagFadeMode: 'fade-out', flagFadeCurve: 'smooth', flagFadeIn: 0, flagFadeStart: 34, flagFadeEnd: 98,
     flagFadeAngle: 0, flagFit: 'fit', flagZoom: 100, flagShiftX: 0, flagShiftY: 0, flagSaturation: 100, flagBrightness: 96,
     showIsoCode: 'theme',
@@ -2726,6 +2730,55 @@
     $('st-layout').value = st.layoutOverride;
     $('st-shape').value = st.shape;
     $('st-centerStyle').value = st.centerStyle || 'theme';
+    const cScaleVal = Math.max(50, Math.min(260, Number(st.centerScale ?? 100)));
+    if ($('rng-centerScale')) $('rng-centerScale').value = cScaleVal;
+    if ($('val-centerScale')) $('val-centerScale').textContent = `${cScaleVal}%`;
+    $('center-scale-chips')?.querySelectorAll('button[data-cscale]').forEach(b => {
+      b.classList.toggle('active-chip', Number(b.dataset.cscale) === cScaleVal);
+    });
+    const cFontVal = Math.max(60, Math.min(220, Number(st.centerFontSize ?? 100)));
+    if ($('rng-centerFontSize')) $('rng-centerFontSize').value = cFontVal;
+    if ($('val-centerFontSize')) $('val-centerFontSize').textContent = `${cFontVal}%`;
+    const cWVal = Number(st.centerWidth ?? 0);
+    if ($('rng-centerWidth')) $('rng-centerWidth').value = cWVal;
+    if ($('val-centerWidth')) $('val-centerWidth').textContent = cWVal >= 100 ? `${cWVal} px` : 'Auto';
+    const cHVal = Number(st.centerHeight ?? 0);
+    if ($('rng-centerHeight')) $('rng-centerHeight').value = cHVal;
+    if ($('val-centerHeight')) $('val-centerHeight').textContent = cHVal >= 20 ? `${cHVal} px` : 'Auto';
+    const cPadVal = Number(st.centerPadX ?? -1);
+    if ($('rng-centerPadX')) $('rng-centerPadX').value = cPadVal;
+    if ($('val-centerPadX')) $('val-centerPadX').textContent = cPadVal >= 0 ? `${cPadVal} px` : 'Auto';
+    const cOpVal = Number(st.centerOpacity ?? 100);
+    if ($('rng-centerOpacity')) $('rng-centerOpacity').value = cOpVal;
+    if ($('val-centerOpacity')) $('val-centerOpacity').textContent = `${cOpVal}%`;
+    const cOffX = Number(st.centerOffsetX ?? 0);
+    if ($('rng-centerOffsetX')) $('rng-centerOffsetX').value = cOffX;
+    if ($('val-centerOffsetX')) $('val-centerOffsetX').textContent = `${cOffX} px`;
+    const cOffY = Number(st.centerOffsetY ?? 0);
+    if ($('rng-centerOffsetY')) $('rng-centerOffsetY').value = cOffY;
+    if ($('val-centerOffsetY')) $('val-centerOffsetY').textContent = `${cOffY} px`;
+    const cRad = Number(st.centerRadius ?? -1);
+    if ($('rng-centerRadius')) $('rng-centerRadius').value = cRad;
+    if ($('val-centerRadius')) $('val-centerRadius').textContent = cRad >= 0 ? `${cRad} px` : 'Auto';
+    const cBw = Number(st.centerBorderW ?? -1);
+    if ($('rng-centerBorderW')) $('rng-centerBorderW').value = cBw;
+    if ($('val-centerBorderW')) $('val-centerBorderW').textContent = cBw >= 0 ? `${cBw} px` : 'Auto';
+    const cBgAlpha = Number(st.centerBgAlpha ?? 94);
+    if ($('rng-centerBgAlpha')) $('rng-centerBgAlpha').value = cBgAlpha;
+    if ($('val-centerBgAlpha')) $('val-centerBgAlpha').textContent = `${cBgAlpha}%`;
+    if ($('chk-center-custom-colors')) $('chk-center-custom-colors').checked = Boolean(st.centerCustomColors);
+    if ($('cp-bg1')) $('cp-bg1').value = st.centerColor1 || '#1b1f2e';
+    if ($('cp-bg2')) $('cp-bg2').value = st.centerColor2 || '#0c0e16';
+    if ($('cp-text')) $('cp-text').value = st.centerTextColor || '#ffffff';
+    if ($('cp-border')) $('cp-border').value = st.centerBorderColor || '#ffd24d';
+    if ($('cp-fmt-bg')) $('cp-fmt-bg').value = st.centerFormatBg || '#ffd24d';
+    if ($('cp-fmt-text')) $('cp-fmt-text').value = st.centerFormatText || '#0b0d14';
+    $('seg-centerLayout')?.querySelectorAll('button[data-val]').forEach(b => {
+      b.classList.toggle('active-chip', b.dataset.val === (st.centerLayout || 'theme'));
+    });
+    $('seg-centerGlow')?.querySelectorAll('button[data-val]').forEach(b => {
+      b.classList.toggle('active-chip', b.dataset.val === (st.centerGlow || 'theme'));
+    });
     $('st-outerBlade').value = st.outerBlade || 'theme';
     $('st-scorePos').value = st.scorePosOverride;
     $('st-borderStyle').value = st.borderStyle;
@@ -3391,7 +3444,7 @@
       navigator.clipboard?.writeText(repoUrl).then(() => toast('📋 GitHub link copied')).catch(() => toast(repoUrl));
     });
     $('btn-share-copy-post')?.addEventListener('click', () => {
-      const msg = 'FGC Open Scorebars v2.8.0 — 100% free & open-source OBS broadcast suite for fighting game tournaments (87 Scorebars, 48 VS Splashes, 17 Brackets, 32 Top 8 Results, Live SFX & Start.gg/Challonge sync) by @Nordi5ke: https://github.com/N5K-dev/fgc-open-scorebars';
+      const msg = 'FGC Open Scorebars v2.8.1 — 100% free & open-source OBS broadcast suite for fighting game tournaments (87 Scorebars, 48 VS Splashes, 17 Brackets, 32 Top 8 Results, Live SFX & Start.gg/Challonge sync) by @Nordi5ke: https://github.com/N5K-dev/fgc-open-scorebars';
       navigator.clipboard?.writeText(msg).then(() => toast('📢 Share text copied to clipboard')).catch(() => toast(msg));
     });
 
@@ -3754,6 +3807,55 @@
     bindStyleSelect('st-layout', 'layoutOverride');
     bindStyleSelect('st-shape', 'shape');
     bindStyleSelect('st-centerStyle', 'centerStyle');
+    bindStyleRange('rng-centerScale', 'centerScale');
+    bindStyleRange('rng-centerFontSize', 'centerFontSize');
+    bindStyleRange('rng-centerWidth', 'centerWidth');
+    bindStyleRange('rng-centerHeight', 'centerHeight');
+    bindStyleRange('rng-centerPadX', 'centerPadX');
+    bindStyleRange('rng-centerOpacity', 'centerOpacity');
+    bindStyleRange('rng-centerOffsetX', 'centerOffsetX');
+    bindStyleRange('rng-centerOffsetY', 'centerOffsetY');
+    bindStyleRange('rng-centerRadius', 'centerRadius');
+    bindStyleRange('rng-centerBorderW', 'centerBorderW');
+    bindStyleRange('rng-centerBgAlpha', 'centerBgAlpha');
+    $('center-scale-chips')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-cscale]');
+      if (!btn) return;
+      commitState({ style: { centerScale: Number(btn.dataset.cscale) } }, true);
+    });
+    $('seg-centerLayout')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-val]');
+      if (!btn) return;
+      commitState({ style: { centerLayout: btn.dataset.val } }, true);
+    });
+    $('seg-centerGlow')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-val]');
+      if (!btn) return;
+      commitState({ style: { centerGlow: btn.dataset.val } }, true);
+    });
+    $('chk-center-custom-colors')?.addEventListener('change', (e) => {
+      commitState({ style: { centerCustomColors: e.target.checked } }, true);
+    });
+    const bindCenterColor = (id, key) => {
+      $(id)?.addEventListener('input', (e) => commitState({ style: { centerCustomColors: true, [key]: e.target.value } }));
+    };
+    bindCenterColor('cp-bg1', 'centerColor1');
+    bindCenterColor('cp-bg2', 'centerColor2');
+    bindCenterColor('cp-text', 'centerTextColor');
+    bindCenterColor('cp-border', 'centerBorderColor');
+    bindCenterColor('cp-fmt-bg', 'centerFormatBg');
+    bindCenterColor('cp-fmt-text', 'centerFormatText');
+    $('btn-center-reset')?.addEventListener('click', () => {
+      commitState({
+        style: {
+          centerStyle: 'theme', centerScale: 100, centerFontSize: 100, centerWidth: 0, centerHeight: 0,
+          centerPadX: -1, centerOffsetX: 0, centerOffsetY: 0, centerLayout: 'theme', centerRadius: -1,
+          centerBorderW: -1, centerOpacity: 100, centerGlow: 'theme', centerCustomColors: false, centerBgAlpha: 94
+        },
+        layoutPos: { centerX: 0, centerY: 0, centerW: 0, smInfoX: 0, smInfoY: 0, smInfoW: 0 }
+      }, true);
+      toast('↺ Center Plate reset to active theme defaults');
+    });
     bindStyleSelect('st-outerBlade', 'outerBlade');
     bindStyleSelect('st-scorePos', 'scorePosOverride');
     bindStyleSelect('st-borderStyle', 'borderStyle');
@@ -6309,18 +6411,18 @@
         ] },
         // Center Round, Format, Smash Stage & Logo
         'round':       { label: '🏆 Phase / Round', focus: 'round-input', input: true, jump: 'round', actions: [
-          { label: '📐 Box Shape & Position', fn: () => { switchScorebarTab('tweaks', 'shape'); flashScorebarTarget(isSmashNow ? 'seg-smashInfoPos' : 'st-centerStyle'); } },
-          { label: '🎨 Box Colors & Surface', fn: () => { switchScorebarTab('tweaks', 'colors'); flashScorebarTarget('card-center-text'); } }
+          { label: '📏 Center Plate Scale & Style', fn: () => { switchScorebarTab('tweaks', 'shape'); flashScorebarTarget('rng-centerScale'); } },
+          { label: '🎨 Box Colors & Surface', fn: () => { switchScorebarTab('tweaks', 'shape'); if ($('center-colors-drawer')) $('center-colors-drawer').open = true; flashScorebarTarget('chk-center-custom-colors'); } }
         ] },
         'format':      { label: '📋 Match Format', focus: 'format-select', input: true, jump: 'round', actions: [
-          { label: '📐 Box Shape & Position', fn: () => { switchScorebarTab('tweaks', 'shape'); flashScorebarTarget(isSmashNow ? 'seg-smashInfoPos' : 'st-centerStyle'); } },
-          { label: '🎨 Box Colors & Surface', fn: () => { switchScorebarTab('tweaks', 'colors'); flashScorebarTarget('card-center-text'); } }
+          { label: '📏 Center Plate Scale & Style', fn: () => { switchScorebarTab('tweaks', 'shape'); flashScorebarTarget('rng-centerScale'); } },
+          { label: '🎨 Box Colors & Surface', fn: () => { switchScorebarTab('tweaks', 'shape'); if ($('center-colors-drawer')) $('center-colors-drawer').open = true; flashScorebarTarget('chk-center-custom-colors'); } }
         ] },
-        'center':      { label: isSmashNow ? '🏆 Round / Stage Box' : '🏆 Center Banner Style', tab: 'tweaks', sub: 'shape', focus: isSmashNow ? 'seg-smashInfoPos' : 'st-centerStyle', input: !isSmashNow, jump: 'round', actions: [
+        'center':      { label: isSmashNow ? '🏆 Round / Stage Box' : '🏆 Center Plate (Round & Format)', tab: 'tweaks', sub: 'shape', focus: 'rng-centerScale', input: false, jump: 'round', actions: [
           { label: '✏️ Round Text', fn: () => flashScorebarTarget('round-input', true) },
           ...(isSmashNow ? [{ label: '🗺️ Stage', fn: () => flashScorebarTarget('smash-stage-select', true) }] : []),
-          { label: '📐 Center Style', fn: () => { switchScorebarTab('tweaks', 'shape'); flashScorebarTarget('st-centerStyle', true); } },
-          { label: '🎨 Box Colors & Surface', fn: () => { switchScorebarTab('tweaks', 'colors'); flashScorebarTarget('card-center-text'); } },
+          { label: '📏 Scale & Size', fn: () => { switchScorebarTab('tweaks', 'shape'); flashScorebarTarget('rng-centerScale'); } },
+          { label: '🎨 Center Colors', fn: () => { switchScorebarTab('tweaks', 'shape'); if ($('center-colors-drawer')) $('center-colors-drawer').open = true; flashScorebarTarget('chk-center-custom-colors'); } },
           { label: '🔤 Fonts', fn: () => { switchScorebarTab('tweaks', 'fonts'); flashScorebarTarget('st-font-name', true); } }
         ] },
         'smash-stage': { label: '🗺️ Smash Stage', focus: 'smash-stage-select', input: true, jump: 'round', actions: [
@@ -6868,7 +6970,7 @@
       vsPreviewFrame.contentWindow?.postMessage({ type: 'test-vs-entry' }, '*');
       toast(`▶ Testing VS entry: ${state.vs?.entryAnim || 'slam-split'}`);
     });
-    window._fgcDownloadPng = async function downloadPixelPerfectPng(target, mode, triggerBtn, fallbackFrame, fallbackMsgType) {
+    window._fgcDownloadPng = async function downloadPixelPerfectPng(target, mode, triggerBtn, fallbackFrame, fallbackMsgType, extraPayload = null) {
       const origTxt = triggerBtn?.textContent || '';
       if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.textContent = '⏳ PNG...'; }
       try {
@@ -6878,7 +6980,7 @@
         const resp = await fetch('/api/export/png', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ target, mode, state })
+          body: JSON.stringify({ target, mode, state, ...(extraPayload || {}) })
         });
         if (!resp.ok) {
           const err = await resp.json().catch(() => ({}));
@@ -6908,6 +7010,9 @@
         if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.textContent = origTxt; }
       }
     };
+    $('btn-sb-export-png')?.addEventListener('click', () => {
+      window._fgcDownloadPng('scorebar', previewBg, $('btn-sb-export-png'), null, null, { bg: previewBg, guides: previewGuides });
+    });
     $('btn-vs-export-png').addEventListener('click', () => {
       window._fgcDownloadPng('vs', state.vs?.viewMode || '1v1', $('btn-vs-export-png'), vsPreviewFrame, 'export-vs-png');
     });
@@ -9396,7 +9501,7 @@
     const applyBtn = $('btn-upd-apply');
     const ghLnk = $('lnk-upd-github');
 
-    const curV = info?.currentVersion ? `v${info.currentVersion}` : 'v2.8.0';
+    const curV = info?.currentVersion ? `v${info.currentVersion}` : 'v2.8.1';
     const latV = info?.latestVersion ? `v${info.latestVersion}` : (isEs() ? 'Sin conexión' : 'Offline');
     if (curEl) curEl.textContent = curV;
     if (latEl) latEl.textContent = latV;
@@ -9473,7 +9578,7 @@
 
   async function checkForUpdates(force = false) {
     if (!isHttp) {
-      renderUpdateUI({ status: 'offline', currentVersion: '2.8.0' });
+      renderUpdateUI({ status: 'offline', currentVersion: '2.8.1' });
       return;
     }
     try {
@@ -9487,7 +9592,7 @@
         else toast(isEs() ? `✅ Estás al día (v${info.currentVersion})` : `✅ Up to date (v${info.currentVersion})`);
       }
     } catch {
-      renderUpdateUI({ status: 'offline', currentVersion: lastUpdateInfo?.currentVersion || '2.8.0' });
+      renderUpdateUI({ status: 'offline', currentVersion: lastUpdateInfo?.currentVersion || '2.8.1' });
     }
   }
 

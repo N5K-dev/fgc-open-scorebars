@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Control Panel — FGC Open Scorebars</title>
 <link rel="icon" type="image/svg+xml" href="assets/brand/fgc-open-scorebars-icon.svg" />
-<link rel="stylesheet" href="panel.css" />
+<link rel="stylesheet" href="css/panel.css" />
 </head>
 <body>
 
@@ -35,7 +35,7 @@
         <span id="conn-text">Connecting...</span>
         <span class="status-info-ic" aria-hidden="true">ⓘ</span>
       </button>
-      <button type="button" class="ver-pill" id="btn-update-pill" title="Check application version &amp; updates">v2.8.0</button>
+      <button type="button" class="ver-pill" id="btn-update-pill" title="Check application version &amp; updates">v2.8.1</button>
       <div class="lang-switch" id="seg-lang" role="group" aria-label="Language" title="Switch interface language (English / Español)">
         <span class="lang-globe" aria-hidden="true" data-no-i18n>🌐</span>
         <button type="button" data-lang="en" class="active-lang" aria-pressed="true" data-no-i18n>EN</button>
@@ -181,6 +181,8 @@
           <button type="button" id="btn-guides" title="Show game HUD safe-zone alignment guides">📐 Guides</button>
           <button type="button" id="btn-crop-hud" class="active-chip" title="Zoom into the top HUD strip">🔍 HUD</button>
           <button type="button" id="btn-pin-preview" class="active-chip" title="Keep the Live Preview pinned at the top while scrolling">📌 Pin</button>
+          <span class="pv-tray-sep" aria-hidden="true"></span>
+          <button type="button" id="btn-sb-export-png" title="Export exact 1920x1080 PNG of this Scorebar preview (with the active gameplay backdrop, chroma green or transparent alpha + HUD guides if enabled)">⬇ PNG</button>
         </div>
       </div>
     </div>
@@ -778,9 +780,9 @@
         </div>
       </div>
 
-      <!-- SUB-PANE 3: SHAPE, INTEGRATED FLAGS & HUD GEOMETRY -->
+      <!-- SUB-PANE 3: SHAPE, HUD GEOMETRY, CENTER PLATE & FLAGS (Unified — Zero Duplicates) -->
       <div class="studio-pane" id="spane-shape">
-        <!-- DEDICATED SUPER SMASH BROS. ULTIMATE CUSTOMIZATION CARD (Auto-shown on Smash presets!) -->
+        <!-- 1. SUPER SMASH LAYOUT & BRANDING (Auto-shown ONLY on Smash presets!) -->
         <div class="studio-box" id="smash-studio-box" style="display:none;margin-bottom:10px;border-color:rgba(250,204,21,0.52);background:linear-gradient(135deg,#17141f,#101422);">
           <h3 style="color:#fde047;margin-bottom:8px;">🌟 Super Smash Layout &amp; Branding</h3>
           <div style="display:grid;grid-template-columns:1fr;gap:8px;">
@@ -814,7 +816,249 @@
           </div>
         </div>
 
-        <div class="studio-box" style="margin-bottom:10px;border-color:rgba(244,63,94,0.45);background:#101320;">
+        <!-- 2. GLOBAL HUD GEOMETRY, PLATE SHAPE & WINGS (Master rules for the entire Scorebar) -->
+        <div class="studio-box" style="margin-bottom:10px;border-color:rgba(96,165,250,0.38);background:#0f1422;">
+          <h3 style="color:#93c5fd;margin-bottom:8px;">📐 Global HUD Geometry, Shape &amp; Wings</h3>
+          <div class="studio-grid" style="margin-bottom:10px;">
+            <div>
+              <label for="st-layout">HUD Layout Mode</label>
+              <select id="st-layout" style="margin-bottom:8px;">
+                <option value="theme">— From Active Theme —</option>
+                <option value="blade">⚡ T8 Blade (Flush Above Healthbars)</option>
+                <option value="kazuya-fists">🥊 PBRD Kazuya Fists (T8 Round-Orb Gloves)</option>
+                <option value="crown">T8 Crown 36px (Top Broadcast Strip)</option>
+                <option value="split">T8 Split-Wing (Between Portrait &amp; Orbs)</option>
+                <option value="arch">T8 Stepped Arch (Connected Visor)</option>
+                <option value="sf6-drive">🥊 SF6 Drive Wing (Clears Round Wins)</option>
+                <option value="sf6-cpt">🥊 SF6 CPT Top Bar (Flush y:0–44px)</option>
+                <option value="sf6-sfl">🥊 SF6 SFL Slim Ribbon (31px Above Round Wins)</option>
+                <option value="sf6-metro">🥊 SF6 Metro Arch (Floating Plates)</option>
+              </select>
+              <label for="st-shape">Global Plate Shape (Wings + Center)</label>
+              <select id="st-shape">
+                <option value="theme">— From Active Theme —</option>
+                <option value="blade-slant">⚡ Parallel Blade (TWT Slant)</option>
+                <option value="diagonal">Diagonal Cut (Broadcast)</option>
+                <option value="bevel">Chamfered Corners (Octagonal)</option>
+                <option value="hex">Sharp Hexagonal</option>
+                <option value="skew">Dynamic Skew</option>
+                <option value="flat">Classic Straight (TV)</option>
+                <option value="rounded">Modern Rounded</option>
+              </select>
+            </div>
+            <div>
+              <div class="row" style="margin-bottom:8px;grid-template-columns:1fr 1fr;">
+                <div>
+                  <label for="st-outerBlade">Outer Edge (Portrait)</label>
+                  <select id="st-outerBlade">
+                    <option value="theme">Theme</option>
+                    <option value="on">⚡ ON (Blade Edge)</option>
+                    <option value="off">OFF</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="st-scorePos">Score Position</label>
+                  <select id="st-scorePos">
+                    <option value="theme">Theme</option>
+                    <option value="inner">Inner</option>
+                    <option value="outer">Outer</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row" style="margin-bottom:0;grid-template-columns:1fr 1fr;">
+                <div>
+                  <label for="st-borderStyle">Global Border Style</label>
+                  <select id="st-borderStyle">
+                    <option value="theme">Theme</option>
+                    <option value="thin">Thin</option>
+                    <option value="bold">3px</option>
+                    <option value="neon">Neon</option>
+                    <option value="none">None</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="st-isoCode">ISO Tag</label>
+                  <select id="st-isoCode">
+                    <option value="theme">Theme</option>
+                    <option value="on">ON (ISO)</option>
+                    <option value="off">OFF</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="sliders-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="slider-box">
+              <div class="slider-head"><span>Global Scale</span><b id="val-scale">100%</b></div>
+              <input type="range" id="rng-scale" min="70" max="120" step="1" value="100" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Vertical Position (Offset Y)</span><b id="val-offsetY">0 px</b></div>
+              <input type="range" id="rng-offsetY" min="-30" max="160" step="1" value="0" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Wing Spread (Width)</span><b id="val-wingSpread">0 px</b></div>
+              <input type="range" id="rng-wingSpread" min="-300" max="220" step="2" value="0" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Scorebar Height (0 = Auto)</span><b id="val-barHeight">Auto</b></div>
+              <input type="range" id="rng-barHeight" min="0" max="64" step="2" value="0" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Blade Slant Angle</span><b id="val-bladeSlant">22 px</b></div>
+              <input type="range" id="rng-bladeSlant" min="0" max="36" step="2" value="22" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Overlay Opacity</span><b id="val-opacity">100%</b></div>
+              <input type="range" id="rng-opacity" min="40" max="100" step="2" value="100" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. EXCLUSIVE CENTER PLATE SECTION (Unified inside Shape & HUD — All 87 Presets!) -->
+        <div class="studio-box" id="center-plate-studio-box" style="margin-bottom:10px;border-color:rgba(250,204,21,0.48);background:linear-gradient(180deg,#151722,#0f121b);">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <h3 style="margin:0;color:#fde047;">🏆 Center Plate (Round &amp; Format)</h3>
+              <span style="font-size:11px;color:var(--muted);">Free scale, dimensions, layout &amp; styling across ALL presets.</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <div class="seg-bar" id="center-scale-chips">
+                <button type="button" data-cscale="80">80%</button>
+                <button type="button" data-cscale="100" class="active-chip">100%</button>
+                <button type="button" data-cscale="125">125%</button>
+                <button type="button" data-cscale="150">150%</button>
+                <button type="button" data-cscale="180">180%</button>
+                <button type="button" data-cscale="220">220%</button>
+                <button type="button" data-cscale="260">260%</button>
+              </div>
+              <button type="button" id="btn-center-reset" style="padding:4px 9px;font-size:11px;">↺ Reset Center Plate</button>
+            </div>
+          </div>
+
+          <div class="sliders-grid" style="margin-bottom:10px;">
+            <div class="slider-box" style="border-color:rgba(250,204,21,0.45);">
+              <div class="slider-head"><span style="color:#fde047;font-weight:800;">Center Plate Scale</span><b id="val-centerScale" style="color:#fde047;">100%</b></div>
+              <input type="range" id="rng-centerScale" min="50" max="260" step="1" value="100" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Round &amp; Format Font Size</span><b id="val-centerFontSize">100%</b></div>
+              <input type="range" id="rng-centerFontSize" min="60" max="220" step="2" value="100" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Plate Width</span><b id="val-centerWidth">Auto</b></div>
+              <input type="range" id="rng-centerWidth" min="0" max="760" step="4" value="0" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Plate Height</span><b id="val-centerHeight">Auto</b></div>
+              <input type="range" id="rng-centerHeight" min="0" max="110" step="2" value="0" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Side Padding</span><b id="val-centerPadX">Auto</b></div>
+              <input type="range" id="rng-centerPadX" min="-1" max="64" step="1" value="-1" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Plate Opacity</span><b id="val-centerOpacity">100%</b></div>
+              <input type="range" id="rng-centerOpacity" min="15" max="100" step="1" value="100" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Offset X (Left / Right)</span><b id="val-centerOffsetX">0 px</b></div>
+              <input type="range" id="rng-centerOffsetX" min="-500" max="500" step="2" value="0" />
+            </div>
+            <div class="slider-box">
+              <div class="slider-head"><span>Offset Y (Up / Down)</span><b id="val-centerOffsetY">0 px</b></div>
+              <input type="range" id="rng-centerOffsetY" min="-40" max="220" step="1" value="0" />
+            </div>
+          </div>
+
+          <div class="studio-grid" style="margin-bottom:8px;">
+            <div>
+              <label for="st-centerStyle">Center Block Style (Follows Global Shape when Auto)</label>
+              <select id="st-centerStyle" style="margin-bottom:8px;">
+                <option value="theme">— Follow Global Shape / Theme —</option>
+                <option value="floating">Clean Floating (Text Only)</option>
+                <option value="trapezoid">Solid Trapezoid</option>
+                <option value="hex">Hex Shield (2XKO)</option>
+                <option value="pill">Rounded Pill / Capsule</option>
+                <option value="flat">Sharp Broadcast Bar</option>
+                <option value="chamfer">Octagonal Bevel</option>
+                <option value="ribbon">Slanted Ribbon</option>
+              </select>
+              <label>Text &amp; Format Arrangement</label>
+              <div class="seg-bar" id="seg-centerLayout">
+                <button type="button" data-val="theme" class="active-chip">Theme</button>
+                <button type="button" data-val="row">ROUND [FT3]</button>
+                <button type="button" data-val="row-rev">[FT3] ROUND</button>
+                <button type="button" data-val="stack">Stacked ↓</button>
+                <button type="button" data-val="stack-rev">Stacked ↑</button>
+              </div>
+            </div>
+            <div>
+              <label>Center Glow &amp; Shadow FX</label>
+              <div class="seg-bar" id="seg-centerGlow" style="margin-bottom:8px;">
+                <button type="button" data-val="theme" class="active-chip">Theme</button>
+                <button type="button" data-val="none">None</button>
+                <button type="button" data-val="subtle">Subtle</button>
+                <button type="button" data-val="neon">Neon</button>
+                <button type="button" data-val="pulse">Pulse</button>
+              </div>
+              <div class="sliders-grid" style="grid-template-columns:1fr 1fr;">
+                <div class="slider-box">
+                  <div class="slider-head"><span>Corner Radius</span><b id="val-centerRadius">Auto</b></div>
+                  <input type="range" id="rng-centerRadius" min="-1" max="40" step="1" value="-1" />
+                </div>
+                <div class="slider-box">
+                  <div class="slider-head"><span>Border Thickness</span><b id="val-centerBorderW">Auto</b></div>
+                  <input type="range" id="rng-centerBorderW" min="-1" max="8" step="1" value="-1" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <details id="center-colors-drawer" style="margin-top:6px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,0.2);background:rgba(10,14,24,0.55);">
+            <summary style="cursor:pointer;font-size:12px;font-weight:700;color:#cbd5e1;list-style:none;display:flex;align-items:center;justify-content:space-between;">
+              <span>🎨 Independent Center Plate Colors (Optional)</span>
+              <span style="font-size:10.5px;color:var(--muted);font-weight:500;">Recolor ONLY the center plate without changing P1/P2 wings ▾</span>
+            </summary>
+            <div style="margin-top:9px;padding-top:9px;border-top:1px solid rgba(255,255,255,0.07);">
+              <div style="margin-bottom:8px;">
+                <label class="toggle-item" style="background:#141c30;border-color:#3b82f6;">
+                  <input type="checkbox" id="chk-center-custom-colors" /> Enable Independent Center Plate Colors
+                </label>
+              </div>
+              <div class="sliders-grid" style="grid-template-columns:repeat(3,1fr);gap:8px;">
+                <div class="color-pair" style="margin:0;">
+                  <label>Plate BG Gradient</label>
+                  <div class="color-inputs">
+                    <input type="color" id="cp-bg1" value="#1b1f2e" title="Center Plate Top Color" />
+                    <input type="color" id="cp-bg2" value="#0c0e16" title="Center Plate Bottom Color" />
+                  </div>
+                </div>
+                <div class="color-pair" style="margin:0;">
+                  <label>Round Text / Border</label>
+                  <div class="color-inputs">
+                    <input type="color" id="cp-text" value="#ffffff" title="Round Text Color" />
+                    <input type="color" id="cp-border" value="#ffd24d" title="Border &amp; Glow Accent Color" />
+                  </div>
+                </div>
+                <div class="color-pair" style="margin:0;">
+                  <label>Format Badge (BG / Text)</label>
+                  <div class="color-inputs">
+                    <input type="color" id="cp-fmt-bg" value="#ffd24d" title="Format Pill Background" />
+                    <input type="color" id="cp-fmt-text" value="#0b0d14" title="Format Pill Text" />
+                  </div>
+                </div>
+              </div>
+              <div class="slider-box" style="margin-top:8px;">
+                <div class="slider-head"><span>Center Background Opacity (0% = Transparent)</span><b id="val-centerBgAlpha">94%</b></div>
+                <input type="range" id="rng-centerBgAlpha" min="0" max="100" step="2" value="94" />
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- 4. INTEGRATED FLAGS (Style & Framing Only) -->
+        <div class="studio-box" style="margin-bottom:10px;border-color:rgba(244,63,94,0.42);background:#101320;">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
             <h3 style="margin:0;">🏳️ Flag Integration Styles (6 Broadcast Modes)</h3>
             <button type="button" id="btn-open-flagfade" style="padding:3px 9px;font-size:11px;border-color:rgba(56,189,248,0.6);color:#7dd3fc;">🌊 Open Flag Fade-In / Fade-Out Editor →</button>
@@ -828,11 +1072,7 @@
             <button type="button" data-val="bezel">🛡️ Recessed Bezel</button>
             <button type="button" data-val="classic">▭ Classic Compact</button>
           </div>
-          <div class="sliders-grid">
-            <div class="slider-box">
-              <div class="slider-head"><span>Blade Slant Angle</span><b id="val-bladeSlant">22 px</b></div>
-              <input type="range" id="rng-bladeSlant" min="0" max="36" step="2" value="22" />
-            </div>
+          <div class="sliders-grid" style="grid-template-columns:1fr 1fr;">
             <div class="slider-box">
               <div class="slider-head"><span>Integrated Flag Width</span><b id="val-flagWidth">62 px</b></div>
               <input type="range" id="rng-flagWidth" min="40" max="140" step="2" value="62" />
@@ -840,10 +1080,6 @@
             <div class="slider-box">
               <div class="slider-head"><span>Flag Intensity / Opacity</span><b id="val-flagOpacity">100%</b></div>
               <input type="range" id="rng-flagOpacity" min="25" max="100" step="2" value="100" />
-            </div>
-            <div class="slider-box">
-              <div class="slider-head"><span>Scorebar Height (0 = Auto)</span><b id="val-barHeight">Auto</b></div>
-              <input type="range" id="rng-barHeight" min="0" max="64" step="2" value="0" />
             </div>
           </div>
           <div style="margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,0.08);">
@@ -870,89 +1106,8 @@
           </div>
         </div>
 
-        <div class="studio-grid" style="margin-bottom:10px;">
-          <div class="studio-box">
-            <h3>Geometry &amp; Game HUD Layout</h3>
-            <label for="st-layout">HUD Layout Mode</label>
-            <select id="st-layout" style="margin-bottom:8px;">
-              <option value="theme">— From Active Theme —</option>
-              <option value="blade">⚡ T8 Blade (Flush Above Healthbars)</option>
-              <option value="kazuya-fists">🥊 PBRD Kazuya Fists (T8 Round-Orb Gloves)</option>
-              <option value="crown">T8 Crown 36px (Top Broadcast Strip)</option>
-              <option value="split">T8 Split-Wing (Between Portrait &amp; Orbs)</option>
-              <option value="arch">T8 Stepped Arch (Connected Visor)</option>
-              <option value="sf6-drive">🥊 SF6 Drive Wing (Clears Round Wins)</option>
-              <option value="sf6-cpt">🥊 SF6 CPT Top Bar (Flush y:0–44px)</option>
-              <option value="sf6-sfl">🥊 SF6 SFL Slim Ribbon (31px Above Round Wins)</option>
-              <option value="sf6-metro">🥊 SF6 Metro Arch (Floating Plates)</option>
-            </select>
-            <label for="st-shape">Plate Shape</label>
-            <select id="st-shape">
-              <option value="theme">— From Active Theme —</option>
-              <option value="blade-slant">⚡ Parallel Blade (TWT Slant)</option>
-              <option value="diagonal">Diagonal Cut (Broadcast)</option>
-              <option value="bevel">Chamfered Corners (Octagonal)</option>
-              <option value="hex">Sharp Hexagonal</option>
-              <option value="skew">Dynamic Skew</option>
-              <option value="flat">Classic Straight (TV)</option>
-              <option value="rounded">Modern Rounded</option>
-            </select>
-          </div>
-
-          <div class="studio-box">
-            <h3>Center, Outer Blade &amp; Border</h3>
-            <div class="row" style="margin-bottom:8px;">
-              <div>
-                <label for="st-centerStyle">Center Block</label>
-                <select id="st-centerStyle">
-                  <option value="theme">Theme</option>
-                  <option value="floating">Clean Floating (TWT)</option>
-                  <option value="trapezoid">Solid Trapezoid</option>
-                  <option value="hex">Hex Shield (2XKO)</option>
-                  <option value="pill">Frosted Pill</option>
-                </select>
-              </div>
-              <div>
-                <label for="st-outerBlade">Outer Edge (Portrait)</label>
-                <select id="st-outerBlade">
-                  <option value="theme">Theme</option>
-                  <option value="on">⚡ ON (Blade Edge)</option>
-                  <option value="off">OFF</option>
-                </select>
-              </div>
-            </div>
-            <div class="row" style="margin-bottom:0;grid-template-columns:1fr 1fr 1fr;">
-              <div>
-                <label for="st-scorePos">Score</label>
-                <select id="st-scorePos">
-                  <option value="theme">Theme</option>
-                  <option value="inner">Inner</option>
-                  <option value="outer">Outer</option>
-                </select>
-              </div>
-              <div>
-                <label for="st-borderStyle">Border</label>
-                <select id="st-borderStyle">
-                  <option value="theme">Theme</option>
-                  <option value="thin">Thin</option>
-                  <option value="bold">3px</option>
-                  <option value="neon">Neon</option>
-                  <option value="none">None</option>
-                </select>
-              </div>
-              <div>
-                <label for="st-isoCode">ISO Tag</label>
-                <select id="st-isoCode">
-                  <option value="theme">Theme</option>
-                  <option value="on">ON (ISO)</option>
-                  <option value="off">OFF</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="studio-box" style="margin-bottom:10px;border-color:rgba(255,107,26,0.42);background:#141118;">
+        <!-- 5. MATCH POINT INDICATOR -->
+        <div class="studio-box" style="margin-bottom:0;border-color:rgba(255,107,26,0.42);background:#141118;">
           <h3 style="color:#fdba74;">🔥 Match Point Indicator (Position, Style, Color &amp; Label)</h3>
           <div class="seg-bar" id="seg-mpStyle" style="margin-bottom:8px;">
             <button type="button" data-val="side-peek" class="active-chip">⚡ Side Fin Beside Score</button>
@@ -976,25 +1131,6 @@
               <label for="st-mpText">Badge Text</label>
               <input type="text" id="st-mpText" placeholder="MATCH POINT" maxlength="18" />
             </div>
-          </div>
-        </div>
-
-        <div class="sliders-grid">
-          <div class="slider-box">
-            <div class="slider-head"><span>Vertical Position (Offset Y)</span><b id="val-offsetY">0 px</b></div>
-            <input type="range" id="rng-offsetY" min="-30" max="160" step="1" value="0" />
-          </div>
-          <div class="slider-box">
-            <div class="slider-head"><span>Global Scale</span><b id="val-scale">100%</b></div>
-            <input type="range" id="rng-scale" min="70" max="120" step="1" value="100" />
-          </div>
-          <div class="slider-box">
-            <div class="slider-head"><span>Wing Spread (Width)</span><b id="val-wingSpread">0 px</b></div>
-            <input type="range" id="rng-wingSpread" min="-300" max="220" step="2" value="0" />
-          </div>
-          <div class="slider-box">
-            <div class="slider-head"><span>Overlay Opacity</span><b id="val-opacity">100%</b></div>
-            <input type="range" id="rng-opacity" min="40" max="100" step="2" value="100" />
           </div>
         </div>
       </div>
@@ -4735,7 +4871,7 @@
       <div class="upd-ver-grid">
         <div class="upd-ver-card">
           <small>Installed Version</small>
-          <strong id="upd-cur-ver">v2.8.0</strong>
+          <strong id="upd-cur-ver">v2.8.1</strong>
         </div>
         <div class="upd-ver-card">
           <small>Latest on GitHub</small>
@@ -4845,7 +4981,7 @@
 
     <div class="sess-body">
       <div class="sess-offline-box" id="sess-offline-box" style="display:none;">
-        <strong>⚠ Local Server Disconnected</strong> <span>Make sure the Start_Scorebar.bat (or node server.mjs) terminal window is still open and running on your PC.</span>
+        <strong>⚠ Local Server Disconnected</strong> <span>Make sure the Start_Scorebar.bat (or node app/server/server.mjs) terminal window is still open and running on your PC.</span>
       </div>
       <div class="sess-limit-warn" id="sess-limit-warn" style="display:none;">
         <strong>⚠ High Session Usage</strong> <span>You are close to the 64 simultaneous SSE session cap. Close unused browser tabs or disconnect idle remote devices below.</span>
@@ -4912,22 +5048,22 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="flags.js"></script>
-<script src="vs-designs.js"></script>
-<script src="sf6-themes.js"></script>
-<script src="game-presets.js"></script>
-<script src="results-designs.js"></script>
-<script src="res-card-engine.js"></script>
-<script src="top8-engine.js"></script>
-<script src="brackets-designs.js"></script>
-<script src="brackets-engine.js"></script>
-<script src="qr.js"></script>
-<script src="custom-fonts.js"></script>
-<script src="audio-engine.js"></script>
-<script src="i18n.js"></script>
-<script src="panel-app.js"></script>
-<script src="panel-presets.js"></script>
-<script src="panel-audio.js"></script>
-<script src="panel-sessions.js"></script>
+<script src="js/core/flags.js"></script>
+<script src="js/designs/vs-designs.js"></script>
+<script src="js/designs/sf6-themes.js"></script>
+<script src="js/designs/game-presets.js"></script>
+<script src="js/designs/results-designs.js"></script>
+<script src="js/core/res-card-engine.js"></script>
+<script src="js/core/top8-engine.js"></script>
+<script src="js/designs/brackets-designs.js"></script>
+<script src="js/core/brackets-engine.js"></script>
+<script src="js/panel/qr.js"></script>
+<script src="js/core/custom-fonts.js"></script>
+<script src="js/core/audio-engine.js"></script>
+<script src="js/panel/i18n.js"></script>
+<script src="js/panel/panel-app.js"></script>
+<script src="js/panel/panel-presets.js"></script>
+<script src="js/panel/panel-audio.js"></script>
+<script src="js/panel/panel-sessions.js"></script>
 </body>
 </html>

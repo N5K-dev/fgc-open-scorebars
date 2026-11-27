@@ -6,7 +6,7 @@ cd /d "%~dp0"
 
 echo.
 echo  ============================================================
-echo     FGC OPEN SCOREBARS - Tekken 8 Broadcast Edition
+echo     FGC OPEN SCOREBARS - Local Broadcast Suite
 echo  ============================================================
 echo.
 
@@ -56,7 +56,7 @@ start "" "http://localhost:8787/panel.html"
 set "FGC_LAUNCHER=1"
 
 :run_server
-node server.mjs
+node app\server\server.mjs
 if %ERRORLEVEL% EQU 42 (
   echo.
   echo  [*] Update applied! Restarting FGC Open Scorebars server...

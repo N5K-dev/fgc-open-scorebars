@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&family=Bebas+Neue&family=Black+Ops+One&family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Cinzel:wght@700;800;900&family=Exo+2:ital,wght@0,700;0,800;1,800&family=Montserrat:ital,wght@0,700;0,800;1,800&family=Orbitron:wght@700;800;900&family=Oswald:wght@600;700&family=Rajdhani:wght@600;700&family=Russo+One&family=Teko:wght@600;700&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="game-scorebars.css" />
+  <link rel="stylesheet" href="css/game-scorebars.css" />
   <style>
     /* =========================================================================
      FGC OPEN SCOREBAR — TEKKEN 8 PRECISION 1920x1080 CANVAS
@@ -49,11 +49,11 @@
     }
 
     body.bg-t8 #stage {
-      background: #000 url('assets/t8-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+      background: #000 url('assets/previews/t8-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
     }
 
     body.bg-sf6 #stage {
-      background: #000 url('assets/sf6-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+      background: #000 url('assets/previews/sf6-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
     }
 
     body.bg-checker {
@@ -410,14 +410,14 @@
 
     #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p1 .kazuya-glove-body {
       background: var(--kazuya-glove-p1);
-      -webkit-mask-image: url('assets/pbrd-kazuya-glove-p1-mask.png');
-      mask-image: url('assets/pbrd-kazuya-glove-p1-mask.png');
+      -webkit-mask-image: url('assets/themes/pbrd-kazuya-glove-p1-mask.png');
+      mask-image: url('assets/themes/pbrd-kazuya-glove-p1-mask.png');
     }
 
     #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p2 .kazuya-glove-body {
       background: var(--kazuya-glove-p2);
-      -webkit-mask-image: url('assets/pbrd-kazuya-glove-p2-mask.png');
-      mask-image: url('assets/pbrd-kazuya-glove-p2-mask.png');
+      -webkit-mask-image: url('assets/themes/pbrd-kazuya-glove-p2-mask.png');
+      mask-image: url('assets/themes/pbrd-kazuya-glove-p2-mask.png');
     }
 
     #scorebar-root[data-layout="kazuya-fists"] .kazuya-glove-body::after {
@@ -430,11 +430,11 @@
     }
 
     #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p1 .kazuya-glove-body::after {
-      background-image: url('assets/pbrd-kazuya-glove-p1-shade.png');
+      background-image: url('assets/themes/pbrd-kazuya-glove-p1-shade.png');
     }
 
     #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p2 .kazuya-glove-body::after {
-      background-image: url('assets/pbrd-kazuya-glove-p2-shade.png');
+      background-image: url('assets/themes/pbrd-kazuya-glove-p2-shade.png');
     }
 
     #scorebar-root[data-layout="kazuya-fists"] .kazuya-glove-studs {
@@ -446,11 +446,11 @@
     }
 
     #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p1 .kazuya-glove-studs {
-      background-image: url('assets/pbrd-kazuya-studs-p1.png');
+      background-image: url('assets/themes/pbrd-kazuya-studs-p1.png');
     }
 
     #scorebar-root[data-layout="kazuya-fists"] .sb-wing.p2 .kazuya-glove-studs {
-      background-image: url('assets/pbrd-kazuya-studs-p2.png');
+      background-image: url('assets/themes/pbrd-kazuya-studs-p2.png');
     }
 
     #scorebar-root[data-layout="kazuya-fists"] .sb-wing .wing-plate {
@@ -3687,6 +3687,23 @@
       backdrop-filter: blur(12px);
     }
 
+    #scorebar-root[data-center-style="flat"] .sb-center {
+      clip-path: none !important;
+      border-radius: 0 !important;
+    }
+
+    #scorebar-root[data-center-style="chamfer"] .sb-center {
+      border-radius: 0 !important;
+      clip-path: polygon(11px 0, calc(100% - 11px) 0, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 11px) !important;
+    }
+
+    #scorebar-root[data-center-style="ribbon"] .sb-center {
+      border-radius: 0 !important;
+      clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%) !important;
+      padding-left: 26px !important;
+      padding-right: 26px !important;
+    }
+
     /* --- 3. Shape Overrides (Dynamic --blade-slant & matching score-box on ANY theme!) --- */
     #scorebar-root[data-shape="blade-slant"] .sb-wing.p1 .wing-plate {
       clip-path: polygon(0 0, calc(100% - var(--blade-slant, 24px)) 0, 100% 100%, var(--blade-slant, 24px) 100%) !important;
@@ -4923,12 +4940,12 @@
   <div id="sb-resize-handle-alt" title="Drag edge to shorten or lengthen (double-click to reset)">↔</div>
   <div id="sb-hover-pill"></div>
 
-  <script src="flags.js"></script>
-  <script src="sf6-themes.js"></script>
-  <script src="game-presets.js"></script>
-  <script src="preset-art.js"></script>
-  <script src="custom-fonts.js"></script>
-  <script src="audio-engine.js"></script>
+  <script src="js/core/flags.js"></script>
+  <script src="js/designs/sf6-themes.js"></script>
+  <script src="js/designs/game-presets.js"></script>
+  <script src="js/designs/preset-art.js"></script>
+  <script src="js/core/custom-fonts.js"></script>
+  <script src="js/core/audio-engine.js"></script>
   <script>
     (() => {
       /* =========================================================================
@@ -5093,8 +5110,8 @@
         }
         document.body.classList.toggle('show-guides', Boolean(guides));
       }
-      if (params.has('preview')) {
-        applyPreviewMode(params.get('preview'), params.get('guides') === '1');
+      if (params.has('preview') || params.get('guides') === '1') {
+        applyPreviewMode(params.get('preview') || '', params.get('guides') === '1');
       }
 
       /* =========================================================================
@@ -5270,16 +5287,21 @@
       let prevP2Score = null;
       let latestState = null;
       let lastSeenIntroNonce = null;
-      const isPreviewMode = params.has('preview');
-      let introPending = !isPreviewMode;
-      let initialIntroDone = isPreviewMode;
+      const isExportMode = params.get('export') === '1';
+      const isPreviewMode = params.has('preview') && !isExportMode;
+      const isStaticPreview = isPreviewMode || isExportMode;
+      let introPending = !isStaticPreview;
+      let initialIntroDone = isStaticPreview;
       let introTimer = null;
       let flashTimer = null;
       let casterIntroTimer = null;
       let lastSceneTriggerTs = 0;
 
-      if (isPreviewMode) {
-        // Panel iframe preview starts immediately visible without delaying the operator
+      if (isExportMode) {
+        stage.classList.add('is-booting');
+      }
+      if (isStaticPreview) {
+        // Panel iframe preview & 1080p PNG export start immediately visible without entry delay
         els.root.classList.remove('hidden', 'no-trans');
         els.smashRoot.classList.remove('hidden', 'no-trans');
       }
@@ -5374,7 +5396,7 @@
       }
 
       function triggerSceneReentry(sourceLabel) {
-        if (isPreviewMode) return;
+        if (isStaticPreview) return;
         const now = Date.now();
         if (now - lastSceneTriggerTs < 260) return;
         lastSceneTriggerTs = now;
@@ -5391,7 +5413,7 @@
       }
 
       // Hook ALL OBS Studio Browser Source & Visibility lifecycle events!
-      if (!isPreviewMode) {
+      if (!isStaticPreview) {
         // Native OBS Browser Source events (work even with "Refresh browser when scene becomes active" OFF!)
         window.addEventListener('obsSourceActiveChanged', (ev) => {
           if (ev.detail?.active) triggerSceneReentry('obs-active');
@@ -6450,6 +6472,94 @@
         setOptScale('lpMpScale', '--lp-mp-scale', lp.mpScale);
         setOptPx('lpMetaW', '--lp-meta-w', lp.metaW, 120);
         setOptScale('lpSmSubScale', '--lp-sm-sub-scale', lp.smSubScale);
+
+        // 6E. Universal Center Plate Studio (Applies across ALL 87 Scorebar presets & Smash!)
+        const cScaleNum = Math.max(50, Math.min(260, Number(st.centerScale ?? 100) || 100));
+        stage.style.setProperty('--c-scale', (cScaleNum / 100).toFixed(3));
+        if (Math.abs(cScaleNum - 100) >= 1) stage.dataset.cScaled = '1';
+        else delete stage.dataset.cScaled;
+
+        const cFontNum = Math.max(60, Math.min(220, Number(st.centerFontSize ?? 100) || 100));
+        if (Math.abs(cFontNum - 100) >= 1) {
+          stage.dataset.cFont = '1';
+          stage.style.setProperty('--c-font-scale', (cFontNum / 100).toFixed(3));
+        } else {
+          delete stage.dataset.cFont;
+          stage.style.removeProperty('--c-font-scale');
+        }
+
+        setOptPx('cW', '--c-w', st.centerWidth, 100);
+        setOptPx('cH', '--c-h', st.centerHeight, 20);
+
+        const cPadVal = Number(st.centerPadX ?? -1);
+        if (Number.isFinite(cPadVal) && cPadVal >= 0) {
+          stage.dataset.cPad = '1';
+          stage.style.setProperty('--c-pad-x', `${Math.round(cPadVal)}px`);
+        } else {
+          delete stage.dataset.cPad;
+          stage.style.removeProperty('--c-pad-x');
+        }
+
+        stage.style.setProperty('--c-off-x', `${Math.round(Number(st.centerOffsetX || 0))}px`);
+        stage.style.setProperty('--c-off-y', `${Math.round(Number(st.centerOffsetY || 0))}px`);
+
+        const cRadVal = Number(st.centerRadius ?? -1);
+        if (Number.isFinite(cRadVal) && cRadVal >= 0) {
+          stage.dataset.cRad = '1';
+          stage.style.setProperty('--c-rad', `${Math.round(cRadVal)}px`);
+        } else {
+          delete stage.dataset.cRad;
+          stage.style.removeProperty('--c-rad');
+        }
+
+        const cBwVal = Number(st.centerBorderW ?? -1);
+        if (Number.isFinite(cBwVal) && cBwVal === 0) {
+          stage.dataset.cBw = '0';
+          stage.style.removeProperty('--c-bw');
+        } else if (Number.isFinite(cBwVal) && cBwVal > 0) {
+          stage.dataset.cBw = '1';
+          stage.style.setProperty('--c-bw', `${Math.round(cBwVal)}px`);
+        } else {
+          delete stage.dataset.cBw;
+          stage.style.removeProperty('--c-bw');
+        }
+
+        const cOpVal = Number(st.centerOpacity ?? 100);
+        if (Number.isFinite(cOpVal) && cOpVal < 99.5) {
+          stage.dataset.cOp = '1';
+          stage.style.setProperty('--c-op', (Math.max(15, Math.min(100, cOpVal)) / 100).toFixed(2));
+        } else {
+          delete stage.dataset.cOp;
+          stage.style.removeProperty('--c-op');
+        }
+
+        const cLay = st.centerLayout && st.centerLayout !== 'theme' ? st.centerLayout : '';
+        if (cLay) stage.dataset.cLayout = cLay;
+        else delete stage.dataset.cLayout;
+
+        const cGlow = st.centerGlow && st.centerGlow !== 'theme' ? st.centerGlow : '';
+        if (cGlow) stage.dataset.cGlow = cGlow;
+        else delete stage.dataset.cGlow;
+
+        const cpGlowCol = st.centerCustomColors ? (st.centerBorderColor || '#ffd24d') : (brandAcc || '#ffd24d');
+        stage.style.setProperty('--cp-glow-col', cpGlowCol);
+
+        if (st.centerCustomColors) {
+          const cpAlpha = Math.max(0, Math.min(1, Number(st.centerBgAlpha ?? 94) / 100));
+          const cp1 = st.centerColor1 || '#1b1f2e';
+          const cp2 = st.centerColor2 || '#0c0e16';
+          stage.dataset.cColors = '1';
+          stage.style.setProperty('--cp-bg', cpAlpha <= 0.01
+            ? 'transparent'
+            : `linear-gradient(180deg, ${hexToRgba(cp1, cpAlpha)}, ${hexToRgba(cp2, cpAlpha)})`);
+          stage.style.setProperty('--cp-text', st.centerTextColor || '#ffffff');
+          stage.style.setProperty('--cp-border', st.centerBorderColor || '#ffd24d');
+          stage.style.setProperty('--cp-fmt-bg', st.centerFormatBg || '#ffd24d');
+          stage.style.setProperty('--cp-fmt-text', st.centerFormatText || '#0b0d14');
+        } else {
+          delete stage.dataset.cColors;
+        }
+
         if (typeof refreshSelectOverlay === 'function') requestAnimationFrame(refreshSelectOverlay);
 
         // 7. Initial OBS Scene Intro & Live Replay Trigger (introNonce)
@@ -6618,7 +6728,8 @@
           return {
             dragKey, mode: 'width', target: 'layoutPos', key: 'centerW',
             cssVar: '--lp-center-w', flagAttr: 'lpCenterW', flagHost: stage,
-            min: 96, max: 640, step: 2, defaultVal: 0, scaled: true,
+            min: 96, max: 760, step: 2, defaultVal: 0, scaled: true,
+            elScale: () => Math.max(0.4, Number(latestState?.style?.centerScale || 100) / 100),
             edges: [1, -1], edgeMult: 2, el: document.getElementById('sb-center'),
             label: 'Center Banner Width', unit: 'px'
           };
@@ -6628,7 +6739,8 @@
           return {
             dragKey, mode: 'width', target: 'layoutPos', key: 'smInfoW',
             cssVar: '--lp-sm-info-w', flagAttr: 'lpSmInfoW', flagHost: stage,
-            min: 130, max: 640, step: 2, defaultVal: 0, scaled: true,
+            min: 130, max: 760, step: 2, defaultVal: 0, scaled: true,
+            elScale: () => Math.max(0.4, Number(latestState?.style?.centerScale || 100) / 100),
             edges: isCentered ? [1, -1] : [1], edgeMult: isCentered ? 2 : 1,
             el: document.getElementById('sm-info-box'),
             label: 'Round Box Width', unit: 'px'
@@ -7051,45 +7163,52 @@
         });
       }
 
-      // Initialize OBS-safe Audio & SFX engine (strictly silent inside preview iframes)
-      window.FGC_AUDIO?.init({ role: 'scorebar', isPreview: isPreviewMode });
+      // Initialize OBS-safe Audio & SFX engine (strictly silent inside preview iframes & 1080p PNG export)
+      window.FGC_AUDIO?.init({ role: 'scorebar', isPreview: isStaticPreview });
 
       // Layer 2: BroadcastChannel & localStorage fallback
       let bc = null;
-      try {
-        bc = new BroadcastChannel('fgc_open_scorebar');
-        bc.onmessage = (ev) => {
-          if (ev.data && ev.data.type === 'state' && ev.data.payload) applyState(ev.data.payload);
-          else if (ev.data && ev.data.type === 'fonts' && Array.isArray(ev.data.payload)) {
-            window.FGC_CUSTOM_FONTS?.setFonts(ev.data.payload);
-            if (latestState) applyState(latestState);
-          } else if (ev.data && ev.data.type === 'sfx' && Array.isArray(ev.data.payload)) {
-            window.FGC_AUDIO?.setCustomSfx(ev.data.payload);
-          } else if (ev.data && ev.data.type === 'audio' && ev.data.payload) {
-            window.FGC_AUDIO?.handleAudioEvent(ev.data.payload);
+      if (!isExportMode) {
+        try {
+          bc = new BroadcastChannel('fgc_open_scorebar');
+          bc.onmessage = (ev) => {
+            if (ev.data && ev.data.type === 'state' && ev.data.payload) applyState(ev.data.payload);
+            else if (ev.data && ev.data.type === 'fonts' && Array.isArray(ev.data.payload)) {
+              window.FGC_CUSTOM_FONTS?.setFonts(ev.data.payload);
+              if (latestState) applyState(latestState);
+            } else if (ev.data && ev.data.type === 'sfx' && Array.isArray(ev.data.payload)) {
+              window.FGC_AUDIO?.setCustomSfx(ev.data.payload);
+            } else if (ev.data && ev.data.type === 'audio' && ev.data.payload) {
+              window.FGC_AUDIO?.handleAudioEvent(ev.data.payload);
+            }
+          };
+        } catch { }
+        window.addEventListener('storage', (ev) => {
+          if (ev.key === STORAGE_KEY && ev.newValue) {
+            try { applyState(JSON.parse(ev.newValue)); } catch { }
           }
-        };
-      } catch { }
-      window.addEventListener('storage', (ev) => {
-        if (ev.key === STORAGE_KEY && ev.newValue) {
-          try { applyState(JSON.parse(ev.newValue)); } catch { }
-        }
-      });
+        });
 
-      // Load cached localStorage state immediately so geometry/theme is primed before intro fires
-      try {
-        const cached = localStorage.getItem(STORAGE_KEY);
-        if (cached) applyState(JSON.parse(cached), { fromCache: !isPreviewMode });
-      } catch { }
+        // Load cached localStorage state immediately so geometry/theme is primed before intro fires
+        try {
+          const cached = localStorage.getItem(STORAGE_KEY);
+          if (cached) applyState(JSON.parse(cached), { fromCache: !isPreviewMode });
+        } catch { }
+      }
 
       // Layer 1: Primary SSE + HTTP fetch from local server.mjs
-      // NOTE: Preview iframes inside panel.html NEVER open EventSource (prevents Chrome 6-socket HTTP/1.1 exhaustion).
+      // NOTE: Preview iframes & 1080p PNG export NEVER open EventSource (prevents Chrome 6-socket HTTP/1.1 exhaustion).
       const isHttp = location.protocol === 'http:' || location.protocol === 'https:';
       if (isHttp) {
-        window.FGC_CUSTOM_FONTS?.fetchAndSync().then(() => { if (latestState) applyState(latestState); });
-        fetch('/api/state').then(r => r.json()).then(s => applyState(s)).catch(() => { });
+        const fontsReq = window.FGC_CUSTOM_FONTS?.fetchAndSync().then(() => { if (latestState) applyState(latestState); }) || Promise.resolve();
+        const stateReq = fetch('/api/state', { cache: 'no-store' }).then(r => r.json()).then(s => applyState(s)).catch(() => { });
+        if (isExportMode) {
+          Promise.all([fontsReq, stateReq]).finally(() => {
+            requestAnimationFrame(() => stage.classList.remove('is-booting'));
+          });
+        }
 
-        if (!isPreviewMode) {
+        if (!isStaticPreview) {
           let activeEs = null;
           let reconnectTimer = null;
           let pageUnloading = false;
@@ -7165,7 +7284,7 @@
             }
           }, 320);
         }
-      } else if (!isPreviewMode) {
+      } else if (!isStaticPreview) {
         // file:// mode in OBS: play intro immediately using localStorage/default state
         initialIntroDone = true;
         playSceneIntro();

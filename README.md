@@ -99,7 +99,7 @@ Built on pure HTML/CSS/JS and a lightweight native Node.js HTTP/SSE server (~15�
 
 ### macOS / Linux / Terminal
 ```bash
-node server.mjs
+node app/server/server.mjs
 ```
 - **Scorebar Overlay (OBS Browser Source):** `http://localhost:8787/`
 - **VS Match Splash / Matchups 2×2 (OBS Browser Source):** `http://localhost:8787/vs.html`
@@ -108,7 +108,7 @@ node server.mjs
 - **Dedicated Audio & SFX Hub (Optional Single OBS Mixer Channel):** `http://localhost:8787/audio.html`
 - **Control Panel & OBS Custom Dock:** `http://localhost:8787/panel.html`
 
-> Customize the port with `PORT=9090 node server.mjs`.
+> Customize the port with `PORT=9090 node app/server/server.mjs`.
 
 ---
 
@@ -166,18 +166,51 @@ Available whenever the Control Panel window or OBS Dock has focus:
 
 ## Project Structure
 
-| File | Purpose |
+```text
+├── Start_Scorebar.bat          # 1-click Windows launcher (auto-restarts on exit code 42)
+├── Install_NodeJS.bat          # Standalone Node.js LTS installer
+├── README.md / LICENSE
+├── assets/                     # Static brand logos, gameplay preview backdrops & theme masks
+│   ├── brand/
+│   ├── previews/
+│   └── themes/
+├── data/                       # Created at runtime (gitignored): state, players, presets, SFX & caches
+├── docs/                       # README showcase media
+└── app/
+    ├── server/                 # Zero-dependency Node.js backend & offline asset managers
+    │   ├── server.mjs
+    │   ├── tournaments.mjs
+    │   ├── assets.mjs
+    │   ├── flags-manager.mjs
+    │   ├── sfx-manager.mjs
+    │   ├── export-png.mjs
+    │   └── flags-world-index.json
+    └── web/                    # Served at http://localhost:8787/ (all OBS URLs unchanged)
+        ├── index.html          # Scorebar overlay (1920x1080)
+        ├── panel.html          # Broadcast Control Panel & OBS Custom Dock
+        ├── vs.html             # VS Match Splash & Matchups 2x2 overlay
+        ├── brackets.html       # Live Brackets, Pools & Top 16 overlay
+        ├── results.html        # Top 8 / Top 12 Results overlay (16:9 & 4:5)
+        ├── audio.html          # Dedicated OBS Audio Hub
+        ├── css/                # panel.css, game-scorebars.css, top8-unified.css
+        └── js/
+            ├── core/           # flags, custom-fonts, audio-engine, top8/brackets/res-card engines
+            ├── panel/          # panel-app, panel-presets, panel-audio, panel-sessions, i18n, qr
+            └── designs/        # game-presets, preset-art, sf6-themes, vs/brackets/results designs
+```
+
+| Module | Purpose |
 | :--- | :--- |
-| [`index.html`](index.html) / [`game-scorebars.css`](game-scorebars.css) / [`preset-art.js`](preset-art.js) | `1920×1080` OBS Scorebar overlay across Tekken 8, SF6, 2XKO, Fatal Fury CotW, SSBU (Singles & Doubles 2v2), and Avatar Legends. |
-| [`vs.html`](vs.html) / [`vs-designs.js`](vs-designs.js) | `1920×1080` VS Match Splash & Matchups 2×2 Board overlay (48+ designs, character renders, avatars, H2H, 1080p PNG export). |
-| [`brackets.html`](brackets.html) / [`brackets-designs.js`](brackets-designs.js) / [`brackets-engine.js`](brackets-engine.js) / [`top8-engine.js`](top8-engine.js) | Dedicated `1920×1080` Top 8 Double Elimination Bracket, Pools/Groups, Pool Tree & Top 16 Table overlay with Start.gg/Challonge sync & manual overrides. |
-| [`results.html`](results.html) / [`results-designs.js`](results-designs.js) / [`res-card-engine.js`](res-card-engine.js) / [`top8-unified.css`](top8-unified.css) | `16:9` & `4:5` Top 8 / Top 12 Final Results overlay with precision SVG vector card shapes, continuous borders, contour FX, and 1:1 PNG export. |
-| [`audio.html`](audio.html) / [`audio-engine.js`](audio-engine.js) / [`sfx-manager.mjs`](sfx-manager.mjs) / [`panel-audio.js`](panel-audio.js) | OBS-safe Broadcast Audio & Custom SFX system (16 Web Audio SFX, persistent `.mp3/.wav/.ogg/.m4a/.webm` uploads, HTTP 206 streaming, single-channel Audio Hub). |
-| [`panel.html`](panel.html) / [`panel.css`](panel.css) / [`panel-app.js`](panel-app.js) / [`panel-presets.js`](panel-presets.js) / [`panel-sessions.js`](panel-sessions.js) | Broadcast Control Panel, Universal Presets & Packs manager, and clickable Local Server & Live Sessions diagnostic monitor. |
-| [`server.mjs`](server.mjs) / [`export-png.mjs`](export-png.mjs) | Zero-dependency Node.js HTTP/SSE server with atomic JSON persistence + `.bak` recovery, schema migration, hardened upload/static security, and CDP 1:1 PNG capture. |
-| [`assets.mjs`](assets.mjs) / [`flags-manager.mjs`](flags-manager.mjs) / [`flags.js`](flags.js) / [`flags-world-index.json`](flags-world-index.json) | On-demand character render cache (`StreamHelperAssets`, 240+ games) + 252 country & 3,148 regional flag downloader/cache. |
-| [`tournaments.mjs`](tournaments.mjs) | Native Start.gg GraphQL v4 client, Challonge REST API v1 client, Seeding & Pools fetcher, flag resolver, and 64-entrant multi-game Demo generator. |
-| [`sf6-themes.js`](sf6-themes.js) / [`game-presets.js`](game-presets.js) / [`i18n.js`](i18n.js) / [`qr.js`](qr.js) / [`custom-fonts.js`](custom-fonts.js) | Game preset catalogs, bilingual EN/ES engine, offline QR LAN remote generator, and global PC font loader. |
+| [`app/web/index.html`](app/web/index.html) / [`game-scorebars.css`](app/web/css/game-scorebars.css) / [`preset-art.js`](app/web/js/designs/preset-art.js) | `1920×1080` OBS Scorebar overlay across Tekken 8, SF6, 2XKO, Fatal Fury CotW, SSBU (Singles & Doubles 2v2), Avatar Legends & MK1. |
+| [`app/web/vs.html`](app/web/vs.html) / [`vs-designs.js`](app/web/js/designs/vs-designs.js) | `1920×1080` VS Match Splash & Matchups 2×2 Board overlay (48+ designs, character renders, avatars, H2H, 1080p PNG export). |
+| [`app/web/brackets.html`](app/web/brackets.html) / [`brackets-designs.js`](app/web/js/designs/brackets-designs.js) / [`brackets-engine.js`](app/web/js/core/brackets-engine.js) / [`top8-engine.js`](app/web/js/core/top8-engine.js) | Dedicated `1920×1080` Top 8 Double Elimination Bracket, Pools/Groups, Pool Tree & Top 16 Table overlay with Start.gg/Challonge sync & manual overrides. |
+| [`app/web/results.html`](app/web/results.html) / [`results-designs.js`](app/web/js/designs/results-designs.js) / [`res-card-engine.js`](app/web/js/core/res-card-engine.js) / [`top8-unified.css`](app/web/css/top8-unified.css) | `16:9` & `4:5` Top 8 / Top 12 Final Results overlay with precision SVG vector card shapes, continuous borders, contour FX, and 1:1 PNG export. |
+| [`app/web/audio.html`](app/web/audio.html) / [`audio-engine.js`](app/web/js/core/audio-engine.js) / [`sfx-manager.mjs`](app/server/sfx-manager.mjs) / [`panel-audio.js`](app/web/js/panel/panel-audio.js) | OBS-safe Broadcast Audio & Custom SFX system (16 Web Audio SFX, persistent `.mp3/.wav/.ogg/.m4a/.webm` uploads, HTTP 206 streaming, single-channel Audio Hub). |
+| [`app/web/panel.html`](app/web/panel.html) / [`panel.css`](app/web/css/panel.css) / [`panel-app.js`](app/web/js/panel/panel-app.js) / [`panel-presets.js`](app/web/js/panel/panel-presets.js) / [`panel-sessions.js`](app/web/js/panel/panel-sessions.js) | Broadcast Control Panel, Universal Presets & Packs manager, and clickable Local Server & Live Sessions diagnostic monitor. |
+| [`app/server/server.mjs`](app/server/server.mjs) / [`export-png.mjs`](app/server/export-png.mjs) | Zero-dependency Node.js HTTP/SSE server with atomic JSON persistence + `.bak` recovery, schema migration, hardened upload/static security, and CDP 1:1 PNG capture. |
+| [`app/server/assets.mjs`](app/server/assets.mjs) / [`flags-manager.mjs`](app/server/flags-manager.mjs) / [`flags.js`](app/web/js/core/flags.js) / [`flags-world-index.json`](app/server/flags-world-index.json) | On-demand character render cache (`StreamHelperAssets`, 240+ games) + 252 country & 3,148 regional flag downloader/cache. |
+| [`app/server/tournaments.mjs`](app/server/tournaments.mjs) | Native Start.gg GraphQL v4 client, Challonge REST API v1 client, Seeding & Pools fetcher, flag resolver, and 64-entrant multi-game Demo generator. |
+| [`sf6-themes.js`](app/web/js/designs/sf6-themes.js) / [`game-presets.js`](app/web/js/designs/game-presets.js) / [`i18n.js`](app/web/js/panel/i18n.js) / [`qr.js`](app/web/js/panel/qr.js) / [`custom-fonts.js`](app/web/js/core/custom-fonts.js) | Game preset catalogs, bilingual EN/ES engine, offline QR LAN remote generator, and global PC font loader. |
 | [`Start_Scorebar.bat`](Start_Scorebar.bat) / [`Install_NodeJS.bat`](Install_NodeJS.bat) | 1-click Windows launcher (with auto-restart loop on exit code `42`) and standalone Node.js LTS installer. |
 
 > Runtime state (`state.json` + automatic `state.json.bak`), saved players, custom presets, SFX clips, custom fonts, cached renders/flags, match history, and optional tokens live exclusively inside `data/` (created automatically at runtime and ignored by Git).

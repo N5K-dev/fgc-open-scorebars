@@ -516,31 +516,32 @@
 
   /* Reworked Clean Scorebar Studio Preview Toolbar */
   .sb-preview-bar {
-    gap: 8px 12px;
+    gap: 6px 10px;
     padding: 7px 11px;
     background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(11, 16, 29, 0.98));
   }
   .pv-left, .pv-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     flex-wrap: wrap;
     min-width: 0;
   }
-  .pv-left { flex: 1 1 280px; }
+  .pv-left { flex: 1 1 260px; flex-wrap: nowrap; }
   .pv-right { flex: 0 1 auto; }
   .pv-design-badge {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    max-width: 250px;
-    padding: 4px 10px;
+    gap: 6px;
+    flex: 0 1 215px;
+    max-width: 225px;
+    padding: 4px 9px;
     border-radius: 8px;
     background: rgba(15, 23, 42, 0.8);
     border: 1px solid rgba(148, 163, 184, 0.16);
     font-size: 11.5px;
     color: #f8fafc;
-    min-width: 0;
+    min-width: 90px;
   }
   .pv-design-badge b {
     white-space: nowrap;
@@ -559,8 +560,9 @@
   .pv-bg-picker {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 2px 3px 2px 9px;
+    gap: 5px;
+    flex-shrink: 0;
+    padding: 2px 3px 2px 8px;
     border-radius: 8px;
     background: rgba(15, 23, 42, 0.88);
     border: 1px solid rgba(148, 163, 184, 0.22);
@@ -579,10 +581,10 @@
   }
   .pv-bg-select {
     width: auto;
-    min-width: 138px;
-    max-width: 195px;
+    min-width: 116px;
+    max-width: 158px;
     height: 24px;
-    padding: 0 22px 0 6px;
+    padding: 0 20px 0 6px;
     font-size: 11px;
     font-weight: 700;
     color: #e2e8f0;
@@ -592,6 +594,9 @@
     cursor: pointer;
   }
   .pv-bg-select:focus { outline: none; box-shadow: none; }
+  @media (max-width: 1100px) {
+    .pv-left { flex-wrap: wrap; }
+  }
   .pv-tray {
     display: inline-flex;
     align-items: center;
@@ -1604,39 +1609,39 @@
     overflow: hidden;
     background:
       linear-gradient(180deg, rgba(6, 9, 16, 0.72) 0%, rgba(6, 9, 16, 0.56) 55%, rgba(6, 9, 16, 0.88) 100%),
-      url('assets/t8-gameplay-ref.jpg') center 45% / cover no-repeat;
+      url('/assets/previews/t8-gameplay-ref.jpg') center 45% / cover no-repeat;
     border: 1px solid rgba(255, 255, 255, 0.11);
     flex-shrink: 0;
   }
   .theme-thumb.is-sf6 {
     background:
       linear-gradient(180deg, rgba(6, 9, 18, 0.7) 0%, rgba(6, 9, 18, 0.54) 55%, rgba(6, 9, 18, 0.88) 100%),
-      url('assets/sf6-gameplay-ref.jpg') center 22% / cover no-repeat;
+      url('/assets/previews/sf6-gameplay-ref.jpg') center 22% / cover no-repeat;
   }
   .theme-thumb.is-2xko {
     background:
       linear-gradient(180deg, rgba(6, 10, 16, 0.62) 0%, rgba(6, 10, 16, 0.48) 55%, rgba(6, 10, 16, 0.86) 100%),
-      url('assets/2xko-gameplay-ref.jpg') center 18% / cover no-repeat;
+      url('/assets/previews/2xko-gameplay-ref.jpg') center 18% / cover no-repeat;
   }
   .theme-thumb.is-ffcotw {
     background:
       linear-gradient(180deg, rgba(8, 8, 10, 0.62) 0%, rgba(8, 8, 10, 0.48) 55%, rgba(8, 8, 10, 0.86) 100%),
-      url('assets/ffcotw-gameplay-ref.jpg') center 14% / cover no-repeat;
+      url('/assets/previews/ffcotw-gameplay-ref.jpg') center 14% / cover no-repeat;
   }
   .theme-thumb.is-ssbu {
     background:
       linear-gradient(180deg, rgba(8, 11, 18, 0.46) 0%, rgba(8, 11, 18, 0.28) 55%, rgba(8, 11, 18, 0.78) 100%),
-      url('assets/ssbu-gameplay-ref.png') center 52% / cover no-repeat;
+      url('/assets/previews/ssbu-gameplay-ref.png') center 52% / cover no-repeat;
   }
   .theme-thumb.is-avatar {
     background:
       linear-gradient(180deg, rgba(10, 9, 8, 0.56) 0%, rgba(10, 9, 8, 0.36) 55%, rgba(10, 9, 8, 0.84) 100%),
-      url('assets/avatar-gameplay-ref.jpg') center 22% / cover no-repeat;
+      url('/assets/previews/avatar-gameplay-ref.jpg') center 22% / cover no-repeat;
   }
   .theme-thumb.is-mk1 {
     background:
       linear-gradient(180deg, rgba(8, 9, 14, 0.58) 0%, rgba(8, 9, 14, 0.36) 55%, rgba(8, 9, 14, 0.86) 100%),
-      url('assets/mk1-gameplay-ref.jpg') center 22% / cover no-repeat;
+      url('/assets/previews/mk1-gameplay-ref.jpg') center 22% / cover no-repeat;
   }
   .theme-card.active .theme-thumb {
     border-color: rgba(96, 165, 250, 0.75);

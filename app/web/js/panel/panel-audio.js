@@ -408,7 +408,7 @@
     const files = Array.from(fileList || []);
     if (!files.length) return;
     if (!P.isHttp) {
-      P.toast('⚠ Start server.mjs to upload persistent SFX files');
+      P.toast('⚠ Start Start_Scorebar.bat (local server) to upload persistent SFX files');
       return;
     }
     const customNameInput = $('aud-upload-name');

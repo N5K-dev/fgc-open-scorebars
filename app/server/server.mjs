@@ -53,12 +53,15 @@ import { createSfxManager, DEFAULT_AUDIO_STATE, normalizeAudioState, mergeAudioS
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, '..', '..');
+const WEB_DIR = path.join(ROOT_DIR, 'app', 'web');
+const ASSETS_STATIC_DIR = path.join(ROOT_DIR, 'assets');
 
-export const APP_VERSION = '2.8.0';
+export const APP_VERSION = '2.8.1';
 const GITHUB_REPO = 'N5K-dev/fgc-open-scorebars';
 const PORT = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || '0.0.0.0';
-const DATA_DIR = path.join(__dirname, 'data');
+const DATA_DIR = path.join(ROOT_DIR, 'data');
 const STATE_FILE = path.join(DATA_DIR, 'state.json');
 const PLAYERS_FILE = path.join(DATA_DIR, 'players.json');
 const PRESETS_FILE = path.join(DATA_DIR, 'presets.json');
@@ -280,7 +283,25 @@ export const DEFAULT_STYLE = {
   shape: 'theme',            // 'theme' | 'blade-slant' | 'diagonal' | 'bevel' | 'hex' | 'skew' | 'flat' | 'rounded'
   flagStyle: 'theme',        // 'theme' | 'blade-twt' | 'fade-blend' | 'twt-code' | 'split-dual' | 'bezel' | 'classic'
   borderStyle: 'theme',      // 'theme' | 'thin' | 'bold' | 'neon' | 'none'
-  centerStyle: 'theme',      // 'theme' | 'floating' | 'trapezoid' | 'hex' | 'pill'
+  centerStyle: 'theme',      // 'theme' | 'floating' | 'trapezoid' | 'hex' | 'pill' | 'flat' | 'chamfer' | 'ribbon'
+  centerScale: 100,          // 50..260 % free center plate scale across ALL presets
+  centerFontSize: 100,       // 60..220 % independent round & format text scale
+  centerWidth: 0,            // 0 = theme auto, else 140..760 px
+  centerHeight: 0,           // 0 = theme auto, else 20..110 px
+  centerPadX: -1,            // -1 = theme auto, else 4..64 px
+  centerOffsetX: 0,          // -500..500 px horizontal shift
+  centerOffsetY: 0,          // -40..220 px vertical shift
+  centerLayout: 'theme',     // 'theme' | 'row' | 'row-rev' | 'stack' | 'stack-rev'
+  centerRadius: -1,          // -1 = theme auto, else 0..40 px
+  centerBorderW: -1,         // -1 = theme auto, else 0..8 px
+  centerOpacity: 100,        // 15..100 % center plate opacity
+  centerGlow: 'theme',       // 'theme' | 'none' | 'subtle' | 'neon' | 'pulse'
+  centerCustomColors: false, // Independent center-plate color override
+  centerBgAlpha: 94,         // 0..100 % center plate background alpha
+  centerTextColor: '#ffffff',
+  centerBorderColor: '#ffd24d',
+  centerFormatBg: '#ffd24d',
+  centerFormatText: '#0b0d14',
   outerBlade: 'theme',       // 'theme' | 'on' | 'off'
   bladeSlant: 22,            // 0..38 px diagonal blade angle
   barHeight: 0,              // 0 = theme default, else 32..64 px
@@ -1438,27 +1459,50 @@ async function extractZipNative(zipFile, destDir) {
   }
 }
 
+function hasServerEntry(dir) {
+  return (
+    fs.existsSync(path.join(dir, 'app', 'server', 'server.mjs')) ||
+    fs.existsSync(path.join(dir, 'server.mjs'))
+  );
+}
+
 function findExtractedAppRoot(dir) {
-  if (fs.existsSync(path.join(dir, 'server.mjs'))) return dir;
+  if (hasServerEntry(dir)) return dir;
   const entries = fs.readdirSync(dir, { withFileTypes: true }).filter(d => d.isDirectory());
   for (const d of entries) {
     const sub = path.join(dir, d.name);
-    if (fs.existsSync(path.join(sub, 'server.mjs'))) return sub;
+    if (hasServerEntry(sub)) return sub;
   }
   return null;
 }
 
-export async function applySafeUpdateFromZip(zipFile, targetDir = __dirname) {
+const LEGACY_FLAT_FILES = [
+  'server.mjs', 'tournaments.mjs', 'assets.mjs', 'flags-manager.mjs', 'sfx-manager.mjs',
+  'export-png.mjs', 'flags-world-index.json',
+  'index.html', 'panel.html', 'vs.html', 'brackets.html', 'results.html', 'audio.html',
+  'panel.css', 'game-scorebars.css', 'top8-unified.css',
+  'flags.js', 'custom-fonts.js', 'audio-engine.js', 'top8-engine.js', 'brackets-engine.js', 'res-card-engine.js',
+  'panel-app.js', 'panel-presets.js', 'panel-audio.js', 'panel-sessions.js', 'i18n.js', 'qr.js',
+  'game-presets.js', 'preset-art.js', 'sf6-themes.js', 'vs-designs.js', 'brackets-designs.js', 'results-designs.js',
+  'assets/2xko-gameplay-ref.jpg', 'assets/avatar-gameplay-ref.jpg', 'assets/ffcotw-gameplay-ref.jpg',
+  'assets/mk1-gameplay-ref.jpg', 'assets/sf6-gameplay-ref.jpg', 'assets/ssbu-gameplay-ref.png', 'assets/t8-gameplay-ref.jpg',
+  'assets/pbrd-kazuya-glove-p1-mask.png', 'assets/pbrd-kazuya-glove-p1-shade.png',
+  'assets/pbrd-kazuya-glove-p2-mask.png', 'assets/pbrd-kazuya-glove-p2-shade.png',
+  'assets/pbrd-kazuya-studs-p1.png', 'assets/pbrd-kazuya-studs-p2.png'
+];
+
+export async function applySafeUpdateFromZip(zipFile, targetDir = ROOT_DIR) {
   const resolvedTarget = path.resolve(targetDir);
   const workDir = path.join(os.tmpdir(), `fgc-scorebars-extract-${Date.now()}`);
   try {
     await extractZipNative(zipFile, workDir);
     const appRoot = findExtractedAppRoot(workDir);
     if (!appRoot) {
-      throw new Error('Downloaded archive is missing server.mjs — update aborted safely');
+      throw new Error('Downloaded archive is missing app/server/server.mjs — update aborted safely');
     }
     const ALLOWED_ROOT_FILE = /^([a-zA-Z0-9._-]+\.(html|js|mjs|bat|css|md|json)|LICENSE)$/i;
     const BLOCKED_ROOT_FILE = /^(\.env|package-lock\.json)/i;
+    const ALLOWED_APP_FILE = /^[a-zA-Z0-9._-]+\.(html|js|mjs|css|json|png|jpe?g|webp|svg)$/i;
     const ALLOWED_ASSET_FILE = /^[a-zA-Z0-9._-]+\.(png|jpe?g|webp|svg)$/i;
 
     let filesUpdated = 0;
@@ -1485,23 +1529,38 @@ export async function applySafeUpdateFromZip(zipFile, targetDir = __dirname) {
         safeWriteFile(path.join(appRoot, ent.name), ent.name);
       }
     }
-    const copyAssetsRecursive = (srcDir, relBase) => {
+    const copyTreeRecursive = (srcDir, relBase, fileRegex) => {
       for (const ent of fs.readdirSync(srcDir, { withFileTypes: true })) {
         const srcChild = path.join(srcDir, ent.name);
         const relChild = path.join(relBase, ent.name);
         if (ent.isDirectory() && /^[a-zA-Z0-9._-]+$/.test(ent.name)) {
-          copyAssetsRecursive(srcChild, relChild);
-        } else if (ent.isFile() && ALLOWED_ASSET_FILE.test(ent.name)) {
+          copyTreeRecursive(srcChild, relChild, fileRegex);
+        } else if (ent.isFile() && fileRegex.test(ent.name)) {
           safeWriteFile(srcChild, relChild);
         }
       }
     };
+    const appSrc = path.join(appRoot, 'app');
+    const usesStructuredApp = fs.existsSync(path.join(appRoot, 'app', 'server', 'server.mjs'));
+    if (fs.existsSync(appSrc) && fs.statSync(appSrc).isDirectory()) {
+      copyTreeRecursive(appSrc, 'app', ALLOWED_APP_FILE);
+    }
     const assetsSrc = path.join(appRoot, 'assets');
     if (fs.existsSync(assetsSrc) && fs.statSync(assetsSrc).isDirectory()) {
-      copyAssetsRecursive(assetsSrc, 'assets');
+      copyTreeRecursive(assetsSrc, 'assets', ALLOWED_ASSET_FILE);
     }
     if (filesUpdated === 0) {
       throw new Error('No valid app files found in release archive');
+    }
+    // If migrating from legacy flat layout to structured app/, clean up obsolete root duplicates safely
+    if (usesStructuredApp) {
+      for (const relOld of LEGACY_FLAT_FILES) {
+        if (fs.existsSync(path.join(appRoot, relOld))) continue;
+        const oldPath = path.resolve(resolvedTarget, relOld);
+        if (oldPath.startsWith(resolvedTarget + path.sep) && fs.existsSync(oldPath)) {
+          try { fs.unlinkSync(oldPath); } catch { }
+        }
+      }
     }
     return { filesUpdated };
   } finally {
@@ -2953,7 +3012,7 @@ const server = http.createServer(async (req, res) => {
           try {
             const childEnv = { ...process.env, FGC_BOOT_DELAY_MS: '650' };
             const child = spawn(process.execPath, [__filename], {
-              cwd: __dirname,
+              cwd: ROOT_DIR,
               detached: true,
               stdio: 'ignore',
               env: childEnv
@@ -2974,14 +3033,14 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // --- API: Pixel-Perfect 1:1 WYSIWYG PNG Export (Results / VS Splash / Brackets) ---
+  // --- API: Pixel-Perfect 1:1 WYSIWYG PNG Export (Scorebar / Results / VS Splash / Brackets) ---
   if (pathname === '/api/export/png' && req.method === 'POST') {
     try {
       if (!findChromiumExecutable()) {
         return sendJson(res, 503, { error: 'NO_BROWSER', message: 'No local Edge/Chrome browser detected for 1:1 PNG capture.' });
       }
       const body = await readBody(req).catch(() => ({}));
-      const target = ['results', 'vs', 'brackets'].includes(body.target) ? body.target : 'results';
+      const target = ['results', 'vs', 'brackets', 'scorebar'].includes(body.target) ? body.target : 'results';
       if (body.state && typeof body.state === 'object') {
         currentState = deepMergeState(currentState, body.state);
         writeJsonAtomic(STATE_FILE, currentState, { keepBackup: true });
@@ -2993,8 +3052,28 @@ const server = http.createServer(async (req, res) => {
       let height = 1080;
       let transparent = false;
       let slug = 'fgc-export';
+      const qs = new URLSearchParams({ export: '1' });
 
-      if (target === 'results') {
+      if (target === 'scorebar') {
+        file = 'index.html';
+        stageSelector = '#stage';
+        width = 1920;
+        height = 1080;
+        const rawBg = String(body.bg || mode || 't8').trim().toLowerCase();
+        const allowedBgs = ['t8', 'sf6', '2xko', 'ffcotw', 'ssbu', 'avatar', 'mk1', 'green'];
+        if (allowedBgs.includes(rawBg)) {
+          qs.set('preview', rawBg);
+          transparent = false;
+        } else {
+          // 'checker' / 'transparent' -> real 1080p RGBA alpha PNG without checkerboard squares
+          transparent = true;
+        }
+        if (body.guides) qs.set('guides', '1');
+        const themeSlug = String(currentState.theme || 'scorebar').toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '') || 'scorebar';
+        const p1Slug = String(currentState.p1?.name || 'p1').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const p2Slug = String(currentState.p2?.name || 'p2').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        slug = `scorebar-${themeSlug}${p1Slug && p2Slug ? `-${p1Slug}-vs-${p2Slug}` : ''}`.slice(0, 72);
+      } else if (target === 'results') {
         file = 'results.html';
         stageSelector = '#res-stage';
         const r = currentState.results || {};
@@ -3022,8 +3101,7 @@ const server = http.createServer(async (req, res) => {
         slug = `brackets-${effMode}`;
       }
 
-      const qs = new URLSearchParams({ export: '1' });
-      if (mode) qs.set('mode', mode);
+      if (mode && target !== 'scorebar') qs.set('mode', mode);
       const url = `http://127.0.0.1:${PORT}/${file}?${qs.toString()}`;
       const pngBuf = await captureOverlayPng({ url, width, height, transparent, stageSelector });
       res.writeHead(200, {
@@ -3071,7 +3149,7 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  // --- Static file serving (strictly blocks /data/, dotfiles, /.git/, /node_modules/, *.mjs & path escapes!) ---
+  // --- Static file serving (serves ONLY app/web/ and assets/; blocks /data/, /server/, dotfiles, /.git/, *.mjs & escapes!) ---
   let relPath =
     pathname === '/' ? '/index.html' :
       pathname === '/panel' ? '/panel.html' :
@@ -3095,6 +3173,7 @@ const server = http.createServer(async (req, res) => {
   if (
     !safePath ||
     firstSeg === 'data' ||
+    firstSeg === 'server' ||
     firstSeg === '.git' ||
     firstSeg === 'node_modules' ||
     segs.some(s => s.startsWith('.')) ||
@@ -3103,10 +3182,22 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     return res.end('Forbidden');
   }
-  const resolvedRoot = path.resolve(__dirname);
-  const fullPath = path.resolve(resolvedRoot, safePath);
+  let resolvedBase;
+  let fullPath;
+  if (firstSeg === 'assets') {
+    const assetRel = segs.slice(1).join(path.sep);
+    if (!assetRel) {
+      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end('Forbidden');
+    }
+    resolvedBase = path.resolve(ASSETS_STATIC_DIR);
+    fullPath = path.resolve(resolvedBase, assetRel);
+  } else {
+    resolvedBase = path.resolve(WEB_DIR);
+    fullPath = path.resolve(resolvedBase, safePath);
+  }
 
-  if (!fullPath.startsWith(resolvedRoot + path.sep)) {
+  if (!fullPath.startsWith(resolvedBase + path.sep)) {
     res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     return res.end('Forbidden');
   }

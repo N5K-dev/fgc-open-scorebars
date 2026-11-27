@@ -18,23 +18,23 @@ body.bg-mk1 {
 }
 
 body.bg-2xko #stage {
-  background: #000 url('assets/2xko-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+  background: #000 url('/assets/previews/2xko-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
 }
 
 body.bg-ffcotw #stage {
-  background: #000 url('assets/ffcotw-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+  background: #000 url('/assets/previews/ffcotw-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
 }
 
 body.bg-ssbu #stage {
-  background: #000 url('assets/ssbu-gameplay-ref.png') 0 0 / 1920px 1080px no-repeat;
+  background: #000 url('/assets/previews/ssbu-gameplay-ref.png') 0 0 / 1920px 1080px no-repeat;
 }
 
 body.bg-avatar #stage {
-  background: #000 url('assets/avatar-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+  background: #000 url('/assets/previews/avatar-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
 }
 
 body.bg-mk1 #stage {
-  background: #000 url('assets/mk1-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
+  background: #000 url('/assets/previews/mk1-gameplay-ref.jpg') 0 0 / 1920px 1080px no-repeat;
 }
 
 #hud-guides-2xko,
@@ -3334,6 +3334,20 @@ body.bg-mk1 #hud-guides-mk1 {
   border-bottom: 3px solid var(--sm-accent) !important;
   clip-path: none !important;
 }
+#smash-root[data-center-style="flat"] .sm-info-box {
+  clip-path: none !important;
+  border-radius: 0 !important;
+}
+#smash-root[data-center-style="chamfer"] .sm-info-box {
+  border-radius: 0 !important;
+  clip-path: polygon(11px 0, calc(100% - 11px) 0, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 11px) !important;
+}
+#smash-root[data-center-style="ribbon"] .sm-info-box {
+  border-radius: 0 !important;
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%) !important;
+  padding-left: 26px !important;
+  padding-right: 26px !important;
+}
 
 /* Smash Plate Shape Overrides (Style Studio -> Plate Shape) */
 #smash-root[data-shape="flat"] .sm-bar,
@@ -3884,13 +3898,24 @@ body.sb-interactive-edit #smash-root[data-flag-pos="fade-bg"] .sm-in-flags {
    ============================================================================ */
 #wing-p1 { translate: var(--lp-p1-wing-x, 0px) var(--lp-p1-wing-y, 0px); }
 #wing-p2 { translate: var(--lp-p2-wing-x, 0px) var(--lp-p2-wing-y, 0px); }
-#sb-center { translate: var(--lp-center-x, 0px) var(--lp-center-y, 0px); }
+#sb-center {
+  translate: calc(var(--lp-center-x, 0px) + var(--c-off-x, 0px)) calc(var(--lp-center-y, 0px) + var(--c-off-y, 0px));
+  scale: var(--c-scale, 1);
+  transform-origin: center top;
+}
 #p1-mp-tag { translate: var(--lp-p1-mp-x, 0px) var(--lp-p1-mp-y, 0px); }
 #p2-mp-tag { translate: var(--lp-p2-mp-x, 0px) var(--lp-p2-mp-y, 0px); }
 #p1-meta-strip { translate: var(--lp-p1-meta-x, 0px) var(--lp-p1-meta-y, 0px); }
 #p2-meta-strip { translate: var(--lp-p2-meta-x, 0px) var(--lp-p2-meta-y, 0px); }
 
-#sm-info-box { translate: var(--lp-sm-info-x, 0px) var(--lp-sm-info-y, 0px); }
+#sm-info-box {
+  translate: calc(var(--lp-sm-info-x, 0px) + var(--c-off-x, 0px)) calc(var(--lp-sm-info-y, 0px) + var(--c-off-y, 0px));
+  scale: var(--c-scale, 1);
+  transform-origin: left top;
+}
+#smash-root[data-info-pos="center-top"] #sm-info-box {
+  transform-origin: center top;
+}
 #sm-side-p1 { translate: var(--lp-sm-p1-x, 0px) var(--lp-sm-p1-y, 0px); }
 #sm-side-p2 { translate: var(--lp-sm-p2-x, 0px) var(--lp-sm-p2-y, 0px); }
 #sm-center-logo { translate: var(--lp-sm-logo-x, 0px) var(--lp-sm-logo-y, 0px); }
@@ -4053,4 +4078,174 @@ body.sb-resizing * {
   pointer-events: none;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.72);
   white-space: nowrap;
+}
+
+/* ============================================================================
+   8. UNIVERSAL CENTER PLATE STUDIO (Works across ALL 87 Scorebar presets & 7 games!)
+   ============================================================================ */
+
+/* Keep scaled center plate cleanly layered above P1/P2 wings */
+#stage[data-c-scaled="1"] #sb-center,
+#stage[data-c-scaled="1"] #sm-info-box {
+  z-index: 26 !important;
+}
+
+/* Independent Font Size (auto-expands height cleanly unless user pinned custom height) */
+#stage[data-c-font="1"] #sb-center .round-text {
+  font-size: calc(16px * var(--c-font-scale, 1)) !important;
+  line-height: 1.05 !important;
+}
+#stage[data-c-font="1"] #sb-center .format-pill {
+  font-size: calc(12px * var(--c-font-scale, 1)) !important;
+  padding: calc(2px * var(--c-font-scale, 1)) calc(7px * var(--c-font-scale, 1)) !important;
+  line-height: 1.08 !important;
+}
+#stage[data-c-font="1"]:not([data-c-h="1"]) #sb-center {
+  height: auto !important;
+  min-height: calc(30px * var(--c-font-scale, 1)) !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+  max-width: none !important;
+}
+#stage[data-c-font="1"] #sm-info-box .sm-round-label {
+  font-size: calc(18px * var(--c-font-scale, 1)) !important;
+  line-height: 1.08 !important;
+}
+#stage[data-c-font="1"] #sm-info-box .sm-format-badge {
+  font-size: calc(11.5px * var(--c-font-scale, 1)) !important;
+  line-height: 1.08 !important;
+}
+#stage[data-c-font="1"]:not([data-c-h="1"]) #sm-info-box {
+  height: auto !important;
+  max-width: none !important;
+}
+
+/* Custom Width, Height, Horizontal Padding, Corner Radius, Border Width & Opacity */
+#stage[data-c-w="1"] #sb-center,
+#stage[data-c-w="1"] #sm-info-box {
+  width: var(--c-w) !important;
+  min-width: var(--c-w) !important;
+  max-width: none !important;
+}
+#stage[data-c-h="1"] #sb-center,
+#stage[data-c-h="1"] #sm-info-box {
+  height: var(--c-h) !important;
+  min-height: var(--c-h) !important;
+}
+#stage[data-c-pad="1"] #sb-center,
+#stage[data-c-pad="1"] #sm-info-box {
+  padding-left: var(--c-pad-x) !important;
+  padding-right: var(--c-pad-x) !important;
+  max-width: none !important;
+}
+#stage[data-c-rad="1"] #sb-center,
+#stage[data-c-rad="1"] #sm-info-box {
+  border-radius: var(--c-rad) !important;
+  clip-path: none !important;
+}
+#stage[data-c-bw="1"] #sb-center,
+#stage[data-c-bw="1"] #sm-info-box {
+  border-style: solid !important;
+  border-width: var(--c-bw) !important;
+}
+#stage[data-c-bw="0"] #sb-center,
+#stage[data-c-bw="0"] #sm-info-box {
+  border: none !important;
+}
+#stage[data-c-op="1"] #scorebar-root:not(.hidden) #sb-center,
+#stage[data-c-op="1"] #smash-root:not(.hidden) #sm-info-box {
+  opacity: var(--c-op, 1) !important;
+}
+
+/* Content Arrangement (Row / Row Reversed / Stacked / Stacked Reversed) */
+#stage[data-c-layout="row"] #sb-center {
+  flex-direction: row !important;
+  gap: 8px !important;
+}
+#stage[data-c-layout="row-rev"] #sb-center {
+  flex-direction: row-reverse !important;
+  gap: 8px !important;
+}
+#stage[data-c-layout="stack"] #sb-center {
+  flex-direction: column !important;
+  gap: 3px !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+#stage[data-c-layout="stack-rev"] #sb-center {
+  flex-direction: column-reverse !important;
+  gap: 3px !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+#stage[data-c-layout="stack"]:not([data-c-h="1"]) #sb-center,
+#stage[data-c-layout="stack-rev"]:not([data-c-h="1"]) #sb-center {
+  height: auto !important;
+  min-height: 44px !important;
+}
+#stage[data-c-layout="row"] #sm-info-box {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+#stage[data-c-layout="row-rev"] #sm-info-box {
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+#stage[data-c-layout="stack"] #sm-info-box {
+  flex-direction: column-reverse !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+#stage[data-c-layout="stack-rev"] #sm-info-box {
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+
+/* Independent Center Plate Colors (Overrides ANY preset without touching P1/P2 wings!) */
+#stage[data-c-colors="1"] #sb-center,
+#stage[data-c-colors="1"] #sm-info-box {
+  background: var(--cp-bg) !important;
+  border-color: var(--cp-border) !important;
+  color: var(--cp-text) !important;
+}
+#stage[data-c-colors="1"] #sb-center .round-text,
+#stage[data-c-colors="1"] #sm-info-box .sm-round-label {
+  color: var(--cp-text) !important;
+}
+#stage[data-c-colors="1"] #sb-center .format-pill,
+#stage[data-c-colors="1"] #sm-info-box .sm-format-badge {
+  background: var(--cp-fmt-bg) !important;
+  color: var(--cp-fmt-text) !important;
+  border-color: transparent !important;
+}
+#stage[data-c-colors="1"] #sm-info-box .sm-format-badge {
+  padding: 2px 7px !important;
+  border-radius: 4px !important;
+}
+
+/* Center Plate Glow & Shadow FX */
+#stage[data-c-glow="none"] #sb-center,
+#stage[data-c-glow="none"] #sm-info-box {
+  box-shadow: none !important;
+  filter: none !important;
+}
+#stage[data-c-glow="subtle"] #sb-center,
+#stage[data-c-glow="subtle"] #sm-info-box {
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.58) !important;
+}
+#stage[data-c-glow="neon"] #sb-center,
+#stage[data-c-glow="neon"] #sm-info-box {
+  box-shadow: 0 0 18px color-mix(in srgb, var(--cp-glow-col, #ffd24d) 72%, transparent), 0 4px 12px rgba(0, 0, 0, 0.62) !important;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--cp-glow-col, #ffd24d) 55%, transparent)) !important;
+}
+#stage[data-c-glow="pulse"] #sb-center,
+#stage[data-c-glow="pulse"] #sm-info-box {
+  animation: centerPlatePulse 2.2s ease-in-out infinite !important;
+}
+@keyframes centerPlatePulse {
+  0%, 100% { filter: drop-shadow(0 0 5px color-mix(in srgb, var(--cp-glow-col, #ffd24d) 38%, transparent)); }
+  50% { filter: drop-shadow(0 0 16px color-mix(in srgb, var(--cp-glow-col, #ffd24d) 85%, transparent)); }
 }
